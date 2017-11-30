@@ -1,17 +1,6 @@
 
 channels:
   - bioconda
-  - cyclus
-  - conda-forge
-  - r
 dependencies:
- - picard = 2.9.2
- - bwa
- - samtools
- - pyvcf
- - java-jdk
- - r-ggplot2
- - r-reshape
- - r-gplots
- - r-gsalib
- - pysam
+ - java-jdk = 6.0.77
+ 

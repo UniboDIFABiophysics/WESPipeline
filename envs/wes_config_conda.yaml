@@ -5,6 +5,7 @@ channels:
   - conda-forge
   - r
 dependencies:
+ - fastqc
  - picard = 2.9.2
  - bwa
  - samtools
@@ -15,3 +16,4 @@ dependencies:
  - r-gplots
  - r-gsalib
  - pysam
+ - bedtools

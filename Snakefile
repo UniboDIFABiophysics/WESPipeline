@@ -1,25 +1,105 @@
-#snakemake --dag | dot -Tpdf > dag.pdf
-#snakemake --detailed-summary > provenance.tsv
-#snakemake --cores 6 --resources mem=12
 
-shell.executable("/bin/bash") # The pipeline works only on /bin/bash
+shell.executable("/bin/bash")
 
-# Open and read configuration file for samples informations
-import yaml
-with open("samples_config.yaml", "r") as f:
-    samples_cfg = yaml.load(f)
+configfile: "wes_config.yaml"
 
-# Set configuration file
-
-configfile: "config.yaml"
-
-# Extract the main directory
+import pandas as pd
 import os
-home = os.path.expanduser("~")
+import yaml
+import subprocess as sp
 
-#####################################
-#  Set parameters from config file  #
-#####################################
+
+# get main path (home)
+homepath = os.path.expanduser('~')
+
+# get current path
+currentpath = os.getcwd() + '/'
+
+folder= config['folders']['resultdir']
+scripts = config['folders']['scripts']
+
+custom_storepath=config['folders']['custom_resultdir']
+
+
+# build and create PROCESSPATH & STOREPATH
+processpath = currentpath + 'wes_analyses/' + folder
+
+if not os.path.exists(processpath):
+     os.makedirs(processpath)
+
+storepath=currentpath
+storepath_tree=storepath
+
+# save tree structure as dictionary
+dirs = {'01_fastq': ['01_preprocess', '02_postprocess', '03_fastqc', 'logs'],
+          '02_fastq_trimmed': ['01_fastqc', 'logs'],
+          '03_alignment_genome': ['01_intermediate', '02_bqsr', 'logs'],
+          '04_alignment_exome': ['01_intermediate', '02_unmapped_fastq', 'logs'],
+          '05_alignment_MT': ['01_intermediate', '02_bqsr', 'logs'],
+          '06_mutect_genome': ['logs'],
+          '07_mutect_MT': ['logs'],
+          '08_varscan_genome': ['01_mpileup', 'logs'],
+          '09_varscan_MT': ['01_mpileup', 'logs'],
+          '10_variants_filter': ['logs'],
+         }
+
+# loop over dictionary items and define each folder and subfolder
+processpath_tree = [['/'.join([processpath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
+
+# initialize storepath if necessary
+if custom_storepath:
+    storepath = currentpath + custom_storepath + '/' + folder
+    storepath_tree = [['/'.join([storepath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
+
+#/-----------------------------------------------------------------------------------------#/
+
+
+# References
+hg = homepath + config['fasta']['genome'] # Human Genome Reference
+MT = homepath + config['fasta']['MT']
+nextera = homepath + config['fasta']['nextera']
+nextera_expanded = homepath + config['fasta']['nextera_expanded']
+truseq = homepath + config['fasta']['truseq']
+
+hg_indexes = [hg+".bwt", hg+".pac", hg+".amb", hg+".ann", hg+".sa"] # Indexes for hg
+MT_indexes = [MT+".bwt", MT+".pac", MT+".amb", MT+".ann", MT+".sa"]
+nextera_indexes = [nextera+".bwt", nextera+".pac", nextera+".amb", nextera+".ann", nextera+".sa"]
+nextexp_indexes = [nextera_expanded+".bwt", nextera_expanded+".pac", nextera_expanded+".amb", nextera_expanded+".ann", nextera_expanded+".sa"]
+truseq_indexes = [truseq+".bwt", truseq+".pac", truseq+".amb", truseq+".ann", truseq+".sa"]
+
+
+indels_ref = homepath+ config['ref-files']['indels_ref'] # Set of known indels
+dbsnp = homepath+ config['ref-files']['dbsnp'] # SNP database
+cosmic = homepath+ config['ref-files']['cosmic'] # Catalog of somatic mutation in cancer
+humandb = homepath+ config['ref-files']['humandb'] # Annovar human databases folder
+build_ver = config['ref-files']['build_ver'] # Set build version
+dbsnp_ver = config['ref-files']['dbsnp_ver'] # Set SNP database version
+kg_ver = config['ref-files']['kg_ver'] # Set  version # Set ethnicity groups based on time
+mitochondrial_ver = config['ref-files']['mitochondrial_ver'] # Set parameter command for annotating mitochondria variants
+
+# Softwares
+gatk = homepath+ config['softwares']['gatk']
+muTect = homepath+ config['softwares']['muTect']
+annovar = homepath+ config['softwares']['annovar']
+convert2annovar = homepath+ config['softwares']['convert2annovar']
+adapter_removal = homepath + config['adapter_removal']
+
+# Sample details
+platform = config['sample-details']['platform'] # Set platform for alignment
+library = config['sample-details']['library'] # Set library for alignment
+
+# bed files
+nextexp_bed = homepath + config['bed']['nextera_expanded'] # Set target intervals for exome analysis
+nextera_bed = homepath + config['bed']['nextera']
+MT_bed = homepath + config['bed']['MT']
+truseq_bed = homepath + config['bed']['truseq']
+
+# Annovar databases
+annovar_dbs = [homepath + config['annovar_dbs']['hg19_db'] , homepath + config['annovar_dbs']['snp138_db']]
+
+
+
+
 
 # Label's parameters
 n_sim = config['n_sim']
@@ -42,716 +122,807 @@ M_thrs = 1
 LodnT_thrs = 1
 Lodnv_thrs = 1
 
-# References
-hg = home + config['ref-files']['hg'] # Human Genome Reference
-bwa_indexes = [hg+".bwt", hg+".pac", hg+".amb", hg+".ann", hg+".sa"] # Indexes for hg
-indels_ref = home + config['ref-files']['indels_ref'] # Set of known indels
-dbsnp = home + config['ref-files']['dbsnp'] # SNP database
-cosmic = home + config['ref-files']['cosmic'] # Catalog of somatic mutation in cancer
-humandb = home + config['ref-files']['humandb'] # Annovar human databases folder
-build_ver = config['ref-files']['build_ver'] # Set build version
-dbsnp_ver = config['ref-files']['dbsnp_ver'] # Set SNP database version
-kg_ver = config['ref-files']['kg_ver'] # Set  version # Set ethnicity groups based on time
-mitochondrial_ver = config['ref-files']['mitochondrial_ver'] # Set parameter command for annotating mitochondria variants
 
-# Folders
-scripts = config['folders']['scripts']
-resultdir = config['folders']['resultdir']
 
-# Softwares
-gatk = home + config['softwares']['gatk']
-muTect = home + config['softwares']['muTect']
-annovar = home + config['softwares']['annovar']
-convert2annovar = home + config['softwares']['convert2annovar']
 
-# Sample details
-platform = config['sample-details']['platform'] # Set platform for mapping
-library = config['sample-details']['library'] # Set library for mapping
-target = home + config['sample-details']['target'] # Set target intervals for exome analysis
 
-# HaplotypeCaller parameters
-genotyping_mode = config['hap-caller']['genotyping_mode'] # Set genotyping mode
-stand_emit_conf = config['hap-caller']['stand_emit_conf'] # stand_emit_conf 10.0 means that it won’t report any potential SNPs with a quality below 10.0;
-stand_call_conf = config['hap-caller']['stand_call_conf'] # but unless they meet the quality threshold set by -stand_call_conf (30.0, in this case), they will be listed as failing the quality filter
+#### Load data
 
-# Hard Filter parameters
-filter_exp_snps = config['hard-filter']['snps'] # Set command to define thresholds for snps
-filter_exp_indels = config['hard-filter']['indels'] # Set command to define thresholds for indels
+## Load input sample list
+input_list = config['input_list']
 
-# Annovar databases
-annovar_dbs = [home + config['annovar_dbs']['hg19_db'] , home + config['annovar_dbs']['snp138_db']]
+with open(input_list) as infile:
+    sample_names = infile.read().splitlines()
 
-#LODn parameters
-min_n_cov = config['LODn']['min_n_cov'] #Set the minimum read depth for normal and tumor samples
-min_t_cov = config['LODn']['min_t_cov']
+# move sample list file to processpath
+sp.call(' '.join(['cp', input_list, processpath]), shell=True)
 
-#######################
-#   Get fastq files   #
-#######################
 
-# Define variables
-patients = [p for p in samples_cfg['patients']]
-PATHS = [ps for p in samples_cfg['patients'] for ps in samples_cfg['patients'][p]]
-SAMPLES = [name.split('/')[-1] for name in PATHS]
-sicks = [s for s in samples_cfg['patients'] if len(samples_cfg['patients'][s])==2]
+data = currentpath + config['dataset']
+dataset = pd.read_table(data, sep = '\t',header=0, index_col='sample_id', dtype='str')
+
+##### BUILD TUMOR/NORMAL MATCHING LIST
+
+# create empty list to store tumor_normal name matches
+match_list = {}
+checked_match_list = {}
+
+custom_match = config['custom_match']
+
+# if -m option was selected
+if custom_match:
+
+    # load custom matching file
+    custom_match = pd.read_table(custom_match, sep='\t', header=0, dtype='str')
+
+    # move custom matching file to processpath
+    sp.call(' '.join(['mv', custom_match, processpath]), shell=True)
+
+
+    # get list of tumors that are both in sample list and custom list
+    tumor = [s for s in sample_names if s in custom_match.index]
+
+    # loop over them
+    for t in tumor:
+
+        # get normal samples that are matched to t in custom list
+        normal = custom_match.loc[t, 'normal']
+
+        # if there is only one normal, concatenate to tumor and add to tumor_normal list
+        if type(normal) == str:
+            match_list.append('_'.join([t, normal]))
+
+        # if there are many normal, concatenate each of them to tumor and add to tumor_normal list
+        else:
+            for n in normal:
+                match_list.append('_'.join([t, n]))
+
+
+# if no custom matching is needed
+else:
+
+    # get list of tumor contained in sample list
+    tumor = [s for s in sample_names if dataset.loc[s, 'matching'] == 'tumor']
+
+    # loop over them
+    for t in tumor:
+
+        # get patient ID
+        patient = dataset.loc[t, 'patient_id']
+        # get matched normal
+        normal = dataset[(dataset.patient_id == patient) & (dataset.matching == 'normal')].index[0]
+
+        # concatenate it to tumor and add to tumor_normal list
+        match_list[patient] = ('_'.join([t, normal]))
+
+### LOOP OVER MATCHES
+for patient in match_list:
+        match = match_list[patient]
+        # extract names of current paired samples
+        names = match.split('_')
+
+        # get WES library kit for tumor and normal
+        kit_tumor = dataset.loc[names[0], 'kit_wes']
+        kit_normal = dataset.loc[names[1], 'kit_wes']
+
+        # KIT CHECKPOINT
+        if kit_tumor != kit_normal:
+            continue
+
+        checked_match_list[patient] = match_list[patient]
+
+patients  = [p for p in checked_match_list]
+samples = [s for p in patients for s in checked_match_list[p].split('_')]
+
+def get_kit(wildcards):
+    return dataset.loc[wildcards, 'kit_wes']
+
+def get_fastq_path(wildcards):
+    path = dataset.loc[wildcards,'fastq_path_wes']
+    if path == './':
+        path = ''
+    return path
+
+def get_fastq_id(wildcards):
+    return dataset.loc[wildcards,'fastq_id_wes']
+
+# get pcr primers
+def get_pcr(wildcards,i):
+    kit = get_kit(wildcards)
+    if i==1:
+        return config['adapter'][kit]['adapter1']
+    else:
+        return config['adapter'][kit]['adapter2']
+
+def get_bed(wildcards):
+    kit = get_kit(wildcards)
+    return homepath + config['bed'][kit] + "_fixed.bed"
+
+def get_ref(wildcards):
+    kit = get_kit(wildcards)
+    return homepath + config['fasta'][kit]
+
+def get_ref_indexes(wildcards):
+    kit = get_kit(wildcards)
+    r = homepath + config['fasta'][kit]
+    r_indexes = [r+".bwt", r+".pac", r+".amb", r+".ann", r+".sa"]
+    return r_indexes
+
+def get_ref_fai(wildcards):
+    kit = get_kit(wildcards)
+    r = homepath + config['fasta'][kit]
+    return r+'.fai'
+
+def get_ref_dict(wildcards):
+    kit = get_kit(wildcards)
+    r = homepath + config['fasta'][kit]
+    return r.replace('fasta','dict')
+
+
+# define align paths
+
+alignpath_genome = processpath + '/03_alignment_genome/'
+alignpath_exome = processpath + '04_alignment_exome/'
+alignpath_MT = processpath + '/05_alignment_MT/'
 
 # Wildcard costrains necessary for search only certain names
 wildcard_constraints:
-    path = "("+"|".join(PATHS)+")",
-    sample = "("+"|".join(SAMPLES)+")",
-    sick = "("+"|".join(sicks)+")",
+    sample = "("+"|".join(samples)+")",
+    patient = "("+"|".join(patients)+")",
 
-# Container to get patient name from sample name
-sample_to_patient = {}
 
-for patient in patients:
-    for s in samples_cfg['patients'][patient]:
-        s = s.split('/')[-1]
-        sample_to_patient[s] = patient
 
-# Container to get normal/tumour sample from patient's name
-sicks_list = {}
-for sick in sicks:
-    sicks_list[sick] = {}
-    sicks_list[sick]['N'] = samples_cfg['patients'][sick][0].split('/')[-1]
-    sicks_list[sick]['T'] = samples_cfg['patients'][sick][1].split('/')[-1]
+##########################################
+#           PIPELINE BEGINNING           #
+##########################################
 
-# Get sample from path
-def path_to_sample(wildcards, index = '1'):
-    return (PATHS[SAMPLES.index(wildcards)] + "_{index}.fastq".format(index=index))
-
-# Get normal/tumour bam file from patient's name
-def get_bam(wildcards, sample_type='N'):
-    return (resultdir+sicks_list[wildcards][sample_type]+"_recal.bam")
-
-# Get normal/tumour bai file from patient's name
-def get_bai(wildcards, sample_type='N'):
-    return (resultdir+sicks_list[wildcards][sample_type]+"_recal.bai")
-
-# Get normal sample name from patient's name
-def get_code(wildcards):
-    return (sicks_list[wildcards]['N'])
-
-# Get table or vcf tumour sample from patient's name
-def get_lodn_infile(wildcards,format,idx=""):
-    if format == 'table':
-        return (resultdir+sicks_list[wildcards]['T']+".tsv")
-    elif format == 'vcf':
-        return (resultdir+sicks_list[wildcards]['T']+"_filtered_variants.vcf"+idx)
-
-#######################
-# Workflow final rule #
-#######################
 
 rule all:
-    """
-    THE END.
-    """
+  """
+    PIPELINE ENDING
+  """
+  input:
+    expand(processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R1_fastqc.html",sample=samples),
+    expand(processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R2_fastqc.html",sample=samples),
+    expand(alignpath_genome + "02_bqsr/" + "{sample}"+"_recal.bam",sample=samples),
+    #expand(alignpath_exome + '02_unmapped_fastq/' + "{sample}_R1.unmapped.fastq",sample=samples),
+    expand(alignpath_MT + "02_bqsr/" + "{sample}"+"_recal.bam",sample=samples),
+  run:
+    pass
+
+###########################################################################################
+
+rule create_tmpdir:
+  output:
+    tmp = temp(currentpath + 'wes_analyses/tmp/'),
+  run:
+    pass
+
+#% TODO: add temp for outpath[1,2] after checking
+
+rule downloadDecompressMergeFastq:
+    output:
+        outpath1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1_unchecked.fastq",
+        outpath2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2_unchecked.fastq",
+    params:
+        fastq_path = lambda wildcards: get_fastq_path(wildcards.sample),
+        fastq_id = lambda wildcards: get_fastq_id(wildcards.sample),
+        scripts = scripts,
+        name = '{sample}',
+        all_fastq = config['all_fastq'],
+        homepath = homepath,
+        processpath = processpath,
+        cadaver = config['cadaver'],
+    log:
+         processpath + '01_fastq/logs/',
+    message:'>> {sample} - Fastq preprocessing : downloading, decompressing and merging fastq'
+    script:
+        "{params.scripts}"+"downloadDecompressMergeFastq.py"
+
+rule fastq_checkpoint:
     input:
-        expand(resultdir+"{sample}"+".tsv", sample=SAMPLES),
-        expand(resultdir+ 'mutect_ann/' + "{sick}"+".tsv", sick=sicks),
-        expand(resultdir+"{sick}"+"_lodn.vcf",sick=sicks),
-        expand(resultdir+"{sick}"+"_lodn_table.tsv",sick=sicks),
-    benchmark:
-        "benchmarks/benchmark_rule_all_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        unchecked1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1_unchecked.fastq",
+        unchecked2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2_unchecked.fastq",
+    output:
+        checked1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1.fastq",
+        checked2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2.fastq",
+    params:
+        name="{sample}",
     run:
-        pass
+        import os
+        import subprocess as sp
+        size1 = os.stat("{input.unchecked1}").st_size
+        size2 = os.stat("{input.unchecked2}").st_size
+        if size1 != size2:
+            sp.call("echo 'Error. {params.name} fastq files have different size!!",shell=True)
+            sp.call("exit 1",shell=True)
+        else:
+            sp.call("mv {input.unchecked1} {output.checked1}",shell=True)
+            sp.call("mv {input.unchecked2} {output.checked2}",shell=True)
 
-#########################################################
-#                      GATK-LODn                        #
-#########################################################
+rule fastqc_R1:
+  input:
+    fastq1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1.fastq",
+  output:
+    fastq1_fastqc_zip = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R1_fastqc.zip",
+    fastq1_fastqc_html = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R1_fastqc.html",
+  params:
+    outpath = processpath + '01_fastq/03_fastqc/',
+  log:
+    processpath + '01_fastq/logs/' + "{sample}" + '_R1_fastqc.log'
+  conda:
+    "envs/wes_config_conda.yaml"
+  #benchmark:
+  message: 'fastqc1'
+  shell:
+    "fastqc -o {params.outpath} {input.fastq1} > {log} 2>&1"
 
-#############################
-#        gatk_pipe          #
-#############################
+rule fastqc_R2:
+  input:
+    fastq2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2.fastq",
+  output:
+    fastq2_fastqc_zip = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R2_fastqc.zip",
+    fastq2_fastqc_html = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R2_fastqc.html",
+  params:
+    outpath = processpath + '01_fastq/03_fastqc/',
+  log:
+    processpath + '01_fastq/logs/' + "{sample}" + '_R2_fastqc.log'
+  conda:
+    "envs/wes_config_conda.yaml"
+  #benchmark:
+  message: 'fastqc2'
+  shell:
+    "fastqc -o {params.outpath} {input.fastq2} > {log} 2>&1"
 
-rule Unzip_sample1:
-    """
-    Unzip first sample run file.
-    """
+#% TODO: Adapter removal issue
+
+rule trim_02:
     input:
-        sample1_zipped = "{path}"+"_1.fastq.gz",
+        fastq1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1.fastq",
+        fastq2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2.fastq",
     output:
-        sample1_unzipped = temp("{path}"+"_1.fastq"),
+        fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
+        fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
+    params:
+        pcr1 = lambda wildcards: get_pcr(wildcards.sample,1),
+        pcr2 = lambda wildcards: get_pcr(wildcards.sample,2),
+        adapter_removal=adapter_removal,
+    log:
+        log_disc = processpath + '02_fastq_trimmed/logs/' + '{sample}_discarded.log',
+        log_stats = processpath + '02_fastq_trimmed/logs/' + '{sample}_stats.log',
+        log_sgtn = processpath + '02_fastq_trimmed/logs/' + '{sample}_singleton.log',
+    #conda:
+    #benchmarks:
+    message: 'trimming'
     shell:
-        "gunzip -c {input.sample1_zipped} > {output.sample1_unzipped}"
+        "{params.adapter_removal} --file1 {input.fastq1} --file2 {input.fastq1} --pcr1 {params.pcr1} --pcr2 {params.pcr2} --stats --trimns --trimqualities --minquality 20 --minlength 80 --output1 {output.fastq1_trimmed} --output2 {output.fastq2_trimmed} --discarded {log.log_disc} --outputstats {log.log_stats} --singleton {log.log_sgtn}"
 
-rule Unzip_sample2:
-    """
-    Unzip second sample run file.
-    """
-    input:
-        sample2_zipped = "{path}"+"_2.fastq.gz",
-    output:
-        sample2_unzipped = temp("{path}"+"_2.fastq"),
-    shell:
-        "gunzip -c {input.sample2_zipped} > {output.sample2_unzipped}"
 
-rule mapping:
+rule fastqc_trimmed_R1:
+  input:
+    fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
+  output:
+    fastq1tr_fastqc_zip = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R1_fastqc.zip",
+    fastq1tr_fastqc_html = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R1_fastqc.html",
+  params:
+    outpath = processpath + '01_fastq/03_fastqc/',
+  log:
+    processpath + '02_fastq_trimmed/logs/' + "{sample}" + '_R1_fastqc.log'
+  conda:
+    "envs/wes_config_conda.yaml"
+  #benchmark:
+  message: 'fastqc on trimmed fastq1'
+  shell:
+    "fastqc -o {params.outpath} {input.fastq2} > {log} 2>&1"
+
+rule fastqc_trimmed_R2:
+  input:
+    fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
+  output:
+    fastq2tr_fastqc_zip = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R2_fastqc.zip",
+    fastq2tr_fastqc_html = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R2_fastqc.html",
+  params:
+    outpath = processpath + '01_fastq/03_fastqc/',
+  log:
+    processpath + '02_fastq_trimmed/logs/' + "{sample}" + '_R2_fastqc.log'
+  conda:
+    "envs/wes_config_conda.yaml"
+  #benchmark:
+  message: 'fastqc on trimmed fastq1'
+  shell:
+    "fastqc -o {params.outpath} {input.fastq2} > {log} 2>&1"
+
+
+
+##########################
+#### GENOME ALIGNMENT ####
+##########################
+
+rule map_to_genome:
     """
-    This tool maps the samples to the reference genome.
+    This tool maps the samples to the human reference genome.
     It does append a header necessary for the GATK analysis.
     """
     input:
-        bwa_indexes,
-        sample1 = lambda wildcards: path_to_sample(wildcards.sample,1),
-        sample2 = lambda wildcards: path_to_sample(wildcards.sample,2),
+        hg_indexes,
+        fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
+        fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
     output:
-        outfile =  temp(resultdir+"{sample}"+".sam"),
+        outfile =  alignpath_genome + '01_intermediate/' + "{sample}.sam",
     params:
         reference = hg,
-        library = library,
+        library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
         name = "{sample}",
+    log:
+        alignpath_genome + 'logs/' + '{sample}_alignment.log',
     conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_mapping_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_mapping_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
     threads: map_thrs
-    resources: mem=6
-    version: 0.1
-    message: "bwa is aligning the sample '{params.name}' with the reference genome"
+    #resources: mem=6
+    #version: 0.1
+    message: ">> {sample} - Aligning to reference NUCLEAR GENOME"
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {params.reference} {input.sample1} {input.sample2} > {output.outfile}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {params.reference} {input.sample1} {input.sample2} > {output.outfile} 2> {log}"
 
-
-rule sort_picard:
+rule sorting_genome:
     """
     This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        r = resultdir+"{sample}"+".sam",
+        sam = alignpath_genome + '01_intermediate/' + "{sample}.sam",
+        tmp = currentpath + 'wes_analyses/tmp/',
     output:
-        temp(resultdir+"{sample}"+"_sorted.bam"),
+        outdir = alignpath_genome + '01_intermediate/' + "{sample}_sorted.bam",
+    log:
+        alignpath_genome + '{sample}_sorting.log'
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_sort_picard_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
-        "picard SortSam INPUT={input.r} OUTPUT={output}.tmp SORT_ORDER=coordinate"
-        " && [ -s {output}.tmp ] && mv {output}.tmp {output}"
+        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={input.tmp} 2> {log}"
 
-
-rule mark_duplicates:
+rule marking_genome:
     """
     This tool locates and tags duplicate reads in a BAM or SAM file, where duplicate reads are defined as originating from a single fragment of DNA.
     """
     input:
-        r=resultdir+"{sample}"+"_sorted.bam",
+        sorted_bam = alignpath_genome + '01_intermediate/' + "{sample}_sorted.bam",
+        tmp = currentpath + 'wes_analyses/tmp/',
     output:
-        temp(resultdir+"{sample}"+"_dedup.bam"),
-    params:
-        metricsfile=resultdir+"{sample}"+"_dedup.metrics.txt",
-        outdir=resultdir,
+        out = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
+    log:
+        mx = alignpath_genome + '{sample}_metrix.log',
+        mark = alignpath_genome + '{sample}_marking.log',
     conda:
         "envs/config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_mark_duplicates_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
         "picard MarkDuplicates"
-        " INPUT={input.r} OUTPUT={output}.tmp METRICS_FILE={params.metricsfile}"
-        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=8000"
-        " && [ -s {output}.tmp ] && mv {output}.tmp {output}"
+        " INPUT={input.sorted_bam} OUTPUT={output.out}.tmp METRICS_FILE={log.mx} "
+        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={input.tmp} 2> {log.mark}"
 
-
-rule build_bam_index:
+rule indexing_genome:
     """
     This tool creates an index file for the input BAM that allows fast look-up of data in a BAM file, like an index on a database.
     """
     input:
-        r=resultdir+"{sample}"+"_dedup.bam",
+        marked_bam = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
     output:
-        temp(resultdir+"{sample}"+"_dedup.bai"),
+        marked_bai = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bai",
+    log:
+        alignpath_genome + '{sample}_indexing.log',
     conda:
         "envs/config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_build_bam_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
-        "picard BuildBamIndex INPUT={input.r} OUTPUT={output}"
+        "picard BuildBamIndex INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
 
 
-rule realigner_target_creator:
+rule RTC_genome:
     """
     This tool defines intervals to target for local realignment.
     """
     input:
         hg.replace('fasta', 'dict'),
-        idx=resultdir+"{sample}"+"_dedup.bai",
+        marked_bai = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bai",
         ref=hg+'.fai',
         indels_ref=indels_ref,
         gatk = gatk,
-        seq=resultdir+"{sample}"+"_dedup.bam",
+        marked_bam = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
+        bed = lambda wildcards: get_bed(wildcards.sample),
     output:
-        temp(resultdir+"{sample}"+".intervals"),
+        alignpath_genome + 'logs/'+"{sample}"+".intervals",
     params:
         ref=hg,
+    log:
+        alignpath_genome + 'logs/' + "{sample}" + "_RTC.log"
     conda:
         "envs/config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_realigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     threads: RT_thrs
     shell:
-        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.seq} -known {input.indels_ref} -nt {threads} -o {output}"
+        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.seq} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
 
 
-rule IndelRealigner:
+rule IndelRealigner_genome:
     """
     This tool performs local realignment of reads around indels.
     """
     input:
-        target=resultdir+"{sample}"+".intervals",
-        bam=resultdir+"{sample}"+"_dedup.bam",
-        idx=resultdir+"{sample}"+"_dedup.bai",
+        intvs = alignpath_genome + 'logs/'+"{sample}"+".intervals",
+        bam = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
+        idx = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bai",
     output:
-        r_bam = temp(resultdir+"{sample}"+"_realigned.bam"),
-        r_idx = temp(resultdir+"{sample}"+"_realigned.bai"),
+        r_bam = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bam",
+        r_idx = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bai",
     params:
         gatk = gatk,
-        ref=hg,
+        ref = hg,
         indels_ref=indels_ref,
+    log:
+        alignpath_genome + 'logs/' + "{sample}" + "_IndelRealigner.log"
     conda:
         "envs/config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_indelrealigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
-        "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.target} -known {params.indels_ref} -o {output.r_bam}"
+        "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -ip 50 -o {output.r_bam} 2> {log}"
 
-rule BQSR_step_1:
+
+rule BaseRecal_genome:
     """
     This tool detects systematic errors in base quality scores.
     This step produces a recalibrated data table.
     """
     input:
-        r_bam=resultdir+"{sample}"+"_realigned.bam",
-        r_idx=resultdir+"{sample}"+"_realigned.bai",
+        r_bam = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bam",
+        r_idx = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
+        bed = lambda wildcards: get_bed(wildcards.sample),
     output:
-        outtable1 = temp(resultdir+"{sample}"+"_recal_data.table"),
+        outtable = alignpath_genome + "logs/" + "{sample}"+"_recal_data.table",
     params:
         gatk = gatk,
         ref=hg,
         indels_ref=indels_ref
+    log:
+        alignpath_genome + "logs/" + "{sample}" + '_recalibrating_01.log'
     conda:
         "envs/config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_BQSR1_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR1_thrs=BQSR1_thrs,n_cpu=n_cpu)
+        "benchmarks/benchmark_BQSR_BaseRecal_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR1_thrs=BQSR1_thrs,n_cpu=n_cpu)
     threads: BQSR1_thrs
     shell:
-        "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -knownSites {input.dbsnp} -knownSites {params.indels_ref} -nct {threads} -o {output.outtable1}"
+        "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -L {input.bed} -ip 50 -knownSites {input.dbsnp} -knownSites {params.indels_ref} -nct {threads} -o {output.outtable} 2> {log}"
 
-rule BQSR_step_2:
-    """
-    This tool detects systematic errors in base quality scores.
-    This step produces a post recalibrated data table.
-    """
-    input:
-        outtable1 = resultdir+"{sample}"+"_recal_data.table",
-        r_bam=resultdir+"{sample}"+"_realigned.bam",
-        r_idx=resultdir+"{sample}"+"_realigned.bai",
-    output:
-        outtable2 = temp(resultdir+"{sample}"+"_post_recal_data.table"),
-    params:
-        gatk = gatk,
-        ref=hg,
-        indels_ref=indels_ref,
-        dbsnp = dbsnp,
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_BQSR2_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR2_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR2_thrs=BQSR2_thrs, n_cpu=n_cpu)
-    threads: BQSR2_thrs
-    shell:
-        "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -knownSites {params.dbsnp} -knownSites {params.indels_ref} -BQSR {input.outtable1} -nct {threads} -o {output.outtable2}"
-
-rule BQSR_step_3:
-    """
-    This tool creates plots to visualize base recalibration results.
-    """
-    input:
-        outtable1 = resultdir+"{sample}"+"_recal_data.table",
-        outtable2 = resultdir+"{sample}"+"_post_recal_data.table",
-    output:
-        plots = resultdir+"{sample}"+"_recalibrationPlots.pdf",
-    params:
-        gatk = gatk,
-        ref=hg,
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_BQSR3_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-    shell:
-        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots}"
-
-rule BQSR_step_4:
+rule PrintReads_genome:
     """
     This tool writes out sequence read data.
     """
     input:
-        r_bam = resultdir+"{sample}"+"_realigned.bam",
-        r_idx=resultdir+"{sample}"+"_realigned.bai",
-        outtable1 = resultdir+"{sample}"+"_recal_data.table",
-        plots = resultdir+"{sample}"+"_recalibrationPlots.pdf",
+        r_bam = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bam",
+        r_idx = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bai",
+        outtable = alignpath_genome + "logs/" + "{sample}"+"_recal_data.table",
     output:
-        recal_bam = resultdir+"{sample}"+"_recal.bam",
-        recal_bai = resultdir+"{sample}"+"_recal.bai",
+        recal_bam = alignpath_genome + "02_bqsr/" + "{sample}"+"_recal.bam",
+        recal_bai = alignpath_genome + "02_bqsr/" + "{sample}"+"_recal.bai",
     params:
         gatk = gatk,
         ref=hg,
+    log:
+        alignpath_genome + "logs/" + "{sample}" + '_recalibrating_02.log'
     conda:
         "envs/config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_BQSR4_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR4_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR4_thrs=BQSR4_thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_BQSR_PrintReads_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR4_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR4_thrs=BQSR4_thrs, n_cpu=n_cpu)
     threads: BQSR4_thrs
     shell:
-        "java -jar {params.gatk} -T PrintReads -R {params.ref} -I {input.r_bam} -BQSR {input.outtable1} -nct {threads} -o {output.recal_bam}"
+        "java -jar {params.gatk} -T PrintReads -R {params.ref} -I {input.r_bam} -BQSR {input.outtable} -nct {threads} -o {output.recal_bam} 2> {log}"
 
-rule HaplotypeCaller:
+
+
+
+
+
+##########################
+####  EXOME ALIGNMENT ####
+##########################
+
+rule map_to_exome:
     """
-    GATK Hard Filtering Variants
-    This tool calls germline SNPs and indels via local re-assembly of haplotypes.
+    This tool maps the samples to the reference exome.
+    It does append a header necessary for the GATK analysis.
     """
     input:
-        recal_bam = resultdir+"{sample}"+"_recal.bam",
-        recal_bai = resultdir+"{sample}"+"_recal.bai",
+        fai = lambda wildcards: get_ref_fai(wildcards.sample),
+        fasta_dict = lambda wildcards: get_ref_dict(wildcards.sample),
+        indexes = lambda wildcards: get_ref_indexes(wildcards.sample),
+        reference = lambda wildcards: get_ref(wildcards.sample),
+        fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
+        fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
     output:
-        vcf_raw = resultdir+"{sample}"+"_raw.vcf",
-        vcf_idx = resultdir+"{sample}"+"_raw.vcf.idx"
+        outfile =  alignpath_exome + '01_intermediate/' + "{sample}.sam",
     params:
-        gatk = gatk,
-        ref=hg,
-        genotyping_mode = genotyping_mode,
-        stand_emit_conf = stand_emit_conf,
-        stand_call_conf = stand_call_conf,
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_HaplotypeCaller_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{HC_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, HC_thrs=HC_thrs, n_cpu=n_cpu)
-    threads: HC_thrs
-    shell:
-        "java -jar {params.gatk} -T HaplotypeCaller -R {params.ref} -I {input.recal_bam} --genotyping_mode {params.genotyping_mode} -stand_emit_conf {params.stand_emit_conf} -stand_call_conf {params.stand_call_conf} -nct {threads} -o {output.vcf_raw}"
-
-# Since GATK 3.7 -stand_emit_conf {params.stand_emit_conf} has been deprecated
-
-rule HardFilter_1SNPs:
-    """
-    GATK Hard Filtering Variants
-    This tool extracts the snps from the call set.
-    """
-    input:
-        vcf_raw = resultdir+"{sample}"+"_raw.vcf",
-        vcf_idx = resultdir+"{sample}"+"_raw.vcf.idx"
-    output:
-        raw_snps = temp(resultdir+"{sample}"+"_snps.vcf"),
-        raw_snps_idx = temp(resultdir+"{sample}"+"_snps.vcf.idx"),
-    params:
-        gatk = gatk,
-        ref=hg,
-        selectType = '-selectType SNP'
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_HardFilter1SNPs_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{HF1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, HF1_thrs=HF1_thrs, n_cpu=n_cpu)
-    threads: HF1_thrs
-    shell:
-        "java -jar {params.gatk} -T SelectVariants -R {params.ref} -V {input.vcf_raw} {params.selectType} -o {output.raw_snps}"
-
-rule HardFilter_2SNPs:
-    """
-    GATK Hard Filtering Variants
-    This tool applies the filter to the SNP call set.
-    """
-    input:
-        raw_snps = resultdir+"{sample}"+"_snps.vcf",
-        raw_snps_idx = temp(resultdir+"{sample}"+"_snps.vcf.idx"),
-    output:
-        filt_snps = temp(resultdir+"{sample}"+"_hard_filtered.snps.vcf"),
-        filt_snps_idx = temp(resultdir+"{sample}"+"_hard_filtered.snps.vcf.idx")
-    params:
-        gatk = gatk,
-        ref=hg,
-        filter_exp_snps = filter_exp_snps,
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_HardFilter2SNPs_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{HF2_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, HF2_thrs=HF2_thrs, n_cpu=n_cpu)
-    threads: HF2_thrs
-    shell:
-        "java -jar {params.gatk} -T VariantFiltration -R {params.ref} -V {input.raw_snps} {params.filter_exp_snps} -o {output.filt_snps}"
-
-rule HardFilter_1Indels:
-    """
-    GATK Hard Filtering Variants
-    This tool extracts the Indels from the call set.
-    """
-    input:
-        vcf_raw = resultdir+"{sample}"+"_raw.vcf",
-        vcf_idx = resultdir+"{sample}"+"_raw.vcf.idx",
-    output:
-        raw_indels = temp(resultdir+"{sample}"+"_indels.vcf"),
-        raw_indels_idx = temp(resultdir+"{sample}"+"_indels.vcf.idx"),
-    params:
-        gatk = gatk,
-        ref=hg,
-        selectType = '-selectType INDEL',
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_HardFilter1Indels_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{HF1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, HF1_thrs=HF1_thrs, n_cpu=n_cpu)
-    threads: HF1_thrs
-    shell:
-        "java -jar {params.gatk} -T SelectVariants -R {params.ref} -V {input.vcf_raw} {params.selectType} -o {output.raw_indels}"
-
-rule HardFilter_2Indels:
-    """
-    GATK Hard Filtering Variants
-    This tool applies the filter to the Indel call set.
-    """
-    input:
-        raw_indels = resultdir+"{sample}"+"_indels.vcf",
-        raw_indels_idx = temp(resultdir+"{sample}"+"_indels.vcf.idx"),
-    output:
-        filt_indels = temp(resultdir+"{sample}"+"_hard_filtered.indels.vcf"),
-        filt_indels_idx = temp(resultdir+"{sample}"+"_hard_filtered.indels.vcf.idx"),
-    params:
-        gatk = gatk,
-        ref=hg,
-        filter_exp_indels = filter_exp_indels,
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_HardFilter2Indels_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{HF2_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, HF2_thrs=HF2_thrs, n_cpu=n_cpu)
-    threads: HF2_thrs
-    shell:
-        "java -jar {params.gatk} -T VariantFiltration -R {params.ref} -V {input.raw_indels} {params.filter_exp_indels} -o {output.filt_indels}"
-
-rule HardFilter_Combine:
-    """
-    GATK Hard Filtering Variants
-    This tool combines variants.
-    """
-    input:
-        filt_snps = resultdir+"{sample}"+"_hard_filtered.snps.vcf",
-        filt_snps_idx = temp(resultdir+"{sample}"+"_hard_filtered.snps.vcf.idx"),
-        filt_indels = resultdir+"{sample}"+"_hard_filtered.indels.vcf",
-        filt_indels_idx = temp(resultdir+"{sample}"+"_hard_filtered.indels.vcf.idx"),
-    output:
-        vcf_filt = resultdir+"{sample}"+"_filtered_variants.vcf",
-        vcf_filt_idx = resultdir+"{sample}"+"_filtered_variants.vcf.idx"
-    params:
-        gatk = gatk,
-        ref=hg,
-    conda:
-        "envs/config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_HardFilterCombine_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{HFC_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, HFC_thrs=HFC_thrs, n_cpu=n_cpu)
-    threads: HFC_thrs
-    shell:
-        "java -jar {params.gatk} -T CombineVariants -R {params.ref} --variant:snps {input.filt_snps} --variant:indels {input.filt_indels} -o {output.vcf_filt} -genotypeMergeOptions PRIORITIZE -priority snps,indels"
-
-rule Annotation:
-    """
-    This tool uses annovar to annotate.
-    """
-    input:
-        vcf = resultdir+"{sample}"+"_filtered_variants.vcf",
-        annovar_dbs = annovar_dbs,
-    output:
-        k_f = temp(resultdir+"{sample}"+"_rmdup.known.exonic_variant_function"),
-        n_f = temp(resultdir+"{sample}"+"_rmdup.novel.exonic_variant_function"),
-        mit_rmdup = temp(resultdir+"{sample}"+".mit"),
-    params:
-        scripts = scripts,
-        convert2annovar = convert2annovar,
-        annovar = annovar,
-        humandb = humandb,
-        build_ver = build_ver,
-        dbsnp_ver = dbsnp_ver,
-        kg_ver = kg_ver,
-        mitochondrial_ver = mitochondrial_ver,
-        fmt = 'vcf4',
-        outdir = resultdir,
+        library = lambda wildcards: get_kit(wildcards.sample),
+        platform = platform,
         name = "{sample}",
-        err_log = True,
-        maf = 0.05,
-        mutect = False,
-    benchmark:
-        "benchmarks/benchmark_Annotation_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-    script:
-        "{params.scripts}"+"Annotation.py"
-
-rule MakeFinalFile:
-    """
-    This step makes the final file.
-    """
-    input:
-        k_f = resultdir+"{sample}"+"_rmdup.known.exonic_variant_function",
-        n_f = resultdir+"{sample}"+"_rmdup.novel.exonic_variant_function",
-        mit_rmdup = resultdir+"{sample}"+".mit",
-    output:
-        out = resultdir+"{sample}"+".tsv",
-    params:
-        scripts = scripts,
-        mutect = False,
-        sample_order = ['n','t'],
-        dbsnp_freq = True,
-        dbsnpFreq = None,
-        dbsnpAllele = None,
-        code = None, # Not necessary except for muTect
-        vcf = None,  # Not necessary except for muTect
-    benchmark:
-        "benchmarks/benchmark_MakeFinalFile_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-    script:
-        "{params.scripts}" + "MakeFinalFile.py"
-
-
-
-
-##############################
-#        mutect_pipe         #
-##############################
-
-rule muTect:
-    """
-    This step uses muTect 1.1.4 to call variants.
-    """
-    input:
-        muTect = muTect,
-        cosmic = cosmic,
-        fixed_target = target + "_fixed.bed",
-        normal_bam = lambda wildcards: get_bam(wildcards.sick,'N'),
-        tumour_bam = lambda wildcards: get_bam(wildcards.sick,'T'),
-        normal_bai = lambda wildcards: get_bai(wildcards.sick,'N'),
-        tumour_bai = lambda wildcards: get_bai(wildcards.sick,'T'),
-    output:
-        vcf = resultdir+"{sick}"+"_mutect.vcf",
-        vcf_idx = resultdir+"{sick}"+"_mutect.vcf.idx",
-        coverage_out = resultdir+"{sick}"+"_coverage.wig",
-    params:
-        dbsnp = dbsnp,
-        ref = hg,
+    log:
+        alignpath_exome + 'logs/' + '{sample}_alignment.log',
     conda:
-        "envs/config_conda_muTect.yaml"
-    benchmark:
-        "benchmarks/benchmark_muTect_ref_{sick}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_mapping_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
+    threads: map_thrs
+    #resources: mem=6
+    #version: 0.1
+    message: ">> {sample} - - Aligning to reference EXOME"
     shell:
-        "java -Xmx50g -jar {input.muTect} --analysis_type MuTect --reference_sequence {params.ref} --cosmic {input.cosmic} --intervals {input.fixed_target} --input_file:normal {input.normal_bam} --input_file:tumor {input.tumour_bam} --vcf {output.vcf} --coverage_file {output.coverage_out}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.sample1} {input.sample2} > {output.outfile} 2> {log}"
 
-rule Annotation_muTect:
+rule sorting_exome:
     """
-    This tool uses annovar to annotate.
+    This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        vcf = resultdir+"{sick}"+"_mutect.vcf",
-        vcf_idx = resultdir+"{sick}"+"_mutect.vcf.idx",
-        annovar_dbs = annovar_dbs,
+        sam = alignpath_exome + '01_intermediate/' + "{sample}.sam",
+        tmp = currentpath + 'wes_analyses/tmp/',
     output:
-        k_f = temp(resultdir+ 'mutect_ann/' + "{sick}"+"_rmdup.known.exonic_variant_function"),
-        n_f = temp(resultdir+ 'mutect_ann/' + "{sick}"+"_rmdup.novel.exonic_variant_function"),
-        mit_rmdup = temp(resultdir+ 'mutect_ann/' + "{sick}"+".mit"),
-    params:
-        scripts = scripts,
-        convert2annovar = convert2annovar,
-        annovar = annovar,
-        humandb = humandb,
-        build_ver = build_ver,
-        dbsnp_ver = dbsnp_ver,
-        kg_ver = kg_ver,
-        mitochondrial_ver = mitochondrial_ver,
-        fmt = 'vcf4old',
-        outdir = resultdir + '/mutect_ann',
-        name = "{sick}",
-        err_log = True,
-        maf = 0.05,
-        mutect = True,
-    threads: M_thrs
-    benchmark:
-        "benchmarks/benchmark_AnnotationM_ref_{sick}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-    script:
-        "{params.scripts}"+"Annotation.py"
+        outdir = alignpath_exome + '01_intermediate/' + "{sample}_sorted.bam",
+    log:
+        alignpath_exome + 'logs/' + '{sample}_sorting.log'
+    conda:
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_sort_picard_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={input.tmp} 2> {log}"
 
-rule MakeFinalFile_mutect:
-    """
-    This step makes the final file.
-    """
+
+rule extractUnmapped_extract:
     input:
-        k_f = resultdir+ 'mutect_ann/' + "{sick}"+"_rmdup.known.exonic_variant_function",
-        n_f = resultdir+ 'mutect_ann/' + "{sick}"+"_rmdup.novel.exonic_variant_function",
-        mit_rmdup = resultdir+ 'mutect_ann/' + "{sick}"+".mit",
+        alignpath_exome + '01_intermediate/' + "{sample}_sorted.bam",
     output:
-        out = resultdir+ 'mutect_ann/' + "{sick}"+".tsv",
-    params:
-        scripts = scripts,
-        mutect = True,
-        sample_order = ['n','t'], # sample_order can change for muTect
-        dbsnp_freq = True,
-        dbsnpFreq = None,
-        dbsnpAllele = None,
-        code = lambda wildcards: get_code(wildcards.sick),
-        vcf = resultdir+"{sick}"+"_mutect.vcf",
-    benchmark:
-        "benchmarks/benchmark_MakeFinalFileM_ref_{sick}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-    script:
-        "{params.scripts}" + "MakeFinalFile.py"
-
-###########################
-#        run_lodn         #
-###########################
-
-rule lodn_table:
-    """
-    This step applies the LODn classifier on table.
-    """
-    input:
-        infile = lambda wildcards: get_lodn_infile(wildcards.sick,'table'),
-        normal_bam = lambda wildcards: get_bam(wildcards.sick,'N'),
-        normal_bai = lambda wildcards: get_bai(wildcards.sick,'N')
-    output:
-        outfile = resultdir+"{sick}"+"_lodn_table.tsv",
-    params:
-        fmt = 'table',
-        scripts = scripts,
-        min_n_cov = min_n_cov,
-        min_t_cov = min_t_cov,
+        alignpath_exome + '01_intermediate/' + "{sample}_unmapped.bam",
+    log:
+        alignpath_exome + 'logs/' + '{sample}_unmapped.log'
     conda:
         "envs/config_conda.yaml"
-    threads: LodnT_thrs
-    benchmark:
-        "benchmarks/benchmark_LODntable_ref_{sick}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{LodnT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, LodnT_thrs=LodnT_thrs, n_cpu=n_cpu)
-    script:
-        "{params.scripts}" + "LODn_table.py"
+    shell:
+        "samtools view -b -f 4 {input} > {output} 2> {log}"
 
-rule lodn_vcf:
-    """
-    This step applies the LODn classifier on vcf.
-    """
+rule extractUnmapped_convert:
     input:
-        infile = lambda wildcards: get_lodn_infile(wildcards.sick,'vcf'),
-        infile_idx = lambda wildcards: get_lodn_infile(wildcards.sick,'vcf','.idx'),
-        normal_bam = lambda wildcards: get_bam(wildcards.sick,'N'),
-        normal_bai = lambda wildcards: get_bai(wildcards.sick,'N')
+        alignpath_exome + '01_intermediate/' + "{sample}_unmapped.bam",
     output:
-        outfile = resultdir+"{sick}"+"_lodn.vcf",
-    params:
-        fmt = 'vcf',
-        scripts = scripts,
-        min_n_cov = min_n_cov,
-        min_t_cov = min_t_cov,
+        unmapped1 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R1.unmapped.fastq",
+        unmapped2 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R2.unmapped.fastq",
+        unpair = alignpath_exome + '02_unmapped_fastq/' + "{sample}_unpaired.unmapped.fastq",
+    log:
+        alignpath_exome + 'logs/' + '{sample}_unmapped_fastq.log'
     conda:
         "envs/config_conda.yaml"
-    threads: Lodnv_thrs
-    benchmark:
-        "benchmarks/benchmark_LODnvcf_ref_{sick}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{Lodnv_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, Lodnv_thrs=Lodnv_thrs, n_cpu=n_cpu)
-    script:
-        "{params.scripts}" + "LODn_vcf.py"
+    shell:
+        "picard SamToFastq I={input} F={output.unmapped1} F2={output.unmapped2} FU={output.unpair} 2> {log}"
+
+
+
+##########################
+####   MT ALIGNMENT   ####
+##########################
+
+rule map_to_MT:
+    """
+    This tool maps the samples to the mitochondria genome.
+    It does append a header necessary for the GATK analysis.
+    """
+    input:
+        MT_indexes,
+        reference = MT,
+        unmapped1 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R1.unmapped.fastq",
+        unmapped2 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R2.unmapped.fastq",
+        unpair = alignpath_exome + '02_unmapped_fastq/' + "{sample}_unpaired.unmapped.fastq",
+    output:
+        outfile =  alignpath_MT + '01_intermediate/' + "{sample}.sam",
+    params:
+        library = lambda wildcards: get_kit(wildcards.sample),
+        platform = platform,
+        name = "{sample}",
+    log:
+        alignpath_MT + 'logs/' + '{sample}_alignment.log',
+    conda:
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_mapping_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
+    threads: map_thrs
+    #resources: mem=6
+    #version: 0.1
+    message: ">> {sample} - Aligning to reference MITOCHONDRIAL GENOME"
+    shell:
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.sample1} {input.sample2} > {output.outfile} 2> {log}"
+
+rule sorting_MT:
+    """
+    This tool sorts the input SAM or BAM file by coordinate.
+    """
+    input:
+        sam = alignpath_MT + '01_intermediate/' + "{sample}.sam",
+        tmp = currentpath + 'wes_analyses/tmp/',
+    output:
+        outdir = alignpath_MT + '01_intermediate/' + "{sample}_sorted.bam",
+    log:
+        alignpath_MT + '{sample}_sorting.log'
+    conda:
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_sort_picard_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={input.tmp} 2> {log}"
+
+rule marking_MT:
+    """
+    This tool locates and tags duplicate reads in a BAM or SAM file, where duplicate reads are defined as originating from a single fragment of DNA.
+    """
+    input:
+        sorted_bam = alignpath_MT + '01_intermediate/' + "{sample}_sorted.bam",
+        tmp = currentpath + 'wes_analyses/tmp/',
+    output:
+        out = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
+    log:
+        mx = alignpath_MT + '{sample}_metrix.log',
+        mark = alignpath_MT + '{sample}_marking.log',
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_mark_duplicates_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard MarkDuplicates"
+        " INPUT={input.sorted_bam} OUTPUT={output.out}.tmp METRICS_FILE={log.mx} "
+        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={input.tmp} 2> {log.mark}"
+
+rule indexing_MT:
+    """
+    This tool creates an index file for the input BAM that allows fast look-up of data in a BAM file, like an index on a database.
+    """
+    input:
+        marked_bam = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
+    output:
+        marked_bai = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bai",
+    log:
+        alignpath_MT + '{sample}_indexing.log',
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_build_bam_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard BuildBamIndex INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
+
+
+rule RTC_MT:
+    """
+    This tool defines intervals to target for local realignment.
+    """
+    input:
+        MT.replace('fasta', 'dict'),
+        marked_bai = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bai",
+        ref = MT+'.fai',
+        indels_ref=indels_ref,
+        gatk = gatk,
+        marked_bam = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
+        bed = MT_bed + ".bed",
+    output:
+        alignpath_MT + 'logs/'+"{sample}"+".intervals",
+    params:
+        ref=MT,
+    log:
+        alignpath_MT + 'logs/' + "{sample}" + "_RTC.log"
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_realigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
+    threads: RT_thrs
+    shell:
+        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.seq} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
+
+
+rule IndelRealigner_MT:
+    """
+    This tool performs local realignment of reads around indels.
+    """
+    input:
+        intvs = alignpath_MT + 'logs/'+"{sample}"+".intervals",
+        bam = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
+        idx = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bai",
+    output:
+        r_bam = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bam",
+        r_idx = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bai",
+    params:
+        gatk = gatk,
+        ref = MT,
+        indels_ref=indels_ref,
+    log:
+        alignpath_MT + 'logs/' + "{sample}" + "_IndelRealigner.log"
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_indelrealigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -ip 50 -o {output.r_bam} 2> {log}"
+
+
+rule BaseRecal_MT:
+    """
+    This tool detects systematic errors in base quality scores.
+    This step produces a recalibrated data table.
+    """
+    input:
+        r_bam = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bam",
+        r_idx = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bai",
+        dbsnp = dbsnp,
+        bed = MT_bed + ".bed",
+    output:
+        outtable = alignpath_MT + "logs/" + "{sample}"+"_recal_data.table",
+    params:
+        gatk = gatk,
+        ref=MT,
+        indels_ref=indels_ref
+    log:
+        alignpath_MT + "logs/" + "{sample}" + '_recalibrating_01.log'
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_BQSR_BaseRecal_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR1_thrs=BQSR1_thrs,n_cpu=n_cpu)
+    threads: BQSR1_thrs
+    shell:
+        "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -L {input.bed} -ip 50 -knownSites {input.dbsnp} -knownSites {params.indels_ref} -nct {threads} -o {output.outtable} 2> {log}"
+
+rule PrintReads_MT:
+    """
+    This tool writes out sequence read data.
+    """
+    input:
+        r_bam = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bam",
+        r_idx = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bai",
+        outtable = alignpath_MT + "logs/" + "{sample}"+"_recal_data.table",
+    output:
+        recal_bam = alignpath_MT + "02_bqsr/" + "{sample}"+"_recal.bam",
+        recal_bai = alignpath_MT + "02_bqsr/" + "{sample}"+"_recal.bai",
+    params:
+        gatk = gatk,
+        ref=MT,
+    log:
+        alignpath_MT + "logs/" + "{sample}" + '_recalibrating_02.log'
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_BQSR_PrintReads_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR4_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR4_thrs=BQSR4_thrs, n_cpu=n_cpu)
+    threads: BQSR4_thrs
+    shell:
+        "java -jar {params.gatk} -T PrintReads -R {params.ref} -I {input.r_bam} -BQSR {input.outtable} -nct {threads} -o {output.recal_bam} 2> {log}"
+
+
+
+
+
+
+
+
+
 
 
 ###############################################################################
 #                           SINGLE-TIME-RUN RULES                             #
 ###############################################################################
 
-#########################################################
-#                   DOWNLOADING FILES                   #
-#########################################################
+#################################################
+#                   GET FASTA                   #
+#################################################
 
 rule download_reference:
     """download the hg19 human reference genome from 1000genome"""
@@ -774,6 +945,53 @@ rule gunzip_reference:
     shell:
         "gunzip {input.zipped} || true"
 
+rule get_nextera_fasta:
+    input:
+        hg = hg,
+        bed_fixed = nextera_bed + "_fixed.bed"
+    output:
+        nextera,
+    conda:
+        "envs/wes_config_conda.yaml"
+    shell:
+        "bedtools get fasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
+
+rule get_nextexp_fasta:
+    input:
+        hg = hg,
+        bed_fixed = nextexp_bed + "_fixed.bed"
+    output:
+        nextera_expanded,
+    conda:
+        "envs/wes_config_conda.yaml"
+    shell:
+        "bedtools get fasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
+
+rule get_truseq_fasta:
+    input:
+        hg = hg,
+        bed_fixed = truseq_bed + "_fixed.bed"
+    output:
+        truseq,
+    conda:
+        "envs/wes_config_conda.yaml"
+    shell:
+        "bedtools get fasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
+
+rule get_MT_fasta:
+    input:
+        hg,
+    output:
+        MT,
+    conda:
+        "envs/wes_config_conda.yaml"
+    shell:
+        "samtools faidx {input} MT > {output}"
+
+
+########################
+#    GET SEVERAL FILES #
+########################
 rule download_indels_ref:
     """download the indel reference from 1000genome """
     output:
@@ -826,24 +1044,72 @@ rule download_cosmic:
         "wget http://www.broadinstitute.org/cancer/cga/sites/default/files/data/tools/mutect/b37_cosmic_v54_120711.vcf && "
         "mv b37_cosmic_v54_120711.vcf {output.cosmic}"
 
-rule download_target:
+rule download_nextexp_bed:
     """download target from illumina"""
     output:
-        target = temp(target + ".bed"),
+        nextexp_bed = temp(nextexp_bed + ".bed"),
     shell:
         "wget https://support.illumina.com/content/dam/illumina-support/documents/documentation/chemistry_documentation/samplepreps_nextera/nexterarapidcapture/nexterarapidcapture_expandedexome_targetedregions.bed && "
-        "mv nexterarapidcapture_expandedexome_targetedregions.bed {output.target}"
+        "mv nexterarapidcapture_expandedexome_targetedregions.bed {output.nextexp_bed}"
 
-rule fix_target:
+rule fix_nextexp_bed:
+    """fix target: remove prefix chr in first column"""
+    input:
+        nextexp_bed + ".bed",
+    output:
+        nextexp_bed + "_fixed.bed",
+    params:
+        scripts = scripts,
+        line_to_skip = None,
+    script:
+        "{params.scripts}" + "editBEDChromField.py"
+
+rule download_nextera_bed:
+    """download target from illumina"""
+    output:
+        nextera_bed = temp(nextera_bed + ".bed"),
+    shell:
+        "wget https://support.illumina.com/content/dam/illumina-support/documents/documentation/chemistry_documentation/samplepreps_nextera/nexterarapidcapture/nexterarapidcapture_exome_targetedregions.bed && "
+        "mv nexterarapidcapture_exome_targetedregions.bed {output}"
+
+rule fix_nextera_bed:
     """fix target: remove prefix chr in first column and last column(name)"""
     input:
-        target = target + ".bed",
+        nextera_bed + ".bed",
     output:
-        fixed_target = target + "_fixed.bed",
+        nextera_bed + "_fixed.bed",
+    params:
+        scripts = scripts,
+        line_to_skip = None,
+    script:
+        "{params.scripts}" + "editBEDChromField.py"
+
+rule download_truseq_bed:
+    """download target from illumina"""
+    output:
+        truseq_bed = temp(truseq_bed + ".bed"),
     shell:
-        "sed 's/^chr//' {input.target} > no_chr.bed &&"
-        "awk \'{{print $1,$2,$3}}\' no_chr.bed > {output.fixed_target} &&"
-        "rm no_chr.bed"
+        "wget https://support.illumina.com/content/dam/illumina-support/documents/downloads/productfiles/truseq/truseq-exome-targeted-regions-manifest-v1-2-bed.zip && "
+        "gunzip truseq-exome-targeted-regions-manifest-v1-2-bed.zip && "
+        "mv truseq-exome-targeted-regions-manifest-v1-2.bed {output}"
+
+rule fix_truseq_bed:
+    """fix target: remove prefix chr in first column and last column(name)"""
+    input:
+        truseq_bed + ".bed",
+    output:
+        truseq_bed + "_fixed.bed",
+    params:
+        scripts = scripts,
+        line_to_skip = None,
+    script:
+        "{params.scripts}" + "editBEDChromField.py"
+
+rule get_MT_bed:
+    output:
+        MT_bed = temp(MT_bed + ".bed"),
+    run:
+        pass
 
 
 rule download_annovar_databases:
@@ -859,27 +1125,29 @@ rule download_annovar_databases:
 
 
 #########################################################
-#                   REFERENCE INDEXING                  #
+#                   REFERENCES INDEXING                  #
 #########################################################
 
-rule index_bwa:
+###############
+##     HG    ##
+###############
+rule hg_index_bwa:
     """
     Generate the index of the reference genome for the bwa program.
     """
     input:
         hg,
     output:
-        bwa_indexes,
+        hg_indexes,
     conda:
         "envs/config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     version: 0.1
     shell:
         "bwa index -a bwtsw {hg}"
 
-
-rule index_picard:
+rule index_picard_hg:
     """
     Generate the index of the reference genome for the picard program.
     """
@@ -894,8 +1162,7 @@ rule index_picard:
     shell:
         "picard CreateSequenceDictionary R={input.hg} O={output}"
 
-
-rule index_samtools:
+rule index_samtools_hg:
     """
     Generate the index of the reference genome for the samtools and gatk programs.
     """
@@ -909,6 +1176,194 @@ rule index_samtools:
         "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
         "samtools faidx {input.hg} "
+
+###############
+##  Nextera  ##
+###############
+
+rule nextera_index_bwa:
+    input:
+        nextera,
+    output:
+        nextera_indexes,
+    conda:
+        "envs/config_conda.yaml"
+    #benchmark:
+    #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    version: 0.1
+    shell:
+        "bwa index -a bwtsw {input}"
+
+rule index_picard_nextera:
+    """
+    Generate the index of the reference genome for the picard program.
+    """
+    input:
+        nextera,
+    output:
+        nextera.replace('fasta', 'dict'),
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard CreateSequenceDictionary R={input} O={output}"
+
+rule index_samtools_nextera:
+    """
+    Generate the index of the reference genome for the samtools and gatk programs.
+    """
+    input:
+        nextera,
+    output:
+        nextera+'.fai',
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "samtools faidx {input} "
+
+
+########################
+##  Nextera_expanded  ##
+########################
+
+rule nextexp_index_bwa:
+    input:
+        nextera_expanded,
+    output:
+        nextexp_indexes,
+    conda:
+        "envs/config_conda.yaml"
+    #benchmark:
+    #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    version: 0.1
+    shell:
+        "bwa index -a bwtsw {input}"
+
+rule index_picard_nextexp:
+    """
+    Generate the index of the reference genome for the picard program.
+    """
+    input:
+        nextera_expanded,
+    output:
+        nextera_expanded.replace('fasta', 'dict'),
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard CreateSequenceDictionary R={input} O={output}"
+
+rule index_samtools_nextexp:
+    """
+    Generate the index of the reference genome for the samtools and gatk programs.
+    """
+    input:
+        nextera_expanded,
+    output:
+        nextera_expanded+'.fai',
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "samtools faidx {input} "
+
+##############
+##  Truseq  ##
+##############
+rule truseq_index_bwa:
+    input:
+        truseq,
+    output:
+        truseq_indexes,
+    conda:
+        "envs/config_conda.yaml"
+    #benchmark:
+    #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    version: 0.1
+    shell:
+        "bwa index -a bwtsw {input}"
+
+rule index_picard_truseq:
+    """
+    Generate the index of the reference genome for the picard program.
+    """
+    input:
+        truseq,
+    output:
+        truseq.replace('fasta', 'dict'),
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard CreateSequenceDictionary R={input} O={output}"
+
+rule index_samtools_truseq:
+    """
+    Generate the index of the reference genome for the samtools and gatk programs.
+    """
+    input:
+        truseq,
+    output:
+        truseq+'.fai',
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "samtools faidx {input} "
+
+#############
+#     MT    #
+#############
+rule MT_index_bwa:
+    input:
+        MT,
+    output:
+        MT_indexes,
+    conda:
+        "envs/config_conda.yaml"
+    #benchmark:
+    #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    version: 0.1
+    shell:
+        "bwa index -a bwtsw {input}"
+
+rule index_picard_MT:
+    """
+    Generate the index of the reference genome for the picard program.
+    """
+    input:
+        MT,
+    output:
+        MT.replace('fasta', 'dict'),
+    conda:
+        "envs/config_conda.yaml"
+    benchmark:
+        "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "picard CreateSequenceDictionary R={input} O={output}"
+
+rule index_samtools_MT:
+    """
+    Generate the index of the reference genome for the samtools and gatk programs.
+    """
+    input:
+        MT,
+    output:
+        MT+'.fai',
+    conda:
+        "envs/config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    shell:
+        "samtools faidx {input} "
+
 
 #########################################################
 #                   CHECKING REQUIREMENTS               #

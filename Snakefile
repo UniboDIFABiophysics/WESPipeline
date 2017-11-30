@@ -1124,11 +1124,11 @@ rule fix_truseq_bed:
     script:
         "{params.scripts}" + "editBEDChromField.py"
 
-rule get_MT_bed:
+rule create_MTbed:
     output:
-        MT_bed = temp(MT_bed + ".bed"),
-    run:
-        pass
+        MT_bed = MT_bed + ".bed",
+    shell:
+        "echo 'MT 1 16569' > {output}"
 
 
 rule download_annovar_databases:

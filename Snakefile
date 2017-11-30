@@ -49,6 +49,7 @@ storepath = currentpath
 # initialize storepath if necessary
 if custom_storepath:
     storepath = currentpath + custom_storepath + folder
+    processpath = storepath
     # storepath_tree = [['/'.join([storepath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
 
 #/-----------------------------------------------------------------------------------------#/
@@ -98,8 +99,9 @@ truseq_bed = homepath + config['bed']['truseq']
 # Annovar databases
 annovar_dbs = [homepath + config['annovar_dbs']['hg19_db'] , homepath + config['annovar_dbs']['snp138_db']]
 
+# script rsIDfilter
 
-
+rsIDfilter = scripts + config['rsIDfilter']
 
 
 # Label's parameters
@@ -338,14 +340,7 @@ rule all:
   input:
     expand(fastqcpath +"{sample}" + "_R1_fastqc.html",sample=samples),
     expand(fastqcpath +"{sample}" + "_R2_fastqc.html",sample=samples),
-    #expand(alignpath_genomebqsr + "{sample}"+"_recal.bam",sample=samples),
-    #expand(alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",sample=samples),
-    #expand(alignpath_MTbqsr + "{sample}"+"_recal.bam",sample=samples),
-    #expand(mutectpath_genome + "{patient}.tsv",patient=patients),
-    #expand(mutectpath_MT + "{patient}.tsv",patient=patients),
-    #expand(varscanpath_genome + "{patient}_snv.tsv",patient=patients),
-    #expand(varscanpath_MT + "{patient}_snv.tsv",patient=patients),
-    expand(variants_filter + "{patient}_all_somatic_annotated.tsv",patient=patients),
+    expand(variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",patient=patients),
   run:
     pass
 
@@ -1322,6 +1317,44 @@ rule MergeMutectVarscan:
 ############ filter on exonic, non-synonymous, polymorphisms
 
 
+rule create_rsID_table:
+    input:
+        not_filtered = variants_filter + "{patient}_all_somatic_annotated.tsv",
+        maf = "/",
+    output:
+        variants_filter + "{patient}_rsID.tsv",
+    params:
+        scripts = scripts,
+    script:
+        "{params.scripts}" + "fEP_script.py"
+
+rule filterExonicPolymorphic:
+    input:
+        variants_filter + "{patient}_rsID.tsv",
+    output:
+        "{patient}_rsID_maf.tsv"
+    params:
+        rsIDfilter = rsIDfilter,
+        workdir = variants_filter,
+    log:
+        info = variants_filter_logs + "{patient}_rsID_session_info.log",
+        err = variants_filter_logs + "{patient}_rsID_err.log",
+    conda:
+        "envs/wes_config_conda.yaml",
+    shell:
+        "Rscript {params.rsIDfilter} {params.workdir} > {log.info} 2> {log.err} && "
+        "cat {log.info} {log.err} > {log.err}"
+
+rule checkMAFs:
+    input:
+        not_filtered = variants_filter + "{patient}_all_somatic_annotated.tsv",
+        maf = "{patient}_rsID_maf.tsv",
+    output:
+        variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",
+    params:
+        scripts = scripts,
+    script:
+        "{params.scripts}"+"fEP_script.py"
 
 ###############################################################################
 #                           SINGLE-TIME-RUN RULES                             #

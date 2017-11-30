@@ -82,6 +82,7 @@ gatk = homepath+ config['softwares']['gatk']
 muTect = homepath+ config['softwares']['muTect']
 annovar = homepath+ config['softwares']['annovar']
 convert2annovar = homepath+ config['softwares']['convert2annovar']
+tableannovar = homepath+ config['softwares']['tableannovar']
 adapter_removal = homepath + config['adapter_removal']
 
 # Sample details
@@ -344,7 +345,7 @@ rule all:
     #expand(mutectpath_MT + "{patient}.tsv",patient=patients),
     #expand(varscanpath_genome + "{patient}_snv.tsv",patient=patients),
     #expand(varscanpath_MT + "{patient}_snv.tsv",patient=patients),
-    expand(variants_filter +"{patient}_mutect_somatic.tsv",patient=patients),
+    expand(variants_filter + "{patient}_all_somatic_annotated.tsv",patient=patients),
   run:
     pass
 
@@ -1135,6 +1136,8 @@ rule varscan_MT_patient:
 ###     FILTERING  ###
 ######################
 
+########## FILTER SOMATIC
+
 rule MergeWriteVariants:
     input:
         mutect_genome = mutectpath_genome + "{patient}.tsv",
@@ -1197,6 +1200,128 @@ rule KeepOnlyVariants:
     # benchmark:
     script:
         "{params.scripts}"+"KeepOnlyVariants.py"
+
+
+############# ANNOVAR
+
+############## MUTECT
+
+rule MutectSplitVariants:
+    input:
+        m_tsv = variants_filter +"{patient}_mutect_somatic.tsv",
+    output:
+        ann_genome = variants_filter +"{patient}_mutect_annovar_genome.tsv",
+        ann_MT = variants_filter +"{patient}_mutect_annovar_mt.tsv",
+    params:
+        scripts = scripts,
+        workdir = variants_filter,
+        name = "{patient}"
+    script:
+        "{params.scripts}"+"MutectSplitVariants.py"
+
+
+rule annovar_genome_mutect:
+    input:
+        ann_genome = variants_filter +"{patient}_mutect_annovar_genome.tsv",
+        annovar_dbs = annovar_dbs,
+    output:
+        variants_filter_logs + "{patient}_mutect_genome"
+    params:
+        protocol = config['protocols']['genome'],
+        operation = config['operations']['genome'],
+        tableannovar = tableannovar,
+        humandb = humandb,
+        build_ver = build_ver,
+    log:
+        variants_filter_logs + "{patient}_mutect_genome_annovar_err.log"
+    shell:
+        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+
+rule annovar_MT_mutect:
+    input:
+        ann_MT = variants_filter +"{patient}_mutect_annovar_mt.tsv",
+        annovar_dbs = annovar_dbs,
+    output:
+        variants_filter_logs + "{patient}_mutect_mt_g"
+    params:
+        protocol = config['protocols']['MT'],
+        operation = config['operations']['MT'],
+        tableannovar = tableannovar,
+        humandb = humandb,
+        mitochondrial_ver = mitochondrial_ver,
+    log:
+        variants_filter_logs + "{patient}_mutect_mt_g_annovar_err.log"
+    shell:
+        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+
+######## VARSCAN
+
+rule VarscanSplitVariants:
+    input:
+        vsn_tsv = variants_filter +"{patient}_varscan_somatic.tsv",
+    output:
+        ann_genome = variants_filter +"{patient}_varscan_annovar_genome.tsv",
+        ann_MT = variants_filter +"{patient}_varscan_annovar_mt.tsv",
+    params:
+        scripts = scripts,
+        workdir = variants_filter,
+        name = "{patient}"
+    script:
+        "{params.scripts}"+"VarscanSplitVariants.py"
+
+rule annovar_genome_varscan:
+    input:
+        ann_genome = variants_filter +"{patient}_varscan_annovar_genome.tsv",
+        annovar_dbs = annovar_dbs,
+    output:
+        variants_filter_logs + "{patient}_varscan_genome"
+    params:
+        protocol = config['protocols']['genome'],
+        operation = config['operations']['genome'],
+        tableannovar = tableannovar,
+        humandb = humandb,
+        build_ver = build_ver,
+    log:
+        variants_filter_logs + "{patient}_varscan_genome_annovar_err.log"
+    shell:
+        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+
+rule annovar_MT_varscan:
+    input:
+        ann_MT = variants_filter +"{patient}_varscan_annovar_mt.tsv",
+        annovar_dbs = annovar_dbs,
+    output:
+        variants_filter_logs + "{patient}_varscan_mt_g"
+    params:
+        protocol = config['protocols']['MT'],
+        operation = config['operations']['MT'],
+        tableannovar = tableannovar,
+        humandb = humandb,
+        mitochondrial_ver = mitochondrial_ver,
+    log:
+        variants_filter_logs + "{patient}_varscan_mt_g_annovar_err.log"
+    shell:
+        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+
+
+rule MergeMutectVarscan:
+    input:
+        variants_filter_logs + "{patient}_mutect_genome",
+        variants_filter_logs + "{patient}_mutect_mt_g",
+        variants_filter_logs + "{patient}_varscan_genome",
+        variants_filter_logs + "{patient}_varscan_mt_g",
+    output:
+        variants_filter + "{patient}_all_somatic_annotated.tsv",
+    params:
+        scripts = scripts,
+        workdir = variants_filter_logs,
+        name = "{patient}",
+    script:
+        "{params.scripts}"+"MergeMtVar.py"
+
+############ filter on exonic, non-synonymous, polymorphisms
+
+
 
 ###############################################################################
 #                           SINGLE-TIME-RUN RULES                             #

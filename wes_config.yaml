@@ -1,6 +1,6 @@
 input_list: "samples_eg.txt"
 
-dataset: "dataset_eg.tsv"
+dataset: "/dataset_EG.tsv"
 
 custom_match: ""
 
@@ -49,7 +49,7 @@ ref-files:
     mitochondrial_ver: 'GRCh37_MT' # Set parameter command for annotating mitochondria variants
 
 folders:
-    scripts: 'scripts/'
+    scripts: '/scripts'
     resultdir: '/results'
     custom_resultdir: ''  # NEW
 
@@ -77,8 +77,3 @@ hard-filter:
 annovar_dbs:
     hg19_db: '/softwares/annovar/humandb/hg19_ALL.sites.2012_04.txt'
     snp138_db: '/softwares/annovar/humandb/hg19_snp138.txt'
-
-LODn:
-    #Set the minimum read depth for normal and tumor samples
-    min_n_cov: 8
-    min_t_cov: 10

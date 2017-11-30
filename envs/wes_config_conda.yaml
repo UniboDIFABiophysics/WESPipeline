@@ -17,3 +17,4 @@ dependencies:
  - r-gsalib
  - pysam
  - bedtools
+ - varscan

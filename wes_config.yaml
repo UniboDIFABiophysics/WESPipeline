@@ -36,6 +36,7 @@ operations:
   genome: "operation: 'g,r,r,f,f,f,f,f'"
   MT: g
 
+rsIDfilter: "/171117_rsIDfilter.R"
 
 ########### old pipeline stuff
 

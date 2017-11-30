@@ -223,7 +223,7 @@ samples = [s for p in patients for s in checked_match_list[p].split('_')]
 def get_kit(wildcards):
     return dataset.loc[wildcards, 'kit_wes']
 
-def get_bed_mutect(wildcards):
+def get_bed_patient(wildcards):
     kit = patients_dict[wildcards]['kit']
     return (homepath + config['bed'][kit] + "_fixed.bed")
 
@@ -274,6 +274,10 @@ def get_bam(wildcards, sample_type, dir):
 def get_bai(wildcards, sample_type, dir):
     return (dir + patients_dict[wildcards][sample_type] + "_recal.bai")
 
+def get_mpileup(wildcards, sample_type, dir):
+    return (dir + patients_dict[wildcards][sample_type] + ".mpileup")
+
+
 # define align paths
 
 alignpath_genome = processpath + '/03_alignment_genome/'
@@ -298,10 +302,18 @@ exome_int = alignpath_exome + '01_intermediate/'
 exome_logs = alignpath_exome + 'logs/'
 MT_int = alignpath_MT + '01_intermediate/'
 MT_logs = alignpath_MT + 'logs/'
+
 mutectpath_genome = processpath + '/06_mutect_genome/'
 mutectpath_genome_logs = mutectpath_genome + 'logs/'
 mutectpath_MT = processpath + '/07_mutect_MT/'
 mutectpath_MT_logs = mutectpath_MT + 'logs/'
+
+varscanpath_genome = processpath + '/08_varscan_genome/'
+varscanpath_MT = processpath + '/09_varscan_MT/'
+mpileup_varscan_genome = varscanpath_genome + '01_mpileup/'
+mpileup_varscan_MT = varscanpath_MT + '01_mpileup/'
+varscan_genome_logs = varscanpath_genome + 'logs/'
+varscan_MT_logs = varscanpath_MT + 'logs/'
 
 # Wildcard costrains necessary for search only certain names
 wildcard_constraints:
@@ -326,6 +338,9 @@ rule all:
     #expand(alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",sample=samples),
     expand(alignpath_MTbqsr + "{sample}"+"_recal.bam",sample=samples),
     expand(mutectpath_genome + "{patient}.tsv",patient=patients),
+    expand(mutectpath_MT + "{patient}.tsv",patient=patients),
+    expand(varscanpath_genome + "{patient}_snv.tsv",patient=patients),
+    expand(varscanpath_MT + "{patient}_snv.tsv",patient=patients),
   run:
     pass
 
@@ -537,7 +552,7 @@ rule marking_genome:
         mx = alignpath_genome + '{sample}_metrix.log',
         mark = alignpath_genome + '{sample}_marking.log',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_mark_duplicates_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -556,7 +571,7 @@ rule indexing_genome:
     log:
         alignpath_genome + '{sample}_indexing.log',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_build_bam_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -582,7 +597,7 @@ rule RTC_genome:
     log:
         genome_logs + "{sample}" + "_RTC.log"
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_realigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     threads: RT_thrs
@@ -608,7 +623,7 @@ rule IndelRealigner_genome:
     log:
         genome_logs + "{sample}" + "_IndelRealigner.log"
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_indelrealigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -634,7 +649,7 @@ rule BaseRecal_genome:
     log:
         genome_logs + "{sample}" + '_recalibrating_01.log'
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_BQSR_BaseRecal_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR1_thrs=BQSR1_thrs,n_cpu=n_cpu)
     threads: BQSR1_thrs
@@ -658,7 +673,7 @@ rule PrintReads_genome:
     log:
         genome_logs + "{sample}" + '_recalibrating_02.log'
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_BQSR_PrintReads_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR4_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR4_thrs=BQSR4_thrs, n_cpu=n_cpu)
     threads: BQSR4_thrs
@@ -732,7 +747,7 @@ rule extractUnmapped_extract:
     log:
         exome_logs + '{sample}_unmapped.log'
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     shell:
         "samtools view -b -f 4 {input} > {output} 2> {log}"
 
@@ -746,7 +761,7 @@ rule extractUnmapped_convert:
     log:
         exome_logs + '{sample}_unmapped_fastq.log'
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     shell:
         "picard SamToFastq I={input} F={output.unmapped1} F2={output.unmapped2} FU={output.unpair} 2> {log}"
 
@@ -817,7 +832,7 @@ rule marking_MT:
         mx = alignpath_MT + '{sample}_metrix.log',
         mark = alignpath_MT + '{sample}_marking.log',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_mark_duplicates_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -836,7 +851,7 @@ rule indexing_MT:
     log:
         alignpath_MT + '{sample}_indexing.log',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_build_bam_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -862,7 +877,7 @@ rule RTC_MT:
     log:
         MT_logs + "{sample}" + "_RTC.log"
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_realigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     threads: RT_thrs
@@ -888,7 +903,7 @@ rule IndelRealigner_MT:
     log:
         MT_logs + "{sample}" + "_IndelRealigner.log"
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_indelrealigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -914,7 +929,7 @@ rule BaseRecal_MT:
     log:
         MT_logs + "{sample}" + '_recalibrating_01.log'
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_BQSR_BaseRecal_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR1_thrs=BQSR1_thrs,n_cpu=n_cpu)
     threads: BQSR1_thrs
@@ -938,7 +953,7 @@ rule PrintReads_MT:
     log:
         MT_logs + "{sample}" + '_recalibrating_02.log'
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_BQSR_PrintReads_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR4_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR4_thrs=BQSR4_thrs, n_cpu=n_cpu)
     threads: BQSR4_thrs
@@ -964,7 +979,7 @@ rule muTect_genome:
     input:
         muTect = muTect,
         cosmic = cosmic,
-        target = lambda wildcards: get_bed_mutect(wildcards.patient),
+        target = lambda wildcards: get_bed_patient(wildcards.patient),
         normal_bam = lambda wildcards: get_bam(wildcards.patient,'N', alignpath_genomebqsr),
         tumour_bam = lambda wildcards: get_bam(wildcards.patient,'T', alignpath_genomebqsr),
         normal_bai = lambda wildcards: get_bai(wildcards.patient,'N', alignpath_genomebqsr),
@@ -979,12 +994,43 @@ rule muTect_genome:
         m = mutectpath_genome_logs + "{patient}" + "_mutect.log",
         err = mutectpath_genome_logs + "{patient}" + "_mutect_err.log"
     conda:
-        "envs/config_conda_muTect.yaml"
+        "envs/wes_config_conda_muTect.yaml"
     # benchmark:
     #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
     message: 'MuTect on genomic alignment'
     shell:
         "java -Xmx2g -jar {input.muTect} --analysis_type MuTect --reference_sequence {params.ref} --cosmic {input.cosmic} --dbsnp {params.dbsnp} --intervals {input.target} --input_file:normal {input.normal_bam} --input_file:tumor {input.tumour_bam} --out {output.out} --coverage_file {output.cov} > {log.m} 2> {log.err}"
+
+rule muTect_MT:
+    """
+    This step uses muTect 1.1.4 to call variants.
+    """
+    input:
+        muTect = muTect,
+        cosmic = cosmic,
+        target = MT_bed + ".bed",
+        normal_bam = lambda wildcards: get_bam(wildcards.patient,'N', alignpath_MTbqsr),
+        tumour_bam = lambda wildcards: get_bam(wildcards.patient,'T', alignpath_MTbqsr),
+        normal_bai = lambda wildcards: get_bai(wildcards.patient,'N', alignpath_MTbqsr),
+        tumour_bai = lambda wildcards: get_bai(wildcards.patient,'T', alignpath_MTbqsr),
+    output:
+        out = mutectpath_MT + "{patient}.tsv",
+        cov = mutectpath_MT + "{patient}_cov_wig.log"
+    params:
+        dbsnp = dbsnp,
+        ref = MT,
+    log:
+        m = mutectpath_MT_logs + "{patient}" + "_mutect.log",
+        err = mutectpath_MT_logs + "{patient}" + "_mutect_err.log"
+    conda:
+        "envs/wes_config_conda_muTect.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
+    message: 'MuTect on MT alignment'
+    shell:
+        "java -Xmx2g -jar {input.muTect} --analysis_type MuTect --reference_sequence {params.ref} --cosmic {input.cosmic} --dbsnp {params.dbsnp} --intervals {input.target} --input_file:normal {input.normal_bam} --input_file:tumor {input.tumour_bam} --out {output.out} --coverage_file {output.cov} > {log.m} 2> {log.err}"
+
+
 
 
 
@@ -993,8 +1039,92 @@ rule muTect_genome:
 ###  VARSCAN ##
 ###############
 
+rule varscan_genome_sample:
+    """
+    This step uses Varscan to call variants.
+    """
+    input:
+        target = lambda wildcards: get_bed(wildcards.sample),
+        recal_bam = alignpath_genomebqsr + "{sample}"+"_recal.bam",
+        recal_bai = alignpath_genomebqsr + "{sample}"+"_recal.bai",
+    output:
+        out = mpileup_varscan_genome + "{sample}" + ".mpileup",
+    params:
+        ref = hg,
+    log:
+        varscan_genome_logs + "{sample}" + "_mpileup.log"
+    conda:
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
+    shell:
+        "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.recal_bam}"
+
+rule varscan_genome_patient:
+    """
+    This step uses Varscan to call variants.
+    """
+    input:
+        normal = lambda wildcards: get_mpileup(wildcards.patient,'N', mpileup_varscan_genome),
+        tumour = lambda wildcards: get_mpileup(wildcards.patient,'T', mpileup_varscan_genome),
+    output:
+        snv = varscanpath_genome + "{patient}_snv.tsv",
+        indel = varscanpath_genome + "{patient}_indel.tsv",
+    params:
+        ref = hg,
+    log:
+        varscan_genome_logs + "{patient}" + "_varscan.log"
+    conda:
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
+    message: 'VarScan on genomic alignment'
+    shell:
+        "varscan somatic {input.normal} {input.tumour} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
 
 
+rule varscan_MT_sample:
+    """
+    This step uses Varscan to call variants.
+    """
+    input:
+        target = MT_bed + ".bed",
+        recal_bam = alignpath_MTbqsr + "{sample}"+"_recal.bam",
+        recal_bai = alignpath_MTbqsr + "{sample}"+"_recal.bai",
+    output:
+        out = mpileup_varscan_MT + "{sample}" + ".mpileup",
+    params:
+        ref = MT,
+    log:
+        varscan_MT_logs + "{sample}" + "_mpileup.log"
+    conda:
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
+    shell:
+        "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.recal_bam}"
+
+rule varscan_MT_patient:
+    """
+    This step uses Varscan to call variants.
+    """
+    input:
+        normal = lambda wildcards: get_mpileup(wildcards.patient,'N', mpileup_varscan_MT),
+        tumour = lambda wildcards: get_mpileup(wildcards.patient,'T', mpileup_varscan_MT),
+    output:
+        snv = varscanpath_MT + "{patient}_snv.tsv",
+        indel = varscanpath_MT + "{patient}_indel.tsv",
+    params:
+        ref = MT,
+    log:
+        varscan_MT_logs + "{patient}" + "_varscan.log"
+    conda:
+        "envs/wes_config_conda.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
+    message: 'VarScan on MT alignment'
+    shell:
+        "varscan somatic {input.normal} {input.tumour} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
 
 
 
@@ -1222,7 +1352,7 @@ rule hg_index_bwa:
     output:
         hg_indexes,
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     version: 0.1
@@ -1238,7 +1368,7 @@ rule index_picard_hg:
     output:
         hg.replace('fasta', 'dict'),
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1253,7 +1383,7 @@ rule index_samtools_hg:
     output:
         hg+'.fai',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1269,7 +1399,7 @@ rule nextera_index_bwa:
     output:
         nextera_indexes,
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     #benchmark:
     #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     version: 0.1
@@ -1285,7 +1415,7 @@ rule index_picard_nextera:
     output:
         nextera.replace('fasta', 'dict'),
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1300,7 +1430,7 @@ rule index_samtools_nextera:
     output:
         nextera+'.fai',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1317,7 +1447,7 @@ rule nextexp_index_bwa:
     output:
         nextexp_indexes,
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     #benchmark:
     #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     version: 0.1
@@ -1333,7 +1463,7 @@ rule index_picard_nextexp:
     output:
         nextera_expanded.replace('fasta', 'dict'),
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1348,7 +1478,7 @@ rule index_samtools_nextexp:
     output:
         nextera_expanded+'.fai',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1363,7 +1493,7 @@ rule truseq_index_bwa:
     output:
         truseq_indexes,
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     #benchmark:
     #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     version: 0.1
@@ -1379,7 +1509,7 @@ rule index_picard_truseq:
     output:
         truseq.replace('fasta', 'dict'),
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1394,7 +1524,7 @@ rule index_samtools_truseq:
     output:
         truseq+'.fai',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1409,7 +1539,7 @@ rule MT_index_bwa:
     output:
         MT_indexes,
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     #benchmark:
     #    "benchmarks/benchmark_hg_hg_index_bwa_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     version: 0.1
@@ -1425,7 +1555,7 @@ rule index_picard_MT:
     output:
         MT.replace('fasta', 'dict'),
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_index_picard_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
@@ -1440,7 +1570,7 @@ rule index_samtools_MT:
     output:
         MT+'.fai',
     conda:
-        "envs/config_conda.yaml"
+        "envs/wes_config_conda.yaml"
     # benchmark:
     #     "benchmarks/benchmark_index_samtools_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:

@@ -315,6 +315,9 @@ mpileup_varscan_MT = varscanpath_MT + '01_mpileup/'
 varscan_genome_logs = varscanpath_genome + 'logs/'
 varscan_MT_logs = varscanpath_MT + 'logs/'
 
+variants_filter = processpath + '/10_variants_filter/'
+variants_filter_logs = variants_filter + 'logs/'
+
 # Wildcard costrains necessary for search only certain names
 wildcard_constraints:
     sample = "("+"|".join(samples)+")",
@@ -334,13 +337,14 @@ rule all:
   input:
     expand(fastqcpath +"{sample}" + "_R1_fastqc.html",sample=samples),
     expand(fastqcpath +"{sample}" + "_R2_fastqc.html",sample=samples),
-    expand(alignpath_genomebqsr + "{sample}"+"_recal.bam",sample=samples),
+    #expand(alignpath_genomebqsr + "{sample}"+"_recal.bam",sample=samples),
     #expand(alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",sample=samples),
-    expand(alignpath_MTbqsr + "{sample}"+"_recal.bam",sample=samples),
-    expand(mutectpath_genome + "{patient}.tsv",patient=patients),
-    expand(mutectpath_MT + "{patient}.tsv",patient=patients),
-    expand(varscanpath_genome + "{patient}_snv.tsv",patient=patients),
-    expand(varscanpath_MT + "{patient}_snv.tsv",patient=patients),
+    #expand(alignpath_MTbqsr + "{sample}"+"_recal.bam",sample=samples),
+    #expand(mutectpath_genome + "{patient}.tsv",patient=patients),
+    #expand(mutectpath_MT + "{patient}.tsv",patient=patients),
+    #expand(varscanpath_genome + "{patient}_snv.tsv",patient=patients),
+    #expand(varscanpath_MT + "{patient}_snv.tsv",patient=patients),
+    expand(variants_filter +"{patient}_mutect_somatic.tsv",patient=patients),
   run:
     pass
 
@@ -1127,6 +1131,72 @@ rule varscan_MT_patient:
         "varscan somatic {input.normal} {input.tumour} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
 
 
+######################
+###     FILTERING  ###
+######################
+
+rule MergeWriteVariants:
+    input:
+        mutect_genome = mutectpath_genome + "{patient}.tsv",
+        mutect_MT = mutectpath_MT + "{patient}.tsv",
+        snv_genome = varscanpath_genome + "{patient}_snv.tsv",
+        indel_genome = varscanpath_genome + "{patient}_indel.tsv",
+        snv_MT = varscanpath_MT + "{patient}_snv.tsv",
+        indel_MT = varscanpath_MT + "{patient}_indel.tsv",
+    output:
+        m = variants_filter + "{patient}_mutect.tsv",
+        snp = variants_filter + "{patient}_varscan_snv_temp1.tsv",
+        indel = variants_filter + "{patient}_varscan_indel_temp1.tsv",
+        v_all = variants_filter + "{patient}_varscan.tsv",
+    params:
+        scripts=scripts,
+        name = "{patient}",
+        outdir = variants_filter,
+    # benchmark:
+    script:
+        "{params.scripts}"+"MergeWriteVariants.py"
+
+rule filterSomatic_SNV:
+    input:
+        snp = variants_filter + "{patient}_varscan_snv_temp1.tsv",
+        indel = variants_filter + "{patient}_varscan_indel_temp1.tsv",
+    output:
+        variants_filter + "{patient}_varscan_snv_temp2.tsv",
+    log:
+        variants_filter_logs + "{patient}_somaticFilter_snv_err.log"
+    conda:
+        "envs/wes_config_conda.yaml"
+    shell:
+        "varscan somaticFilter {input.snp} --indel-file {input.indel} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
+
+rule filterSomatic_Indel:
+    input:
+        variants_filter + "{patient}_varscan_indel_temp1.tsv",
+    output:
+        variants_filter + "{patient}_varscan_indel_temp2.tsv",
+    log:
+        variants_filter_logs + "{patient}_somaticFilter_indel_err.log"
+    conda:
+        "envs/wes_config_conda.yaml"
+    shell:
+        "varscan somaticFilter {input} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
+
+
+rule KeepOnlyVariants:
+    input:
+        m = variants_filter + "{patient}_mutect.tsv",
+        snv = variants_filter + "{patient}_varscan_snv_temp2.tsv",
+        indel = variants_filter + "{patient}_varscan_indel_temp2.tsv",
+    output:
+        m_tsv = variants_filter +"{patient}_mutect_somatic.tsv",
+        vsn_tsv = variants_filter +"{patient}_varscan_somatic.tsv",
+    params:
+        scripts=scripts,
+        name = "{patient}",
+        outdir = variants_filter,
+    # benchmark:
+    script:
+        "{params.scripts}"+"KeepOnlyVariants.py"
 
 ###############################################################################
 #                           SINGLE-TIME-RUN RULES                             #

@@ -196,6 +196,7 @@ else:
         match_list[patient] = ('_'.join([t, normal]))
 
 ### LOOP OVER MATCHES
+patients_dict={}
 for patient in match_list:
         match = match_list[patient]
         # extract names of current paired samples
@@ -210,12 +211,21 @@ for patient in match_list:
             continue
 
         checked_match_list[patient] = match_list[patient]
+        patients_dict[patient] = match_list[patient]
+        patients_dict[patient] = {}
+        patients_dict[patient]['T'] = names[0]
+        patients_dict[patient]['N'] = names[1]
+        patients_dict[patient]['kit'] = kit_tumor
 
 patients  = [p for p in checked_match_list]
 samples = [s for p in patients for s in checked_match_list[p].split('_')]
 
 def get_kit(wildcards):
     return dataset.loc[wildcards, 'kit_wes']
+
+def get_bed_mutect(wildcards):
+    kit = patients_dict[wildcards]['kit']
+    return (homepath + config['bed'][kit] + "_fixed.bed")
 
 def get_fastq_path(wildcards):
     path = dataset.loc[wildcards,'fastq_path_wes']
@@ -258,6 +268,11 @@ def get_ref_dict(wildcards):
     r = homepath + config['fasta'][kit]
     return r.replace('fasta','dict')
 
+def get_bam(wildcards, sample_type, dir):
+    return (dir + patients_dict[wildcards][sample_type] + "_recal.bam")
+
+def get_bai(wildcards, sample_type, dir):
+    return (dir + patients_dict[wildcards][sample_type] + "_recal.bai")
 
 # define align paths
 
@@ -283,6 +298,10 @@ exome_int = alignpath_exome + '01_intermediate/'
 exome_logs = alignpath_exome + 'logs/'
 MT_int = alignpath_MT + '01_intermediate/'
 MT_logs = alignpath_MT + 'logs/'
+mutectpath_genome = processpath + '/06_mutect_genome/'
+mutectpath_genome_logs = mutectpath_genome + 'logs/'
+mutectpath_MT = processpath + '/07_mutect_MT/'
+mutectpath_MT_logs = mutectpath_MT + 'logs/'
 
 # Wildcard costrains necessary for search only certain names
 wildcard_constraints:
@@ -306,6 +325,7 @@ rule all:
     expand(alignpath_genomebqsr + "{sample}"+"_recal.bam",sample=samples),
     #expand(alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",sample=samples),
     expand(alignpath_MTbqsr + "{sample}"+"_recal.bam",sample=samples),
+    expand(mutectpath_genome + "{patient}.tsv",patient=patients),
   run:
     pass
 
@@ -927,8 +947,51 @@ rule PrintReads_MT:
 
 
 
+#######################
+#     Variant Call    #
+#######################
 
 
+##############
+###  MUTECT ##
+##############
+
+
+rule muTect_genome:
+    """
+    This step uses muTect 1.1.4 to call variants.
+    """
+    input:
+        muTect = muTect,
+        cosmic = cosmic,
+        target = lambda wildcards: get_bed_mutect(wildcards.patient),
+        normal_bam = lambda wildcards: get_bam(wildcards.patient,'N', alignpath_genomebqsr),
+        tumour_bam = lambda wildcards: get_bam(wildcards.patient,'T', alignpath_genomebqsr),
+        normal_bai = lambda wildcards: get_bai(wildcards.patient,'N', alignpath_genomebqsr),
+        tumour_bai = lambda wildcards: get_bai(wildcards.patient,'T', alignpath_genomebqsr),
+    output:
+        out = mutectpath_genome + "{patient}.tsv",
+        cov = mutectpath_genome + "{patient}_cov_wig.log"
+    params:
+        dbsnp = dbsnp,
+        ref = hg,
+    log:
+        m = mutectpath_genome_logs + "{patient}" + "_mutect.log",
+        err = mutectpath_genome_logs + "{patient}" + "_mutect_err.log"
+    conda:
+        "envs/config_conda_muTect.yaml"
+    # benchmark:
+    #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
+    message: 'MuTect on genomic alignment'
+    shell:
+        "java -Xmx2g -jar {input.muTect} --analysis_type MuTect --reference_sequence {params.ref} --cosmic {input.cosmic} --dbsnp {params.dbsnp} --intervals {input.target} --input_file:normal {input.normal_bam} --input_file:tumor {input.tumour_bam} --out {output.out} --coverage_file {output.cov} > {log.m} 2> {log.err}"
+
+
+
+
+###############
+###  VARSCAN ##
+###############
 
 
 

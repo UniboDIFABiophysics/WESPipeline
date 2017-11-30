@@ -28,6 +28,14 @@ bed:
   nextera_expanded: '/data_ref/nexterarapidcapture_expandedexome_targetedregions'
   truseq: "/data_ref/truseq-exome-targeted-regions-manifest-v1-2"
 
+protocols:
+  genome: "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,snp138,1000g2014oct_all,exac03nontcga,ljb26_all"
+  MT: "protocol: ensGene"
+
+operations:
+  genome: "operation: 'g,r,r,f,f,f,f,f'"
+  MT: g
+
 
 ########### old pipeline stuff
 
@@ -58,6 +66,7 @@ softwares:
     muTect: '/softwares/muTect-1.1.4.jar'
     annovar: '/softwares/annovar/annotate_variation.pl'
     convert2annovar: '/softwares/annovar/convert2annovar.pl'
+    tableannovar: '/softwares/annovar/table_annovar.pl'
 
 sample-details:
     platform: 'illumina' # Set platform for mapping

@@ -13,43 +13,43 @@ import subprocess as sp
 homepath = os.path.expanduser('~')
 
 # get current path
-currentpath = os.getcwd() + '/'
+currentpath = os.getcwd()
 
-folder= config['folders']['resultdir']
-scripts = config['folders']['scripts']
+folder= currentpath + config['folders']['resultdir']
+scripts = currentpath + config['folders']['scripts']
 
 custom_storepath=config['folders']['custom_resultdir']
 
 
 # build and create PROCESSPATH & STOREPATH
-processpath = currentpath + 'wes_analyses/' + folder
+processpath = currentpath + '/wes_analyses' + folder
 
 if not os.path.exists(processpath):
      os.makedirs(processpath)
 
-storepath=currentpath
-storepath_tree=storepath
-
-# save tree structure as dictionary
-dirs = {'01_fastq': ['01_preprocess', '02_postprocess', '03_fastqc', 'logs'],
-          '02_fastq_trimmed': ['01_fastqc', 'logs'],
-          '03_alignment_genome': ['01_intermediate', '02_bqsr', 'logs'],
-          '04_alignment_exome': ['01_intermediate', '02_unmapped_fastq', 'logs'],
-          '05_alignment_MT': ['01_intermediate', '02_bqsr', 'logs'],
-          '06_mutect_genome': ['logs'],
-          '07_mutect_MT': ['logs'],
-          '08_varscan_genome': ['01_mpileup', 'logs'],
-          '09_varscan_MT': ['01_mpileup', 'logs'],
-          '10_variants_filter': ['logs'],
-         }
-
-# loop over dictionary items and define each folder and subfolder
-processpath_tree = [['/'.join([processpath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
+storepath = currentpath
+# storepath_tree = storepath
+#
+# # save tree structure as dictionary
+# dirs = {'01_fastq': ['01_preprocess', '02_postprocess', '03_fastqc', 'logs'],
+#           '02_fastq_trimmed': ['01_fastqc', 'logs'],
+#           '03_alignment_genome': ['01_intermediate', '02_bqsr', 'logs'],
+#           '04_alignment_exome': ['01_intermediate', '02_unmapped_fastq', 'logs'],
+#           '05_alignment_MT': ['01_intermediate', '02_bqsr', 'logs'],
+#           '06_mutect_genome': ['logs'],
+#           '07_mutect_MT': ['logs'],
+#           '08_varscan_genome': ['01_mpileup', 'logs'],
+#           '09_varscan_MT': ['01_mpileup', 'logs'],
+#           '10_variants_filter': ['logs'],
+#          }
+#
+# # loop over dictionary items and define each folder and subfolder
+# processpath_tree = [['/'.join([processpath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
 
 # initialize storepath if necessary
 if custom_storepath:
-    storepath = currentpath + custom_storepath + '/' + folder
-    storepath_tree = [['/'.join([storepath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
+    storepath = currentpath + custom_storepath + folder
+    # storepath_tree = [['/'.join([storepath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
 
 #/-----------------------------------------------------------------------------------------#/
 
@@ -265,6 +265,25 @@ alignpath_genome = processpath + '/03_alignment_genome/'
 alignpath_exome = processpath + '04_alignment_exome/'
 alignpath_MT = processpath + '/05_alignment_MT/'
 
+
+# define directories
+tmp_dir = currentpath + '/wes_analyses/tmp/'
+postprocesspath = processpath + '/01_fastq/02_postprocess/'
+trimmedpath = processpath + '/02_fastq_trimmed/'
+fastqcpath = processpath + '/01_fastq/03_fastqc/'
+fastqcpath_trim = processpath + '/02_fastq_trimmed/01_fastqc/'
+alignpath_genomebqsr = alignpath_genome + "02_bqsr/"
+alignpath_MTbqsr = alignpath_MT + "02_bqsr/"
+alignpath_exomeunmapped = alignpath_exome + '02_unmapped_fastq/'
+fastq_logs = processpath + '/01_fastq/logs/'
+trimmed_lods = processpath + '/02_fastq_trimmed/logs/'
+genome_int = alignpath_genome + '01_intermediate/'
+genome_logs = alignpath_genome + 'logs/'
+exome_int = alignpath_exome + '01_intermediate/'
+exome_logs = alignpath_exome + 'logs/'
+MT_int = alignpath_MT + '01_intermediate/'
+MT_logs = alignpath_MT + 'logs/'
+
 # Wildcard costrains necessary for search only certain names
 wildcard_constraints:
     sample = "("+"|".join(samples)+")",
@@ -282,11 +301,11 @@ rule all:
     PIPELINE ENDING
   """
   input:
-    expand(processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R1_fastqc.html",sample=samples),
-    expand(processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R2_fastqc.html",sample=samples),
-    expand(alignpath_genome + "02_bqsr/" + "{sample}"+"_recal.bam",sample=samples),
-    #expand(alignpath_exome + '02_unmapped_fastq/' + "{sample}_R1.unmapped.fastq",sample=samples),
-    expand(alignpath_MT + "02_bqsr/" + "{sample}"+"_recal.bam",sample=samples),
+    expand(fastqcpath +"{sample}" + "_R1_fastqc.html",sample=samples),
+    expand(fastqcpath +"{sample}" + "_R2_fastqc.html",sample=samples),
+    expand(alignpath_genomebqsr + "{sample}"+"_recal.bam",sample=samples),
+    #expand(alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",sample=samples),
+    expand(alignpath_MTbqsr + "{sample}"+"_recal.bam",sample=samples),
   run:
     pass
 
@@ -294,7 +313,7 @@ rule all:
 
 rule create_tmpdir:
   output:
-    tmp = temp(currentpath + 'wes_analyses/tmp/'),
+    temp(tmp_dir),
   run:
     pass
 
@@ -302,8 +321,8 @@ rule create_tmpdir:
 
 rule downloadDecompressMergeFastq:
     output:
-        outpath1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1_unchecked.fastq",
-        outpath2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2_unchecked.fastq",
+        outpath1 = postprocesspath+"{sample}" + "_R1_unchecked.fastq",
+        outpath2 = postprocesspath+"{sample}" + "_R2_unchecked.fastq",
     params:
         fastq_path = lambda wildcards: get_fastq_path(wildcards.sample),
         fastq_id = lambda wildcards: get_fastq_id(wildcards.sample),
@@ -314,18 +333,18 @@ rule downloadDecompressMergeFastq:
         processpath = processpath,
         cadaver = config['cadaver'],
     log:
-         processpath + '01_fastq/logs/',
+         fastq_logs,
     message:'>> {sample} - Fastq preprocessing : downloading, decompressing and merging fastq'
     script:
         "{params.scripts}"+"downloadDecompressMergeFastq.py"
 
 rule fastq_checkpoint:
     input:
-        unchecked1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1_unchecked.fastq",
-        unchecked2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2_unchecked.fastq",
+        unchecked1 = postprocesspath+"{sample}" + "_R1_unchecked.fastq",
+        unchecked2 = postprocesspath+"{sample}" + "_R2_unchecked.fastq",
     output:
-        checked1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1.fastq",
-        checked2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2.fastq",
+        checked1 = postprocesspath+"{sample}" + "_R1.fastq",
+        checked2 = postprocesspath+"{sample}" + "_R2.fastq",
     params:
         name="{sample}",
     run:
@@ -342,14 +361,14 @@ rule fastq_checkpoint:
 
 rule fastqc_R1:
   input:
-    fastq1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1.fastq",
+    fastq1 = postprocesspath+"{sample}" + "_R1.fastq",
   output:
-    fastq1_fastqc_zip = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R1_fastqc.zip",
-    fastq1_fastqc_html = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R1_fastqc.html",
+    fastq1_fastqc_zip = fastqcpath +"{sample}" + "_R1_fastqc.zip",
+    fastq1_fastqc_html = fastqcpath +"{sample}" + "_R1_fastqc.html",
   params:
-    outpath = processpath + '01_fastq/03_fastqc/',
+    outpath = fastqcpath,
   log:
-    processpath + '01_fastq/logs/' + "{sample}" + '_R1_fastqc.log'
+    fastq_logs + "{sample}" + '_R1_fastqc.log'
   conda:
     "envs/wes_config_conda.yaml"
   #benchmark:
@@ -359,14 +378,14 @@ rule fastqc_R1:
 
 rule fastqc_R2:
   input:
-    fastq2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2.fastq",
+    fastq2 = postprocesspath+"{sample}" + "_R2.fastq",
   output:
-    fastq2_fastqc_zip = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R2_fastqc.zip",
-    fastq2_fastqc_html = processpath + '01_fastq/03_fastqc/'+"{sample}" + "_R2_fastqc.html",
+    fastq2_fastqc_zip = fastqcpath +"{sample}" + "_R2_fastqc.zip",
+    fastq2_fastqc_html = fastqcpath +"{sample}" + "_R2_fastqc.html",
   params:
-    outpath = processpath + '01_fastq/03_fastqc/',
+    outpath = fastqcpath,
   log:
-    processpath + '01_fastq/logs/' + "{sample}" + '_R2_fastqc.log'
+    fastq_logs + "{sample}" + '_R2_fastqc.log'
   conda:
     "envs/wes_config_conda.yaml"
   #benchmark:
@@ -378,19 +397,19 @@ rule fastqc_R2:
 
 rule trim_02:
     input:
-        fastq1 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R1.fastq",
-        fastq2 = processpath + '01_fastq/02_postprocess/'+"{sample}" + "_R2.fastq",
+        fastq1 = postprocesspath+"{sample}" + "_R1.fastq",
+        fastq2 = postprocesspath+"{sample}" + "_R2.fastq",
     output:
-        fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
-        fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
+        fastq1_trimmed = trimmedpath+"{sample}" + "_R1.fastq",
+        fastq2_trimmed = trimmedpath+"{sample}" + "_R2.fastq",
     params:
         pcr1 = lambda wildcards: get_pcr(wildcards.sample,1),
         pcr2 = lambda wildcards: get_pcr(wildcards.sample,2),
         adapter_removal=adapter_removal,
     log:
-        log_disc = processpath + '02_fastq_trimmed/logs/' + '{sample}_discarded.log',
-        log_stats = processpath + '02_fastq_trimmed/logs/' + '{sample}_stats.log',
-        log_sgtn = processpath + '02_fastq_trimmed/logs/' + '{sample}_singleton.log',
+        log_disc = trimmed_lods + '{sample}_discarded.log',
+        log_stats = trimmed_lods + '{sample}_stats.log',
+        log_sgtn = trimmed_lods + '{sample}_singleton.log',
     #conda:
     #benchmarks:
     message: 'trimming'
@@ -400,14 +419,14 @@ rule trim_02:
 
 rule fastqc_trimmed_R1:
   input:
-    fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
+    fastq1_trimmed = trimmedpath+"{sample}" + "_R1.fastq",
   output:
-    fastq1tr_fastqc_zip = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R1_fastqc.zip",
-    fastq1tr_fastqc_html = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R1_fastqc.html",
+    fastq1tr_fastqc_zip = fastqcpath_trim+"{sample}" + "_R1_fastqc.zip",
+    fastq1tr_fastqc_html = fastqcpath_trim+"{sample}" + "_R1_fastqc.html",
   params:
-    outpath = processpath + '01_fastq/03_fastqc/',
+    outpath = fastqcpath,
   log:
-    processpath + '02_fastq_trimmed/logs/' + "{sample}" + '_R1_fastqc.log'
+    trimmed_lods + "{sample}" + '_R1_fastqc.log'
   conda:
     "envs/wes_config_conda.yaml"
   #benchmark:
@@ -417,14 +436,14 @@ rule fastqc_trimmed_R1:
 
 rule fastqc_trimmed_R2:
   input:
-    fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
+    fastq2_trimmed = trimmedpath+"{sample}" + "_R2.fastq",
   output:
-    fastq2tr_fastqc_zip = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R2_fastqc.zip",
-    fastq2tr_fastqc_html = processpath + '02_fastq_trimmed/01_fastqc/'+"{sample}" + "_R2_fastqc.html",
+    fastq2tr_fastqc_zip = fastqcpath_trim+"{sample}" + "_R2_fastqc.zip",
+    fastq2tr_fastqc_html = fastqcpath_trim+"{sample}" + "_R2_fastqc.html",
   params:
-    outpath = processpath + '01_fastq/03_fastqc/',
+    outpath = fastqcpath,
   log:
-    processpath + '02_fastq_trimmed/logs/' + "{sample}" + '_R2_fastqc.log'
+    trimmed_lods + "{sample}" + '_R2_fastqc.log'
   conda:
     "envs/wes_config_conda.yaml"
   #benchmark:
@@ -445,17 +464,17 @@ rule map_to_genome:
     """
     input:
         hg_indexes,
-        fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
-        fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
+        fastq1_trimmed = trimmedpath+"{sample}" + "_R1.fastq",
+        fastq2_trimmed = trimmedpath+"{sample}" + "_R2.fastq",
     output:
-        outfile =  alignpath_genome + '01_intermediate/' + "{sample}.sam",
+        outfile =  genome_int + "{sample}.sam",
     params:
         reference = hg,
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
         name = "{sample}",
     log:
-        alignpath_genome + 'logs/' + '{sample}_alignment.log',
+        genome_logs + '{sample}_alignment.log',
     conda:
         "envs/wes_config_conda.yaml"
     # benchmark:
@@ -472,10 +491,10 @@ rule sorting_genome:
     This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        sam = alignpath_genome + '01_intermediate/' + "{sample}.sam",
-        tmp = currentpath + 'wes_analyses/tmp/',
+        sam = genome_int + "{sample}.sam",
+        tmp = tmp_dir,
     output:
-        outdir = alignpath_genome + '01_intermediate/' + "{sample}_sorted.bam",
+        outdir = genome_int + "{sample}_sorted.bam",
     log:
         alignpath_genome + '{sample}_sorting.log'
     conda:
@@ -490,10 +509,10 @@ rule marking_genome:
     This tool locates and tags duplicate reads in a BAM or SAM file, where duplicate reads are defined as originating from a single fragment of DNA.
     """
     input:
-        sorted_bam = alignpath_genome + '01_intermediate/' + "{sample}_sorted.bam",
-        tmp = currentpath + 'wes_analyses/tmp/',
+        sorted_bam = genome_int + "{sample}_sorted.bam",
+        tmp = tmp_dir,
     output:
-        out = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
+        out = genome_int+"{sample}"+"_marked.bam",
     log:
         mx = alignpath_genome + '{sample}_metrix.log',
         mark = alignpath_genome + '{sample}_marking.log',
@@ -511,9 +530,9 @@ rule indexing_genome:
     This tool creates an index file for the input BAM that allows fast look-up of data in a BAM file, like an index on a database.
     """
     input:
-        marked_bam = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
+        marked_bam = genome_int+"{sample}"+"_marked.bam",
     output:
-        marked_bai = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bai",
+        marked_bai = genome_int+"{sample}"+"_marked.bai",
     log:
         alignpath_genome + '{sample}_indexing.log',
     conda:
@@ -530,18 +549,18 @@ rule RTC_genome:
     """
     input:
         hg.replace('fasta', 'dict'),
-        marked_bai = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bai",
+        marked_bai = genome_int+"{sample}"+"_marked.bai",
         ref=hg+'.fai',
         indels_ref=indels_ref,
         gatk = gatk,
-        marked_bam = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
+        marked_bam = genome_int+"{sample}"+"_marked.bam",
         bed = lambda wildcards: get_bed(wildcards.sample),
     output:
-        alignpath_genome + 'logs/'+"{sample}"+".intervals",
+        genome_logs+"{sample}"+".intervals",
     params:
         ref=hg,
     log:
-        alignpath_genome + 'logs/' + "{sample}" + "_RTC.log"
+        genome_logs + "{sample}" + "_RTC.log"
     conda:
         "envs/config_conda.yaml"
     benchmark:
@@ -556,18 +575,18 @@ rule IndelRealigner_genome:
     This tool performs local realignment of reads around indels.
     """
     input:
-        intvs = alignpath_genome + 'logs/'+"{sample}"+".intervals",
-        bam = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bam",
-        idx = alignpath_genome + '01_intermediate/'+"{sample}"+"_marked.bai",
+        intvs = genome_logs+"{sample}"+".intervals",
+        bam = genome_int+"{sample}"+"_marked.bam",
+        idx = genome_int+"{sample}"+"_marked.bai",
     output:
-        r_bam = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bam",
-        r_idx = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bai",
+        r_bam = genome_int + "{sample}"+"_realigned.bam",
+        r_idx = genome_int + "{sample}"+"_realigned.bai",
     params:
         gatk = gatk,
         ref = hg,
         indels_ref=indels_ref,
     log:
-        alignpath_genome + 'logs/' + "{sample}" + "_IndelRealigner.log"
+        genome_logs + "{sample}" + "_IndelRealigner.log"
     conda:
         "envs/config_conda.yaml"
     benchmark:
@@ -582,18 +601,18 @@ rule BaseRecal_genome:
     This step produces a recalibrated data table.
     """
     input:
-        r_bam = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bam",
-        r_idx = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bai",
+        r_bam = genome_int +"{sample}"+"_realigned.bam",
+        r_idx = genome_int +"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
         bed = lambda wildcards: get_bed(wildcards.sample),
     output:
-        outtable = alignpath_genome + "logs/" + "{sample}"+"_recal_data.table",
+        outtable = genome_logs + "{sample}"+"_recal_data.table",
     params:
         gatk = gatk,
         ref=hg,
         indels_ref=indels_ref
     log:
-        alignpath_genome + "logs/" + "{sample}" + '_recalibrating_01.log'
+        genome_logs + "{sample}" + '_recalibrating_01.log'
     conda:
         "envs/config_conda.yaml"
     benchmark:
@@ -607,17 +626,17 @@ rule PrintReads_genome:
     This tool writes out sequence read data.
     """
     input:
-        r_bam = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bam",
-        r_idx = alignpath_genome + '01_intermediate/'"{sample}"+"_realigned.bai",
-        outtable = alignpath_genome + "logs/" + "{sample}"+"_recal_data.table",
+        r_bam = genome_int+"{sample}"+"_realigned.bam",
+        r_idx = genome_int+"{sample}"+"_realigned.bai",
+        outtable = genome_logs + "{sample}"+"_recal_data.table",
     output:
-        recal_bam = alignpath_genome + "02_bqsr/" + "{sample}"+"_recal.bam",
-        recal_bai = alignpath_genome + "02_bqsr/" + "{sample}"+"_recal.bai",
+        recal_bam = alignpath_genomebqsr + "{sample}"+"_recal.bam",
+        recal_bai = alignpath_genomebqsr + "{sample}"+"_recal.bai",
     params:
         gatk = gatk,
         ref=hg,
     log:
-        alignpath_genome + "logs/" + "{sample}" + '_recalibrating_02.log'
+        genome_logs + "{sample}" + '_recalibrating_02.log'
     conda:
         "envs/config_conda.yaml"
     benchmark:
@@ -645,16 +664,16 @@ rule map_to_exome:
         fasta_dict = lambda wildcards: get_ref_dict(wildcards.sample),
         indexes = lambda wildcards: get_ref_indexes(wildcards.sample),
         reference = lambda wildcards: get_ref(wildcards.sample),
-        fastq1_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R1.fastq",
-        fastq2_trimmed = processpath + '02_fastq_trimmed/'+"{sample}" + "_R2.fastq",
+        fastq1_trimmed = trimmedpath+"{sample}" + "_R1.fastq",
+        fastq2_trimmed = trimmedpath+"{sample}" + "_R2.fastq",
     output:
-        outfile =  alignpath_exome + '01_intermediate/' + "{sample}.sam",
+        outfile =  exome_int + "{sample}.sam",
     params:
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
         name = "{sample}",
     log:
-        alignpath_exome + 'logs/' + '{sample}_alignment.log',
+        exome_logs + '{sample}_alignment.log',
     conda:
         "envs/wes_config_conda.yaml"
     # benchmark:
@@ -671,12 +690,12 @@ rule sorting_exome:
     This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        sam = alignpath_exome + '01_intermediate/' + "{sample}.sam",
-        tmp = currentpath + 'wes_analyses/tmp/',
+        sam = exome_int + "{sample}.sam",
+        tmp = tmp_dir,
     output:
-        outdir = alignpath_exome + '01_intermediate/' + "{sample}_sorted.bam",
+        outdir = exome_int + "{sample}_sorted.bam",
     log:
-        alignpath_exome + 'logs/' + '{sample}_sorting.log'
+        exome_logs + '{sample}_sorting.log'
     conda:
         "envs/wes_config_conda.yaml"
     # benchmark:
@@ -687,11 +706,11 @@ rule sorting_exome:
 
 rule extractUnmapped_extract:
     input:
-        alignpath_exome + '01_intermediate/' + "{sample}_sorted.bam",
+        exome_int + "{sample}_sorted.bam",
     output:
-        alignpath_exome + '01_intermediate/' + "{sample}_unmapped.bam",
+        exome_int + "{sample}_unmapped.bam",
     log:
-        alignpath_exome + 'logs/' + '{sample}_unmapped.log'
+        exome_logs + '{sample}_unmapped.log'
     conda:
         "envs/config_conda.yaml"
     shell:
@@ -699,13 +718,13 @@ rule extractUnmapped_extract:
 
 rule extractUnmapped_convert:
     input:
-        alignpath_exome + '01_intermediate/' + "{sample}_unmapped.bam",
+        exome_int + "{sample}_unmapped.bam",
     output:
-        unmapped1 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R1.unmapped.fastq",
-        unmapped2 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R2.unmapped.fastq",
-        unpair = alignpath_exome + '02_unmapped_fastq/' + "{sample}_unpaired.unmapped.fastq",
+        unmapped1 = alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",
+        unmapped2 = alignpath_exomeunmapped + "{sample}_R2.unmapped.fastq",
+        unpair = alignpath_exomeunmapped + "{sample}_unpaired.unmapped.fastq",
     log:
-        alignpath_exome + 'logs/' + '{sample}_unmapped_fastq.log'
+        exome_logs + '{sample}_unmapped_fastq.log'
     conda:
         "envs/config_conda.yaml"
     shell:
@@ -725,17 +744,17 @@ rule map_to_MT:
     input:
         MT_indexes,
         reference = MT,
-        unmapped1 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R1.unmapped.fastq",
-        unmapped2 = alignpath_exome + '02_unmapped_fastq/' + "{sample}_R2.unmapped.fastq",
-        unpair = alignpath_exome + '02_unmapped_fastq/' + "{sample}_unpaired.unmapped.fastq",
+        unmapped1 = alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",
+        unmapped2 = alignpath_exomeunmapped + "{sample}_R2.unmapped.fastq",
+        unpair = alignpath_exomeunmapped + "{sample}_unpaired.unmapped.fastq",
     output:
-        outfile =  alignpath_MT + '01_intermediate/' + "{sample}.sam",
+        outfile =  MT_int + "{sample}.sam",
     params:
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
         name = "{sample}",
     log:
-        alignpath_MT + 'logs/' + '{sample}_alignment.log',
+        MT_logs + '{sample}_alignment.log',
     conda:
         "envs/wes_config_conda.yaml"
     # benchmark:
@@ -752,10 +771,10 @@ rule sorting_MT:
     This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        sam = alignpath_MT + '01_intermediate/' + "{sample}.sam",
-        tmp = currentpath + 'wes_analyses/tmp/',
+        sam = MT_int + "{sample}.sam",
+        tmp = tmp_dir,
     output:
-        outdir = alignpath_MT + '01_intermediate/' + "{sample}_sorted.bam",
+        outdir = MT_int + "{sample}_sorted.bam",
     log:
         alignpath_MT + '{sample}_sorting.log'
     conda:
@@ -770,10 +789,10 @@ rule marking_MT:
     This tool locates and tags duplicate reads in a BAM or SAM file, where duplicate reads are defined as originating from a single fragment of DNA.
     """
     input:
-        sorted_bam = alignpath_MT + '01_intermediate/' + "{sample}_sorted.bam",
-        tmp = currentpath + 'wes_analyses/tmp/',
+        sorted_bam = MT_int + "{sample}_sorted.bam",
+        tmp = tmp_dir,
     output:
-        out = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
+        out = MT_int+"{sample}"+"_marked.bam",
     log:
         mx = alignpath_MT + '{sample}_metrix.log',
         mark = alignpath_MT + '{sample}_marking.log',
@@ -791,9 +810,9 @@ rule indexing_MT:
     This tool creates an index file for the input BAM that allows fast look-up of data in a BAM file, like an index on a database.
     """
     input:
-        marked_bam = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
+        marked_bam = MT_int+"{sample}"+"_marked.bam",
     output:
-        marked_bai = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bai",
+        marked_bai = MT_int+"{sample}"+"_marked.bai",
     log:
         alignpath_MT + '{sample}_indexing.log',
     conda:
@@ -810,18 +829,18 @@ rule RTC_MT:
     """
     input:
         MT.replace('fasta', 'dict'),
-        marked_bai = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bai",
+        marked_bai = MT_int+"{sample}"+"_marked.bai",
         ref = MT+'.fai',
         indels_ref=indels_ref,
         gatk = gatk,
-        marked_bam = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
+        marked_bam = MT_int+"{sample}"+"_marked.bam",
         bed = MT_bed + ".bed",
     output:
-        alignpath_MT + 'logs/'+"{sample}"+".intervals",
+        MT_logs+"{sample}"+".intervals",
     params:
         ref=MT,
     log:
-        alignpath_MT + 'logs/' + "{sample}" + "_RTC.log"
+        MT_logs + "{sample}" + "_RTC.log"
     conda:
         "envs/config_conda.yaml"
     # benchmark:
@@ -836,18 +855,18 @@ rule IndelRealigner_MT:
     This tool performs local realignment of reads around indels.
     """
     input:
-        intvs = alignpath_MT + 'logs/'+"{sample}"+".intervals",
-        bam = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bam",
-        idx = alignpath_MT + '01_intermediate/'+"{sample}"+"_marked.bai",
+        intvs = MT_logs+"{sample}"+".intervals",
+        bam = MT_int+"{sample}"+"_marked.bam",
+        idx = MT_int+"{sample}"+"_marked.bai",
     output:
-        r_bam = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bam",
-        r_idx = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bai",
+        r_bam = MT_int+"{sample}"+"_realigned.bam",
+        r_idx = MT_int+"{sample}"+"_realigned.bai",
     params:
         gatk = gatk,
         ref = MT,
         indels_ref=indels_ref,
     log:
-        alignpath_MT + 'logs/' + "{sample}" + "_IndelRealigner.log"
+        MT_logs + "{sample}" + "_IndelRealigner.log"
     conda:
         "envs/config_conda.yaml"
     # benchmark:
@@ -862,18 +881,18 @@ rule BaseRecal_MT:
     This step produces a recalibrated data table.
     """
     input:
-        r_bam = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bam",
-        r_idx = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bai",
+        r_bam = MT_int+"{sample}"+"_realigned.bam",
+        r_idx = MT_int+"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
         bed = MT_bed + ".bed",
     output:
-        outtable = alignpath_MT + "logs/" + "{sample}"+"_recal_data.table",
+        outtable = MT_logs + "{sample}"+"_recal_data.table",
     params:
         gatk = gatk,
         ref=MT,
         indels_ref=indels_ref
     log:
-        alignpath_MT + "logs/" + "{sample}" + '_recalibrating_01.log'
+        MT_logs + "{sample}" + '_recalibrating_01.log'
     conda:
         "envs/config_conda.yaml"
     # benchmark:
@@ -887,17 +906,17 @@ rule PrintReads_MT:
     This tool writes out sequence read data.
     """
     input:
-        r_bam = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bam",
-        r_idx = alignpath_MT + '01_intermediate/'"{sample}"+"_realigned.bai",
-        outtable = alignpath_MT + "logs/" + "{sample}"+"_recal_data.table",
+        r_bam = MT_int+"{sample}"+"_realigned.bam",
+        r_idx = MT_int+"{sample}"+"_realigned.bai",
+        outtable = MT_logs + "{sample}"+"_recal_data.table",
     output:
-        recal_bam = alignpath_MT + "02_bqsr/" + "{sample}"+"_recal.bam",
-        recal_bai = alignpath_MT + "02_bqsr/" + "{sample}"+"_recal.bai",
+        recal_bam = alignpath_MTbqsr + "{sample}"+"_recal.bam",
+        recal_bai = alignpath_MTbqsr + "{sample}"+"_recal.bai",
     params:
         gatk = gatk,
         ref=MT,
     log:
-        alignpath_MT + "logs/" + "{sample}" + '_recalibrating_02.log'
+        MT_logs + "{sample}" + '_recalibrating_02.log'
     conda:
         "envs/config_conda.yaml"
     # benchmark:

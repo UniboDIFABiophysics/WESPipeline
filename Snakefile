@@ -15,8 +15,8 @@ homepath = os.path.expanduser('~')
 # get current path
 currentpath = os.getcwd()
 
-folder= currentpath + config['folders']['resultdir']
-scripts = currentpath + config['folders']['scripts']
+folder= config['folders']['resultdir']
+scripts =  config['folders']['scripts']
 
 custom_storepath=config['folders']['custom_resultdir']
 
@@ -68,6 +68,7 @@ nextera_indexes = [nextera+".bwt", nextera+".pac", nextera+".amb", nextera+".ann
 nextexp_indexes = [nextera_expanded+".bwt", nextera_expanded+".pac", nextera_expanded+".amb", nextera_expanded+".ann", nextera_expanded+".sa"]
 truseq_indexes = [truseq+".bwt", truseq+".pac", truseq+".amb", truseq+".ann", truseq+".sa"]
 
+all_fastq = homepath + config['all_fastq']
 
 indels_ref = homepath+ config['ref-files']['indels_ref'] # Set of known indels
 dbsnp = homepath+ config['ref-files']['dbsnp'] # SNP database
@@ -84,7 +85,7 @@ muTect = homepath+ config['softwares']['muTect']
 annovar = homepath+ config['softwares']['annovar']
 convert2annovar = homepath+ config['softwares']['convert2annovar']
 tableannovar = homepath+ config['softwares']['tableannovar']
-adapter_removal = homepath + config['adapter_removal']
+adapter_removal = homepath + config['softwares']['adapter_removal']
 
 # Sample details
 platform = config['sample-details']['platform'] # Set platform for alignment
@@ -349,6 +350,7 @@ rule all:
 rule create_tmpdir:
   output:
     temp(tmp_dir),
+  threads: 1
   run:
     pass
 
@@ -356,20 +358,21 @@ rule create_tmpdir:
 
 rule downloadDecompressMergeFastq:
     output:
-        outpath1 = postprocesspath+"{sample}" + "_R1_unchecked.fastq",
-        outpath2 = postprocesspath+"{sample}" + "_R2_unchecked.fastq",
+        outpath1 = postprocesspath+ "{sample}" + "_R1_unchecked.fastq",
+        outpath2 = postprocesspath+ "{sample}" + "_R2_unchecked.fastq",
     params:
         fastq_path = lambda wildcards: get_fastq_path(wildcards.sample),
         fastq_id = lambda wildcards: get_fastq_id(wildcards.sample),
         scripts = scripts,
-        name = '{sample}',
-        all_fastq = config['all_fastq'],
+        name = "{sample}",
+        all_fastq = all_fastq,
         homepath = homepath,
         processpath = processpath,
         cadaver = config['cadaver'],
+        logpath = fastq_logs,
+    threads: 1
     log:
-         fastq_logs,
-    message:'>> {sample} - Fastq preprocessing : downloading, decompressing and merging fastq'
+         fastq_logs + '{sample}_cadaver.log',
     script:
         "{params.scripts}"+"downloadDecompressMergeFastq.py"
 
@@ -385,14 +388,15 @@ rule fastq_checkpoint:
     run:
         import os
         import subprocess as sp
-        size1 = os.stat("{input.unchecked1}").st_size
-        size2 = os.stat("{input.unchecked2}").st_size
+ 
+        size1 = os.stat(input.unchecked1).st_size
+        size2 = os.stat(input.unchecked2).st_size
         if size1 != size2:
-            sp.call("echo 'Error. {params.name} fastq files have different size!!",shell=True)
-            sp.call("exit 1",shell=True)
+            sp.call("echo 'Error. "+ params.name +" fastq files have different size!!'",shell=True)
+            raise ErrorValue
         else:
-            sp.call("mv {input.unchecked1} {output.checked1}",shell=True)
-            sp.call("mv {input.unchecked2} {output.checked2}",shell=True)
+            sp.call("mv "+ input.unchecked1 + " " + output.checked1 ,shell=True)
+            sp.call("mv "+ input.unchecked2 + " " + output.checked2 ,shell=True)
 
 rule fastqc_R1:
   input:
@@ -1394,7 +1398,7 @@ rule get_nextera_fasta:
     conda:
         "envs/wes_config_conda.yaml"
     shell:
-        "bedtools get fasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
+        "bedtools getfasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
 
 rule get_nextexp_fasta:
     input:
@@ -1405,7 +1409,7 @@ rule get_nextexp_fasta:
     conda:
         "envs/wes_config_conda.yaml"
     shell:
-        "bedtools get fasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
+        "bedtools getfasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
 
 rule get_truseq_fasta:
     input:
@@ -1416,7 +1420,7 @@ rule get_truseq_fasta:
     conda:
         "envs/wes_config_conda.yaml"
     shell:
-        "bedtools get fasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
+        "bedtools getfasta -fi {input.hg} -bed {input.bed_fixed} -fo {output}"
 
 rule get_MT_fasta:
     input:

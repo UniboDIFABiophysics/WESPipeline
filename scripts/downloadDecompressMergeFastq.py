@@ -1,13 +1,22 @@
-def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath, processpath,logpath, cadaver=False):
+def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath, processpath,logpath,log, cadaver=False):
 
     import os
     import re
     import subprocess as sp
 
     inpath = fastq_path
-    inoutpath = processpath + '01_fastq/01_preprocess/'
-    outpath = processpath + '01_fastq/02_postprocess/'
+    inoutpath = processpath + '/01_fastq/01_preprocess/'
+    outpath = processpath + '/01_fastq/02_postprocess/'
     logpath = logpath
+
+    if not os.path.exists(inoutpath):
+         os.makedirs(inoutpath)
+
+    if not os.path.exists(outpath):
+         os.makedirs(outpath)
+
+    if not os.path.exists(logpath):
+         os.makedirs(logpath)
 
     # create fastq names
     fastq1 = name + '_R1_unchecked.fastq'
@@ -44,7 +53,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         sp.call(' '.join(['cadaver',
                           'https://ngs-ptl.unibo.it:5006',
                           '-r', processpath + 'cadaver_get.sh',
-                          '>', logpath + name + '_cadaver.log']), shell=True)
+                          '>', log]), shell=True)
 
         # delete script
         sp.call(' '.join(['rm', processpath + 'cadaver_get.sh']), shell=True)
@@ -61,6 +70,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         # complete fastq_path
         fastq_path = homepath + fastq_path
 
+
         # list all fastq.gz files that contain fastq_id
         gz_list = [gz for gz in os.listdir(inpath) if re.search(fastq_id, gz)]
 
@@ -68,9 +78,11 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         for gz in gz_list:
 
             # decompress it while downloading to inoutpath
+            index = (os.path.splitext(os.path.basename(inoutpath + gz[:-3]))[0]).split('_')[1]
+            # decompress it while downloading to inoutpath
             sp.call(' '.join(['gzip',
                               '-dc', inpath + gz,
-                              '>', inoutpath + gz[:-3]]), shell=True)
+                              '>', inoutpath + gz[:-10] + "R"+ index + "_unchecked.fastq"]), shell=True)
 
 
 
@@ -78,6 +90,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
 
 
     # list common substring of each pair of fastq
+
     common_substrings = list(set([re.split('_R[12]', f)[0] for f in os.listdir(inoutpath)]))
 
     # list all R1 fastq (unordered), concatenating their relative path
@@ -85,6 +98,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
 
     # list all R2 fastq (unordered), concatenating their relative path
     R2 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('R2', f)]
+
 
     # create new lists
     R1b = []
@@ -131,5 +145,7 @@ downloadDecompressMergeFastq(snakemake.params['name'],
                              snakemake.params['fastq_id'],
                              snakemake.params['homepath'],
                              snakemake.params['processpath'],
+                             snakemake.params['logpath'],
                              snakemake.log,
                              snakemake.params['cadaver'])
+

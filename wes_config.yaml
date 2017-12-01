@@ -1,6 +1,6 @@
 input_list: "samples_eg.txt"
 
-dataset: "/dataset_EG.tsv"
+dataset: "/dataset_eg.tsv"
 
 custom_match: ""
 
@@ -11,9 +11,7 @@ adapter:
   nextera_expanded: {adapter1: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC, adapter2: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG}
   truseq: {adapter1: '', adapter2: ''}
 
-adapter_removal: '/tools/adapter_removal_1.5.4/AdapterRemoval'
-
-all_fastq: /reference/171119_all_fastq.log
+all_fastq: "/data_ref/171119_all_fastq.log"
 
 fasta:
   MT: '/data_ref/MT.fasta'
@@ -58,7 +56,7 @@ ref-files:
     mitochondrial_ver: 'GRCh37_MT' # Set parameter command for annotating mitochondria variants
 
 folders:
-    scripts: '/scripts'
+    scripts: 'scripts/'
     resultdir: '/results'
     custom_resultdir: ''  # NEW
 
@@ -68,6 +66,7 @@ softwares:
     annovar: '/softwares/annovar/annotate_variation.pl'
     convert2annovar: '/softwares/annovar/convert2annovar.pl'
     tableannovar: '/softwares/annovar/table_annovar.pl'
+    adapter_removal: '/softwares/adapter_removal_1.5.4/AdapterRemoval'
 
 sample-details:
     platform: 'illumina' # Set platform for mapping

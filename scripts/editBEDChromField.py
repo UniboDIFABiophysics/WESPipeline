@@ -4,7 +4,7 @@ import pandas as pd
 
 def editBEDChromField(input_bed, line_to_skip,output_bed):
     # get name of BED file from command line
-    bed_name = input_bed
+    bed_name = str(input_bed)
 
     # some files have a first line that we have to skip
     # if no 2nd argument is provided, skip no lines
@@ -23,7 +23,7 @@ def editBEDChromField(input_bed, line_to_skip,output_bed):
     bed_name = bed_name[:-4]
 
     # write to file
-    bed.to_csv(output_bed, sep='\t', header=False, index=False)
+    bed.to_csv(str(output_bed), sep='\t', header=False, index=False)
 
 editBEDChromField(snakemake.input,
                   snakemake.params['line_to_skip'],

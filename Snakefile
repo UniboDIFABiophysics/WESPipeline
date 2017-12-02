@@ -69,6 +69,10 @@ nextexp_indexes = [nextera_expanded+".bwt", nextera_expanded+".pac", nextera_exp
 truseq_indexes = [truseq+".bwt", truseq+".pac", truseq+".amb", truseq+".ann", truseq+".sa"]
 
 all_fastq = homepath + config['all_fastq']
+cadaver = config['cadaver']
+
+if not cadaver:
+    all_fastq = "/"
 
 indels_ref = homepath+ config['ref-files']['indels_ref'] # Set of known indels
 dbsnp = homepath+ config['ref-files']['dbsnp'] # SNP database
@@ -341,6 +345,12 @@ rule all:
   input:
     expand(fastqcpath +"{sample}" + "_R1_fastqc.html",sample=samples),
     expand(fastqcpath +"{sample}" + "_R2_fastqc.html",sample=samples),
+    expand(fastqcpath_trim +"{sample}" + "_R1_fastqc.html",sample=samples),
+    expand(fastqcpath_trim +"{sample}" + "_R2_fastqc.html",sample=samples),
+    expand(fastqcpath +"{sample}" + "_R1_fastqc.zip",sample=samples),
+    expand(fastqcpath +"{sample}" + "_R2_fastqc.zip",sample=samples),
+    expand(fastqcpath_trim +"{sample}" + "_R1_fastqc.zip",sample=samples),
+    expand(fastqcpath_trim +"{sample}" + "_R2_fastqc.zip",sample=samples),
     expand(variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",patient=patients),
   run:
     pass
@@ -357,6 +367,8 @@ rule create_tmpdir:
 #% TODO: add temp for outpath[1,2] after checking
 
 rule downloadDecompressMergeFastq:
+    input:
+        all_fastq = all_fastq,
     output:
         outpath1 = postprocesspath+ "{sample}" + "_R1_unchecked.fastq",
         outpath2 = postprocesspath+ "{sample}" + "_R2_unchecked.fastq",
@@ -365,10 +377,9 @@ rule downloadDecompressMergeFastq:
         fastq_id = lambda wildcards: get_fastq_id(wildcards.sample),
         scripts = scripts,
         name = "{sample}",
-        all_fastq = all_fastq,
         homepath = homepath,
         processpath = processpath,
-        cadaver = config['cadaver'],
+        cadaver = cadaver,
         logpath = fastq_logs,
     threads: 1
     log:
@@ -388,7 +399,7 @@ rule fastq_checkpoint:
     run:
         import os
         import subprocess as sp
- 
+
         size1 = os.stat(input.unchecked1).st_size
         size2 = os.stat(input.unchecked2).st_size
         if size1 != size2:
@@ -1819,7 +1830,7 @@ rule check_GATK:
     """
     output:
         gatk,
-    priority: 4
+    priority: 5
     shell:
         "echo 'Error. Genome Analysis ToolKit not found in softwares directory.' && "
         "exit 1"
@@ -1830,7 +1841,7 @@ rule check_muTect:
     """
     output:
         muTect,
-    priority: 3
+    priority: 4
     shell:
         "echo 'Error. muTect not found in softwares directory.' && "
         "exit 1"
@@ -1841,9 +1852,17 @@ rule check_Annovar:
     """
     output:
         annovar,
-    priority: 2
+    priority: 3
     shell:
         "echo 'Error. Annovar not found in softwares directory.' && "
+        "exit 1"
+
+rule all_fastq:
+    output:
+        all_fastq,
+    priority: 2
+    shell:
+        "echo 'Error. all_fastq.log not found.' && "
         "exit 1"
 
 #########################################################

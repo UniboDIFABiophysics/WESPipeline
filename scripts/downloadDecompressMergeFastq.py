@@ -91,13 +91,13 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
 
     # list common substring of each pair of fastq
 
-    common_substrings = list(set([re.split('_R[12]', f)[0] for f in os.listdir(inoutpath)]))
+    common_substrings = list(set([re.split('_R[12]', f)[0] for f in os.listdir(inoutpath) if re.search(fastq_id,f)]))
 
     # list all R1 fastq (unordered), concatenating their relative path
-    R1 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('R1', f)]
+    R1 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('_R1_', f) and re.search(fastq_id,f)]
 
     # list all R2 fastq (unordered), concatenating their relative path
-    R2 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('R2', f)]
+    R2 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('_R2_', f) and re.search(fastq_id,f)]
 
 
     # create new lists
@@ -113,6 +113,8 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
             # if common substring matches R1 fastq
             if re.search(cs, r1):
 
+                print("r1 ",r1)
+
                 # append it to new list
                 R1b.append(r1)
 
@@ -122,12 +124,17 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
             # if common substring matches R1 fastq
             if re.search(cs, r2):
 
+                print("r2 ", r2)
+
                 # append it to new list
                 R2b.append(r2)
 
     # join elements in new lists
     R1b = ' '.join(R1b)
     R2b = ' '.join(R2b)
+
+    print("R1b ", R1b)
+    print("R2b ", R2b)
 
     # concatenate multiple fastq (if there are)
     sp.call(' '.join(['cat', R1b, '>', outpath + fastq1]), shell=True)

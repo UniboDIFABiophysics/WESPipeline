@@ -147,7 +147,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
 # Snakemake call
 
 downloadDecompressMergeFastq(snakemake.params['name'],
-                             snakemake.params['all_fastq'],
+                             snakemake.input['all_fastq'],
                              snakemake.params['fastq_path'],
                              snakemake.params['fastq_id'],
                              snakemake.params['homepath'],
@@ -155,4 +155,3 @@ downloadDecompressMergeFastq(snakemake.params['name'],
                              snakemake.params['logpath'],
                              snakemake.log,
                              snakemake.params['cadaver'])
-

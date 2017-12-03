@@ -289,7 +289,7 @@ def get_mpileup(wildcards, sample_type, dir):
 # define align paths
 
 alignpath_genome = processpath + '/03_alignment_genome/'
-alignpath_exome = processpath + '04_alignment_exome/'
+alignpath_exome = processpath + '/04_alignment_exome/'
 alignpath_MT = processpath + '/05_alignment_MT/'
 
 
@@ -359,7 +359,7 @@ rule all:
 
 rule create_tmpdir:
   output:
-    temp(tmp_dir),
+    tmp_dir,
   threads: 1
   run:
     pass
@@ -474,7 +474,7 @@ rule fastqc_trimmed_R1:
     fastq1tr_fastqc_zip = fastqcpath_trim+"{sample}" + "_R1_fastqc.zip",
     fastq1tr_fastqc_html = fastqcpath_trim+"{sample}" + "_R1_fastqc.html",
   params:
-    outpath = fastqcpath,
+    outpath = fastqcpath_trim,
   log:
     trimmed_lods + "{sample}" + '_R1_fastqc.log'
   conda:
@@ -482,7 +482,7 @@ rule fastqc_trimmed_R1:
   #benchmark:
   message: 'fastqc on trimmed fastq1'
   shell:
-    "fastqc -o {params.outpath} {input.fastq2} > {log} 2>&1"
+    "fastqc -o {params.outpath} {input} > {log} 2>&1"
 
 rule fastqc_trimmed_R2:
   input:
@@ -491,7 +491,7 @@ rule fastqc_trimmed_R2:
     fastq2tr_fastqc_zip = fastqcpath_trim+"{sample}" + "_R2_fastqc.zip",
     fastq2tr_fastqc_html = fastqcpath_trim+"{sample}" + "_R2_fastqc.html",
   params:
-    outpath = fastqcpath,
+    outpath = fastqcpath_trim,
   log:
     trimmed_lods + "{sample}" + '_R2_fastqc.log'
   conda:
@@ -499,7 +499,7 @@ rule fastqc_trimmed_R2:
   #benchmark:
   message: 'fastqc on trimmed fastq1'
   shell:
-    "fastqc -o {params.outpath} {input.fastq2} > {log} 2>&1"
+    "fastqc -o {params.outpath} {input} > {log} 2>&1"
 
 
 
@@ -532,9 +532,9 @@ rule map_to_genome:
     threads: map_thrs
     #resources: mem=6
     #version: 0.1
-    message: ">> {sample} - Aligning to reference NUCLEAR GENOME"
+    message: ">> {wildcards.sample} - Aligning to reference NUCLEAR GENOME"
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {params.reference} {input.sample1} {input.sample2} > {output.outfile} 2> {log}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {params.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} > {output.outfile} 2> {log}"
 
 rule sorting_genome:
     """
@@ -549,8 +549,8 @@ rule sorting_genome:
         alignpath_genome + '{sample}_sorting.log'
     conda:
         "envs/wes_config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_sort_picard_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    #benchmark:
+     #   "benchmarks/benchmark_sort_picard_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
         "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={input.tmp} 2> {log}"
 
@@ -568,11 +568,11 @@ rule marking_genome:
         mark = alignpath_genome + '{sample}_marking.log',
     conda:
         "envs/wes_config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_mark_duplicates_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+   # benchmark:
+    #    "benchmarks/benchmark_mark_duplicates_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
         "picard MarkDuplicates"
-        " INPUT={input.sorted_bam} OUTPUT={output.out}.tmp METRICS_FILE={log.mx} "
+        " INPUT={input.sorted_bam} OUTPUT={output.out} METRICS_FILE={log.mx} "
         " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={input.tmp} 2> {log.mark}"
 
 rule indexing_genome:
@@ -587,8 +587,8 @@ rule indexing_genome:
         alignpath_genome + '{sample}_indexing.log',
     conda:
         "envs/wes_config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_build_bam_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+   # benchmark:
+    #    "benchmarks/benchmark_build_bam_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
         "picard BuildBamIndex INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
 
@@ -613,11 +613,11 @@ rule RTC_genome:
         genome_logs + "{sample}" + "_RTC.log"
     conda:
         "envs/wes_config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_realigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
+    #benchmark:
+     #   "benchmarks/benchmark_realigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     threads: RT_thrs
     shell:
-        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.seq} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
+        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.marked_bam} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
 
 
 rule IndelRealigner_genome:
@@ -639,8 +639,8 @@ rule IndelRealigner_genome:
         genome_logs + "{sample}" + "_IndelRealigner.log"
     conda:
         "envs/wes_config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_indelrealigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    #benchmark:
+     #   "benchmarks/benchmark_indelrealigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
         "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -ip 50 -o {output.r_bam} 2> {log}"
 
@@ -665,8 +665,8 @@ rule BaseRecal_genome:
         genome_logs + "{sample}" + '_recalibrating_01.log'
     conda:
         "envs/wes_config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_BQSR_BaseRecal_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR1_thrs=BQSR1_thrs,n_cpu=n_cpu)
+   # benchmark:
+    #    "benchmarks/benchmark_BQSR_BaseRecal_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR1_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR1_thrs=BQSR1_thrs,n_cpu=n_cpu)
     threads: BQSR1_thrs
     shell:
         "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -L {input.bed} -ip 50 -knownSites {input.dbsnp} -knownSites {params.indels_ref} -nct {threads} -o {output.outtable} 2> {log}"
@@ -689,8 +689,8 @@ rule PrintReads_genome:
         genome_logs + "{sample}" + '_recalibrating_02.log'
     conda:
         "envs/wes_config_conda.yaml"
-    benchmark:
-        "benchmarks/benchmark_BQSR_PrintReads_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR4_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR4_thrs=BQSR4_thrs, n_cpu=n_cpu)
+   # benchmark:
+    #    "benchmarks/benchmark_BQSR_PrintReads_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BQSR4_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BQSR4_thrs=BQSR4_thrs, n_cpu=n_cpu)
     threads: BQSR4_thrs
     shell:
         "java -jar {params.gatk} -T PrintReads -R {params.ref} -I {input.r_bam} -BQSR {input.outtable} -nct {threads} -o {output.recal_bam} 2> {log}"
@@ -731,9 +731,9 @@ rule map_to_exome:
     threads: map_thrs
     #resources: mem=6
     #version: 0.1
-    message: ">> {sample} - - Aligning to reference EXOME"
+    message: ">> {wildcards.sample} - - Aligning to reference EXOME"
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.sample1} {input.sample2} > {output.outfile} 2> {log}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} > {output.outfile} 2> {log}"
 
 rule sorting_exome:
     """
@@ -812,9 +812,9 @@ rule map_to_MT:
     threads: map_thrs
     #resources: mem=6
     #version: 0.1
-    message: ">> {sample} - Aligning to reference MITOCHONDRIAL GENOME"
+    message: ">> {wildcards.sample} - Aligning to reference MITOCHONDRIAL GENOME"
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.sample1} {input.sample2} > {output.outfile} 2> {log}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.unmapped1} {input.unmapped2} > {output.outfile} 2> {log}"
 
 rule sorting_MT:
     """
@@ -852,7 +852,7 @@ rule marking_MT:
     #     "benchmarks/benchmark_mark_duplicates_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     shell:
         "picard MarkDuplicates"
-        " INPUT={input.sorted_bam} OUTPUT={output.out}.tmp METRICS_FILE={log.mx} "
+        " INPUT={input.sorted_bam} OUTPUT={output.out} METRICS_FILE={log.mx} "
         " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={input.tmp} 2> {log.mark}"
 
 rule indexing_MT:
@@ -897,7 +897,7 @@ rule RTC_MT:
     #     "benchmarks/benchmark_realigner_ref_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     threads: RT_thrs
     shell:
-        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.seq} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
+        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.marked_bam} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
 
 
 rule IndelRealigner_MT:

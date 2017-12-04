@@ -1,7 +1,7 @@
 def KeepOnlyVariants(mutect2, varscan_snp2,varscan_indel2,outpath,match):
     import pandas as pd
 
-    mutect = pd.read_table(mutect2, sep='\t', header=1, dtype='str')
+    mutect = pd.read_table(mutect2, sep='\t', dtype='str')
     mutect = mutect[(mutect.judgement == 'KEEP') & (mutect.covered == 'COVERED')]
     # laod and merge filtered varscan tables
     varscan_snp = pd.read_table(varscan_snp2, sep='\t', header=0)

@@ -102,7 +102,7 @@ MT_bed = homepath + config['bed']['MT']
 truseq_bed = homepath + config['bed']['truseq']
 
 # Annovar databases
-annovar_dbs = [homepath + config['annovar_dbs']['hg19_db'] , homepath + config['annovar_dbs']['snp138_db']]
+annovar_dbs = [homepath + config['annovar_dbs']['hg19_db'] , homepath + config['annovar_dbs']['snp138_db'], homepath + config['annovar_dbs']['hg19_cyto']]
 
 # script rsIDfilter
 
@@ -297,8 +297,8 @@ alignpath_MT = processpath + '/05_alignment_MT/'
 tmp_dir_genome = currentpath + '/wes_analyses/tmp/genome/'
 tmp_dir_exome = currentpath + '/wes_analyses/tmp/exome/'
 tmp_dir_MT = currentpath + '/wes_analyses/tmp/MT/'
-tmp_dir_genome_m = currentpath + '/wes_analyses/tmp/genome/m/'
-tmp_dir_MT_m = currentpath + '/wes_analyses/tmp/MT/m/'
+tmp_dir_genome_m = currentpath + '/wes_analyses/tmp/genome_m/'
+tmp_dir_MT_m = currentpath + '/wes_analyses/tmp/MT_m/'
 postprocesspath = processpath + '/01_fastq/02_postprocess/'
 trimmedpath = processpath + '/02_fastq_trimmed/'
 fastqcpath = processpath + '/01_fastq/03_fastqc/'
@@ -1081,7 +1081,7 @@ rule varscan_genome_sample:
     # benchmark:
     #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
     shell:
-        "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.recal_bam}"
+        "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.recal_bam} > {output} 2> {log}"
 
 rule varscan_genome_patient:
     """
@@ -1125,7 +1125,7 @@ rule varscan_MT_sample:
     # benchmark:
     #     "benchmarks/benchmark_muTect_ref_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{M_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, M_thrs=M_thrs, n_cpu=n_cpu)
     shell:
-        "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.recal_bam}"
+        "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.recal_bam} > {output} 2> {log}"
 
 rule varscan_MT_patient:
     """
@@ -1270,7 +1270,7 @@ rule annovar_MT_mutect:
     log:
         variants_filter_logs + "{patient}_mutect_mt_g_annovar_err.log"
     shell:
-        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+        "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
 
 ######## VARSCAN
 
@@ -1319,7 +1319,7 @@ rule annovar_MT_varscan:
     log:
         variants_filter_logs + "{patient}_varscan_mt_g_annovar_err.log"
     shell:
-        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+        "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
 
 
 rule MergeMutectVarscan:

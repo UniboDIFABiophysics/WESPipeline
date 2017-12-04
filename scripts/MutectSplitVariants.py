@@ -1,4 +1,4 @@
-def SplitVariants(m_som,inoutpath,match):
+def MutectSplitVariants(m_som,inoutpath,match):
     import pandas as pd
     ### MUTECT
 

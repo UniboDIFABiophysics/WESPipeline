@@ -28,11 +28,11 @@ bed:
 
 protocols:
   genome: "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,snp138,1000g2014oct_all,exac03nontcga,ljb26_all"
-  MT: "protocol: ensGene"
+  MT: "ensGene"
 
 operations:
-  genome: "operation: 'g,r,r,f,f,f,f,f'"
-  MT: g
+  genome: "g,r,r,f,f,f,f,f"
+  MT: "g"
 
 rsIDfilter: "/171117_rsIDfilter.R"
 
@@ -86,3 +86,4 @@ hard-filter:
 annovar_dbs:
     hg19_db: '/softwares/annovar/humandb/hg19_ALL.sites.2012_04.txt'
     snp138_db: '/softwares/annovar/humandb/hg19_snp138.txt'
+    hg19_cyto: '/softwares/annovar/humandb/hg19_cytoBand.txt'

@@ -58,12 +58,13 @@ ref-files:
 folders:
     scripts: 'scripts/'
     resultdir: '/results'
+    annovar: '/softwares/annovar/'
     custom_resultdir: ''  # NEW
 
 softwares:
     gatk: '/softwares/GenomeAnalysisTK.jar'
     muTect: '/softwares/muTect-1.1.4.jar'
-    annovar: '/softwares/annovar/annotate_variation.pl'
+    annotate: '/softwares/annovar/annotate_variation.pl'
     convert2annovar: '/softwares/annovar/convert2annovar.pl'
     tableannovar: '/softwares/annovar/table_annovar.pl'
     adapter_removal: '/softwares/adapter_removal_1.5.4/AdapterRemoval'
@@ -84,6 +85,11 @@ hard-filter:
     indels: '--filterExpression "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0" --filterName "indel_hardFilter"'
 
 annovar_dbs:
-    hg19_db: '/softwares/annovar/humandb/hg19_ALL.sites.2012_04.txt'
-    snp138_db: '/softwares/annovar/humandb/hg19_snp138.txt'
-    hg19_cyto: '/softwares/annovar/humandb/hg19_cytoBand.txt'
+    hg19_refGene: "/softwares/annovar/humandb/hg19_refGene.txt"
+    hg19_cytoBand: "/softwares/annovar/humandb/hg19_cytoBand.txt"
+    hg19_gSd: "/softwares/annovar/humandb/hg19_genomicSuperDups.txt"
+    hg19_esp: "/softwares/annovar/humandb/hg19_esp6500siv2_all.txt"
+    hg19_snp138: "/softwares/annovar/humandb/hg19_snp138.txt"
+    hg19_1000g2014oct: "/softwares/annovar/humandb/1000g2014oct_all.txt"
+    hg19_exac03nontcga: "/softwares/annovar/humandb/hg19_exac03nontcga.txt"
+    hg19_ljb26_all: "/softwares/annovar/humandb/hg19_ljb26_all.txt"

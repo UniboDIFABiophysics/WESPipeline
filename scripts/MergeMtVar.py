@@ -1,7 +1,13 @@
-def Merge_MuTect_Varscan(logpath,match,outfile):
+def Merge_MuTect_Varscan(mutecttable,vsntable,logpath,match,outfile):
     import pandas as pd
 
     ###### MUTECT
+
+    # load lists of somatic filtered variants for mutect and varscan
+    mutect = pd.read_table(mutecttable, sep='\t', header=0)
+
+    # specify contig column as 'str'
+    mutect = mutect.astype({'contig': 'str'})
 
     # load annotated file
     mutect_anno_genome = pd.read_table(logpath + match + '_mutect_genome.hg19_multianno.txt', sep='\t', header=0, dtype='str')
@@ -40,6 +46,17 @@ def Merge_MuTect_Varscan(logpath,match,outfile):
                        ], axis=1)
 
     ###### VARSCAN
+
+    ### VARSCAN
+
+    # load lists of somatic filtered variants for mutect and varscan
+    varscan = pd.read_table(vsntable, sep='\t', header=0)
+
+    # set conting values to 'str'
+    varscan = varscan.astype({'chrom': 'str'})
+    
+    # convert 'tumor_var_freq' from percentage to proportion 
+    varscan['tumor_var_freq'] = [float(freq[:-1])/100 for freq in varscan['tumor_var_freq']]
 
     # load annotated files
     varscan_anno_genome = pd.read_table(logpath + match + '_varscan_genome.hg19_multianno.txt', sep='\t', header=0, dtype='str')
@@ -118,6 +135,8 @@ def Merge_MuTect_Varscan(logpath,match,outfile):
 
 
 
-Merge_MuTect_Varscan(snakemake.params['workdir'],
+Merge_MuTect_Varscan(snakemake.input['m_tsv'],
+                     snakemake.input['vsn_tsv'],
+                     snakemake.params['workdir'],
                      snakemake.params['name'],
                      snakemake.output)

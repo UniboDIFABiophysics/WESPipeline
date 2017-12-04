@@ -1253,34 +1253,36 @@ rule annovar_genome_mutect:
         ann_genome = variants_filter +"{patient}_mutect_annovar_genome.tsv",
         annovar_dbs = annovar_dbs,
     output:
-        variants_filter_logs + "{patient}_mutect_genome"
+        variants_filter_logs + "{patient}_mutect_genome.hg19_multianno.txt"
     params:
         protocol = config['protocols']['genome'],
         operation = config['operations']['genome'],
         tableannovar = tableannovar,
         humandb = humandb,
         build_ver = build_ver,
+        out_label = variants_filter_logs + "{patient}_mutect_genome",
     log:
         variants_filter_logs + "{patient}_mutect_genome_annovar_err.log"
     shell:
-        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
 
 rule annovar_MT_mutect:
     input:
         ann_MT = variants_filter +"{patient}_mutect_annovar_mt.tsv",
         annovar_dbs = annovar_dbs,
     output:
-        variants_filter_logs + "{patient}_mutect_mt_g"
+        variants_filter_logs + "{patient}_mutect_mt_g.GRCh37_MT_multianno.txt"
     params:
         protocol = config['protocols']['MT'],
         operation = config['operations']['MT'],
         tableannovar = tableannovar,
         humandb = humandb,
         mitochondrial_ver = mitochondrial_ver,
+        out_label = variants_filter_logs + "{patient}_mutect_mt_g",
     log:
         variants_filter_logs + "{patient}_mutect_mt_g_annovar_err.log"
     shell:
-        "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+        "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
 
 ######## VARSCAN
 
@@ -1302,42 +1304,46 @@ rule annovar_genome_varscan:
         ann_genome = variants_filter +"{patient}_varscan_annovar_genome.tsv",
         annovar_dbs = annovar_dbs,
     output:
-        variants_filter_logs + "{patient}_varscan_genome"
+        variants_filter_logs + "{patient}_varscan_genome.hg19_multianno.txt"
     params:
         protocol = config['protocols']['genome'],
         operation = config['operations']['genome'],
         tableannovar = tableannovar,
         humandb = humandb,
         build_ver = build_ver,
+        out_label = variants_filter_logs + "{patient}_varscan_genome",
     log:
         variants_filter_logs + "{patient}_varscan_genome_annovar_err.log"
     shell:
-        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+        "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
 
 rule annovar_MT_varscan:
     input:
         ann_MT = variants_filter +"{patient}_varscan_annovar_mt.tsv",
         annovar_dbs = annovar_dbs,
     output:
-        variants_filter_logs + "{patient}_varscan_mt_g"
+        variants_filter_logs + "{patient}_varscan_mt_g.GRCh37_MT_multianno.txt"
     params:
         protocol = config['protocols']['MT'],
         operation = config['operations']['MT'],
         tableannovar = tableannovar,
         humandb = humandb,
         mitochondrial_ver = mitochondrial_ver,
+        out_label = variants_filter_logs + "{patient}_varscan_mt_g",
     log:
         variants_filter_logs + "{patient}_varscan_mt_g_annovar_err.log"
     shell:
-        "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
+        "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
 
 
 rule MergeMutectVarscan:
     input:
-        variants_filter_logs + "{patient}_mutect_genome",
-        variants_filter_logs + "{patient}_mutect_mt_g",
-        variants_filter_logs + "{patient}_varscan_genome",
-        variants_filter_logs + "{patient}_varscan_mt_g",
+        m_gen = variants_filter_logs + "{patient}_mutect_genome.hg19_multianno.txt",
+        m_mt = variants_filter_logs + "{patient}_mutect_mt_g.GRCh37_MT_multianno.txt",
+        vsn_gen = variants_filter_logs + "{patient}_varscan_genome.hg19_multianno.txt",
+        vsn_mt = variants_filter_logs + "{patient}_varscan_mt_g.GRCh37_MT_multianno.txt",
+	m_tsv = variants_filter + "{patient}_mutect_somatic.tsv",
+	vsn_tsv = variants_filter + "{patient}_varscan_somatic.tsv",
     output:
         variants_filter + "{patient}_all_somatic_annotated.tsv",
     params:

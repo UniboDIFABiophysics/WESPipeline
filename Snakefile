@@ -294,7 +294,11 @@ alignpath_MT = processpath + '/05_alignment_MT/'
 
 
 # define directories
-tmp_dir = currentpath + '/wes_analyses/tmp/'
+tmp_dir_genome = currentpath + '/wes_analyses/tmp/genome/'
+tmp_dir_exome = currentpath + '/wes_analyses/tmp/exome/'
+tmp_dir_MT = currentpath + '/wes_analyses/tmp/MT/'
+tmp_dir_genome_m = currentpath + '/wes_analyses/tmp/genome/m/'
+tmp_dir_MT_m = currentpath + '/wes_analyses/tmp/MT/m/'
 postprocesspath = processpath + '/01_fastq/02_postprocess/'
 trimmedpath = processpath + '/02_fastq_trimmed/'
 fastqcpath = processpath + '/01_fastq/03_fastqc/'
@@ -359,7 +363,11 @@ rule all:
 
 rule create_tmpdir:
   output:
-    tmp_dir,
+    temp(tmp_dir_genome),
+    temp(tmp_dir_exome),
+    temp(tmp_dir_MT),
+    temp(tmp_dir_genome_m),
+    temp(tmp_dir_MT_m),
   threads: 1
   run:
     pass
@@ -542,7 +550,7 @@ rule sorting_genome:
     """
     input:
         sam = genome_int + "{sample}.sam",
-        tmp = tmp_dir,
+        tmp = tmp_dir_genome,
     output:
         outdir = genome_int + "{sample}_sorted.bam",
     log:
@@ -560,7 +568,7 @@ rule marking_genome:
     """
     input:
         sorted_bam = genome_int + "{sample}_sorted.bam",
-        tmp = tmp_dir,
+        tmp = tmp_dir_genome_m,
     output:
         out = genome_int+"{sample}"+"_marked.bam",
     log:
@@ -741,7 +749,7 @@ rule sorting_exome:
     """
     input:
         sam = exome_int + "{sample}.sam",
-        tmp = tmp_dir,
+        tmp = tmp_dir_exome,
     output:
         outdir = exome_int + "{sample}_sorted.bam",
     log:
@@ -822,7 +830,7 @@ rule sorting_MT:
     """
     input:
         sam = MT_int + "{sample}.sam",
-        tmp = tmp_dir,
+        tmp = tmp_dir_MT,
     output:
         outdir = MT_int + "{sample}_sorted.bam",
     log:
@@ -840,7 +848,7 @@ rule marking_MT:
     """
     input:
         sorted_bam = MT_int + "{sample}_sorted.bam",
-        tmp = tmp_dir,
+        tmp = tmp_dir_MT_m,
     output:
         out = MT_int+"{sample}"+"_marked.bam",
     log:

@@ -90,6 +90,6 @@ annovar_dbs:
     hg19_gSd: "/softwares/annovar/humandb/hg19_genomicSuperDups.txt"
     hg19_esp: "/softwares/annovar/humandb/hg19_esp6500siv2_all.txt"
     hg19_snp138: "/softwares/annovar/humandb/hg19_snp138.txt"
-    hg19_1000g2014oct: "/softwares/annovar/humandb/1000g2014oct_all.txt"
+    hg19_1000g2014oct: "/softwares/annovar/humandb/hg19_ALL.sites.2014_10.txt"
     hg19_exac03nontcga: "/softwares/annovar/humandb/hg19_exac03nontcga.txt"
     hg19_ljb26_all: "/softwares/annovar/humandb/hg19_ljb26_all.txt"

@@ -86,7 +86,7 @@ mitochondrial_ver = config['ref-files']['mitochondrial_ver'] # Set parameter com
 # Softwares
 gatk = homepath+ config['softwares']['gatk']
 muTect = homepath+ config['softwares']['muTect']
-annovar = homepath + config['softwares']['annovar']
+annovar = homepath + config['folders']['annovar']
 annotate = homepath+ config['softwares']['annotate']
 convert2annovar = homepath+ config['softwares']['convert2annovar']
 tableannovar = homepath+ config['softwares']['tableannovar']
@@ -110,7 +110,7 @@ annovar_dbs = [homepath + config['annovar_dbs']['hg19_refGene'],
                homepath + config['annovar_dbs']['hg19_snp138'],
                homepath + config['annovar_dbs']['hg19_1000g2014oct'],
                homepath + config['annovar_dbs']['hg19_exac03nontcga'],
-               homepath + config['annovar_dbs']['ljb26_all'],
+               homepath + config['annovar_dbs']['hg19_ljb26_all'],
                ]
 
 

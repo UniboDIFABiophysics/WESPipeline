@@ -86,7 +86,8 @@ mitochondrial_ver = config['ref-files']['mitochondrial_ver'] # Set parameter com
 # Softwares
 gatk = homepath+ config['softwares']['gatk']
 muTect = homepath+ config['softwares']['muTect']
-annovar = homepath+ config['softwares']['annovar']
+annovar = homepath + config['softwares']['annovar']
+annotate = homepath+ config['softwares']['annotate']
 convert2annovar = homepath+ config['softwares']['convert2annovar']
 tableannovar = homepath+ config['softwares']['tableannovar']
 adapter_removal = homepath + config['softwares']['adapter_removal']
@@ -102,7 +103,16 @@ MT_bed = homepath + config['bed']['MT']
 truseq_bed = homepath + config['bed']['truseq']
 
 # Annovar databases
-annovar_dbs = [homepath + config['annovar_dbs']['hg19_db'] , homepath + config['annovar_dbs']['snp138_db'], homepath + config['annovar_dbs']['hg19_cyto']]
+annovar_dbs = [homepath + config['annovar_dbs']['hg19_refGene'],
+               homepath + config['annovar_dbs']['hg19_cytoBand'],
+               homepath + config['annovar_dbs']['hg19_gSd'],
+               homepath + config['annovar_dbs']['hg19_esp'],
+               homepath + config['annovar_dbs']['hg19_snp138'],
+               homepath + config['annovar_dbs']['hg19_1000g2014oct'],
+               homepath + config['annovar_dbs']['hg19_exac03nontcga'],
+               homepath + config['annovar_dbs']['ljb26_all'],
+               ]
+
 
 # script rsIDfilter
 
@@ -1574,17 +1584,98 @@ rule create_MTbed:
     shell:
         "echo 'MT 1 16569' > {output}"
 
+##########################################
+##      DOWNLOAD ANNOVAR DATABASES      ##
+##########################################
 
-rule download_annovar_databases:
+rule download_hg19refGene:
     input:
-        annovar = annovar,
-    output:
-        annovar_dbs,
+        annovar,
     params:
+        annotate = annotate,
         humandb = humandb,
+    output:
+        annovar_dbs[0],
     shell:
-        "{input.annovar} -downdb -buildver hg19 -webfrom annovar snp138 {params.humandb} && "
-        "{input.annovar} -downdb 1000g2012apr {params.humandb} -buildver hg19"
+        "{params.annotate} -buildver hg19 -downdb -webfrom annovar refGene {params.humandb}"
+
+
+rule download_hg19cytoBand:
+    input:
+        annovar,
+    params:
+        annotate = annotate,
+        humandb = humandb,
+    output:
+        annovar_dbs[1],
+    shell:
+        "{params.annotate} -buildver hg19 -downdb cytoBand {params.humandb}"
+
+rule download_hg19gSd:
+    input:
+        annovar,
+    params:
+        annotate = annotate,
+        humandb = humandb,
+    output:
+        annovar_dbs[2],
+    shell:
+        "{params.annotate} -buildver hg19 -downdb genomicSuperDups {params.humandb}"
+
+rule download_hg19_esp:
+    input:
+        annovar,
+    params:
+        annotate = annotate,
+        humandb = humandb,
+    output:
+        annovar_dbs[3],
+    shell:
+        "{params.annotate} -buildver hg19 -downdb -webfrom annovar esp6500siv2_all {params.humandb}"
+
+rule download_hg19snp138:
+    input:
+        annovar,
+    params:
+        annotate = annotate,
+        humandb = humandb,
+    output:
+        annovar_dbs[4],
+    shell:
+        "{params.annotate} -buildver hg19 -downdb -webfrom annovar snp138 {params.humandb}"
+
+rule download_1000g2014oct:
+    input:
+        annovar,
+    params:
+        annotate = annotate,
+        humandb = humandb,
+    output:
+        annovar_dbs[5],
+    shell:
+        "{params.annotate} -buildver hg19 -downdb -webfrom annovar 1000g2014oct {params.humandb}"
+
+rule download_exac03nontcga:
+    input:
+        annovar,
+    params:
+        annotate = annotate,
+        humandb = humandb,
+    output:
+        annovar_dbs[6],
+    shell:
+        "{params.annotate} -buildver hg19 -downdb -webfrom annovar exac03nontcga {params.humandb}"
+
+rule download_ljb26_all:
+    input:
+        annovar,
+    params:
+        annotate = annotate,
+        humandb = humandb,
+    output:
+        annovar_dbs[7],
+    shell:
+        "{params.annotate} -buildver hg19 -downdb -webfrom annovar ljb26_all {params.humandb}"
 
 
 #########################################################

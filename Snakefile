@@ -312,6 +312,7 @@ tmp_dir_exome = currentpath + '/wes_analyses/tmp/exome/'
 tmp_dir_MT = currentpath + '/wes_analyses/tmp/MT/'
 tmp_dir_genome_m = currentpath + '/wes_analyses/tmp/genome_m/'
 tmp_dir_MT_m = currentpath + '/wes_analyses/tmp/MT_m/'
+preprocesspath = processpath + '/01_fastq/01_preprocess/'
 postprocesspath = processpath + '/01_fastq/02_postprocess/'
 trimmedpath = processpath + '/02_fastq_trimmed/'
 fastqcpath = processpath + '/01_fastq/03_fastqc/'
@@ -387,7 +388,6 @@ rule create_tmpdir:
   run:
     pass
 
-#% TODO: add temp for outpath[1,2] after checking
 
 rule downloadDecompressMergeFastq:
     input:
@@ -401,9 +401,11 @@ rule downloadDecompressMergeFastq:
         scripts = scripts,
         name = "{sample}",
         homepath = homepath,
+        preprocesspath = preprocesspath,
+        postprocesspath = postprocesspath,
+        logpath = fastq_logs,
         processpath = processpath,
         cadaver = cadaver,
-        logpath = fastq_logs,
     benchmark:
         "benchmarks/benchmark_downloadDecompressMergeFastq_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : downloading, decompressing and merging fastq "
@@ -1394,7 +1396,7 @@ rule MergeMutectVarscan:
 	m_tsv = variants_filter + "{patient}_mutect_somatic.tsv",
 	vsn_tsv = variants_filter + "{patient}_varscan_somatic.tsv",
     output:
-        variants_filter + "{patient}_all_somatic_annotated.tsv",
+        table_out = variants_filter + "{patient}_all_somatic_annotated.tsv",
     params:
         scripts = scripts,
         workdir = variants_filter_logs,

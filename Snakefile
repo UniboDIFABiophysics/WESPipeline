@@ -289,14 +289,14 @@ def get_ref_dict(wildcards):
     r = homepath + config['fasta'][kit]
     return r.replace('fasta','dict')
 
-def get_bam(wildcards, sample_type, dir):
-    return (dir + patients_dict[wildcards][sample_type] + "_recal.bam")
+def get_bam(wildcards, sample_type, Dir):
+    return (Dir + patients_dict[wildcards][sample_type] + "_recal.bam")
 
-def get_bai(wildcards, sample_type, dir):
-    return (dir + patients_dict[wildcards][sample_type] + "_recal.bai")
+def get_bai(wildcards, sample_type, Dir):
+    return (Dir + patients_dict[wildcards][sample_type] + "_recal.bai")
 
-def get_mpileup(wildcards, sample_type, dir):
-    return (dir + patients_dict[wildcards][sample_type] + ".mpileup")
+def get_mpileup(wildcards, sample_type, Dir):
+    return (Dir + patients_dict[wildcards][sample_type] + ".mpileup")
 
 
 # define directories
@@ -478,7 +478,7 @@ rule trim_02:
         "benchmarks/benchmark_trim_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: '>> {wildcards.sample} : Trimming'
     shell:
-        "{params.adapter_removal} --file1 {input.fastq1} --file2 {input.fastq1} --pcr1 {params.pcr1} --pcr2 {params.pcr2} --stats --trimns --trimqualities --minquality 20 --minlength 80 --output1 {output.fastq1_trimmed} --output2 {output.fastq2_trimmed} --discarded {log.log_disc} --outputstats {log.log_stats} --singleton {log.log_sgtn}"
+        "{params.adapter_removal} --file1 {input.fastq1} --file2 {input.fastq2} --pcr1 {params.pcr1} --pcr2 {params.pcr2} --stats --trimns --trimqualities --minquality 20 --minlength 80 --output1 {output.fastq1_trimmed} --output2 {output.fastq2_trimmed} --discarded {log.log_disc} --outputstats {log.log_stats} --singleton {log.log_sgtn}"
 
 
 rule fastqc_trimmed_R1:
@@ -920,7 +920,7 @@ rule RTC_MT:
     output:
         MT_logs+"{sample}"+".intervals",
     params:
-        ref=MT,
+        reference=MT,
     log:
         MT_logs + "{sample}" + "_RTC.log"
     conda:
@@ -930,7 +930,7 @@ rule RTC_MT:
     message: ">> {wildcards.sample} : RTC MT"
     threads: RT_thrs
     shell:
-        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.ref} -I {input.marked_bam} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
+        "java -jar {input.gatk} -T RealignerTargetCreator -R {params.reference} -I {input.marked_bam} -L {input.bed} -ip 50 -known {input.indels_ref} -nt {threads} -o {output} 2> {log}"
 
 
 rule IndelRealigner_MT:
@@ -1382,8 +1382,8 @@ rule MergeMutectVarscan:
         m_mt = variants_filter_logs + "{patient}_mutect_mt_g.GRCh37_MT_multianno.txt",
         vsn_gen = variants_filter_logs + "{patient}_varscan_genome.hg19_multianno.txt",
         vsn_mt = variants_filter_logs + "{patient}_varscan_mt_g.GRCh37_MT_multianno.txt",
-	m_tsv = variants_filter + "{patient}_mutect_somatic.tsv",
-	vsn_tsv = variants_filter + "{patient}_varscan_somatic.tsv",
+        m_tsv = variants_filter + "{patient}_mutect_somatic.tsv",
+        vsn_tsv = variants_filter + "{patient}_varscan_somatic.tsv",
     output:
         table_out = variants_filter + "{patient}_all_somatic_annotated.tsv",
     params:
@@ -1416,7 +1416,6 @@ rule filterExonicPolymorphic:
         "{patient}_rsID_maf.tsv"
     params:
         rsIDfilter = rsIDfilter,
-        workdir = variants_filter,
     log:
         info = variants_filter_logs + "{patient}_rsID_session_info.log",
         err = variants_filter_logs + "{patient}_rsID_err.log",
@@ -1426,7 +1425,7 @@ rule filterExonicPolymorphic:
         "benchmarks/benchmark_fEP_ref_null_subject_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.patient} : filtering exonic/non-synonymous/non-polymorphic"
     shell:
-        "Rscript {params.rsIDfilter} {params.workdir} > {log.info} 2> {log.err} && "
+        "Rscript {params.rsIDfilter} {input} {output} > {log.info} 2> {log.err} && "
         "cat {log.info} {log.err} > {log.err}"
 
 rule checkMAFs:

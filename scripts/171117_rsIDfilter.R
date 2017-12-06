@@ -7,6 +7,17 @@
 
 rsIDfilter <- function(input_table,outtable) {
 
+   # if rsnps is installed locally, load
+   if("rsnps" %in% rownames(installed.packages()))
+      do.call('library', list("rsnps"))
+
+   # if rsnps is not installed locally, download, then load
+   else {
+      dir.create(Sys.getenv("R_LIBS_USER"), showWarnings = FALSE, recursive = TRUE)
+      install.packages("rsnps", Sys.getenv("R_LIBS_USER"), repos = "https://cloud.r-project.org/")
+      do.call("library", list("rsnps"))
+   }
+
   library(rsnps)
 
   # store command line arguments

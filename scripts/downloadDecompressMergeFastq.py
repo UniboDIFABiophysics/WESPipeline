@@ -1,12 +1,12 @@
-def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath, processpath,logpath,log, cadaver=False):
+def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath, preprocesspath,postprocesspath,logpath,log, processpath ,cadaver=False):
 
     import os
     import re
     import subprocess as sp
 
     inpath = fastq_path
-    inoutpath = processpath + '/01_fastq/01_preprocess/'
-    outpath = processpath + '/01_fastq/02_postprocess/'
+    inoutpath = preprocesspath
+    outpath = postprocesspath
     logpath = logpath
 
     if not os.path.exists(inoutpath):
@@ -79,26 +79,20 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
 
             # decompress it while downloading to inoutpath
             index = (os.path.splitext(os.path.basename(inoutpath + gz[:-3]))[0]).split('_')[1]
+            
             # decompress it while downloading to inoutpath
             sp.call(' '.join(['gzip',
                               '-dc', inpath + gz,
-                              '>', inoutpath + gz[:-10] + "R"+ index + "_unchecked.fastq"]), shell=True)
-
-
-
-
-
+                              '>', inoutpath + gz[:-3]]), shell=True)
 
     # list common substring of each pair of fastq
-
     common_substrings = list(set([re.split('_R[12]', f)[0] for f in os.listdir(inoutpath) if re.search(fastq_id,f)]))
 
     # list all R1 fastq (unordered), concatenating their relative path
-    R1 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('_R1_', f) and re.search(fastq_id,f)]
+    R1 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('_R1', f) and re.search(fastq_id,f)]
 
     # list all R2 fastq (unordered), concatenating their relative path
-    R2 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('_R2_', f) and re.search(fastq_id,f)]
-
+    R2 = [inoutpath + f for f in os.listdir(inoutpath) if re.search('_R2', f) and re.search(fastq_id,f)]
 
     # create new lists
     R1b = []
@@ -113,8 +107,6 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
             # if common substring matches R1 fastq
             if re.search(cs, r1):
 
-                print("r1 ",r1)
-
                 # append it to new list
                 R1b.append(r1)
 
@@ -124,7 +116,6 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
             # if common substring matches R1 fastq
             if re.search(cs, r2):
 
-                print("r2 ", r2)
 
                 # append it to new list
                 R2b.append(r2)
@@ -133,15 +124,10 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
     R1b = ' '.join(R1b)
     R2b = ' '.join(R2b)
 
-    print("R1b ", R1b)
-    print("R2b ", R2b)
 
     # concatenate multiple fastq (if there are)
     sp.call(' '.join(['cat', R1b, '>', outpath + fastq1]), shell=True)
     sp.call(' '.join(['cat', R2b, '>', outpath + fastq2]), shell=True)
-
-    # delete fastq in INOUTPATH
-    sp.call(' '.join(['rm', inoutpath + '*']), shell=True)
 
 
 # Snakemake call
@@ -151,7 +137,9 @@ downloadDecompressMergeFastq(snakemake.params['name'],
                              snakemake.params['fastq_path'],
                              snakemake.params['fastq_id'],
                              snakemake.params['homepath'],
-                             snakemake.params['processpath'],
+                             snakemake.params['preprocesspath'],                                                                                
+                             snakemake.params['postprocesspath'],
                              snakemake.params['logpath'],
-                             snakemake.log,
+                             snakemake.log['log'],
+                             snakemake.params['processpath'],
                              snakemake.params['cadaver'])

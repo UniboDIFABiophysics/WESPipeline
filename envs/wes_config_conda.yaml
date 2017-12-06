@@ -6,7 +6,7 @@ channels:
   - r
 dependencies:
  - fastqc
- - picard = 2.9.2
+ - picard
  - bwa
  - samtools
  - pyvcf

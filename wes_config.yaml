@@ -1,6 +1,6 @@
 input_list: "samples_eg.txt"
 
-dataset: "/dataset_eg.tsv"
+dataset: "/Dati_Eugenio/dataset_Eugenio.tsv"
 
 custom_match: ""
 
@@ -34,7 +34,7 @@ operations:
   genome: "g,r,r,f,f,f,f,f"
   MT: "g"
 
-rsIDfilter: "/171117_rsIDfilter.R"
+rsIDfilter: "171117_rsIDfilter.R"
 
 ########### old pipeline stuff
 

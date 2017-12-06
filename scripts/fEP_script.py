@@ -3,6 +3,7 @@ def fEP(not_filt_table, output_table, tsv):
     import pandas as pd
 
     # load tables
+    
     variants = pd.read_table(not_filt_table, sep='\t', header=0)
 
     # keep exonic
@@ -10,14 +11,16 @@ def fEP(not_filt_table, output_table, tsv):
 
     # remove synonymous
     variants = variants[variants.var_type != 'synonymous SNV']
+    
 
     # remove polymorphisms according to 1000g, ESP and EXAC
     remove = variants[(variants['1000g'] >= 0.01) | (variants.esp >= 0.01) | (variants.exac >= 0.01)].index
     variants = variants.drop(remove)
+    
 
     if (tsv=="/"):
         # select rsIDs and write to file
-        rsID = variants.dbsnp_id[pd.notnull(variants.dbsnp_id)]
+        rsID = variants.dbsnp_id[pd.notnull(variants.dbsnp_id)]       
         rsID.to_csv(output_table, sep='\t', header=False, index=False)
     else:
         # load output of R script
@@ -39,6 +42,6 @@ def fEP(not_filt_table, output_table, tsv):
         variants.to_csv(output_table, sep='\t', header=True, index=False)
 
 
-fEP(snakemake.input['not_filtered'],
-    snakemake.output,
+fEP(snakemake.input['tsv'],
+    snakemake.output['out'],
     snakemake.input['maf'])

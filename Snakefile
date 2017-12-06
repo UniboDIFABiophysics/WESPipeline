@@ -308,6 +308,11 @@ postprocesspath = processpath + '/01_fastq/02_postprocess/'
 trimmedpath = processpath + '/02_fastq_trimmed/'
 fastqcpath = processpath + '/01_fastq/03_fastqc/'
 fastqcpath_trim = processpath + '/02_fastq_trimmed/01_fastqc/'
+
+alignpath_genome = processpath + '/03_alignment_genome/'
+alignpath_exome = processpath + '/04_alignment_exome/'
+alignpath_MT = processpath + '/05_alignment_MT/'
+
 alignpath_genomebqsr = alignpath_genome + "02_bqsr/"
 alignpath_MTbqsr = alignpath_MT + "02_bqsr/"
 alignpath_exomeunmapped = alignpath_exome + '02_unmapped_fastq/'
@@ -320,10 +325,6 @@ exome_logs = alignpath_exome + 'logs/'
 MT_int = alignpath_MT + '01_intermediate/'
 MT_logs = alignpath_MT + 'logs/'
 
-
-alignpath_genome = processpath + '/03_alignment_genome/'
-alignpath_exome = processpath + '/04_alignment_exome/'
-alignpath_MT = processpath + '/05_alignment_MT/'
 
 mutectpath_genome = processpath + '/06_mutect_genome/'
 mutectpath_genome_logs = mutectpath_genome + 'logs/'
@@ -577,7 +578,7 @@ rule marking_genome:
         sorted_bam = genome_int + "{sample}_sorted.bam",
     output:
         out = genome_int+"{sample}"+"_marked.bam",
-    paramas:
+    params:
         tmp = tmp_dir,
     log:
         mx = alignpath_genome + '{sample}_metrix.log',
@@ -1398,10 +1399,10 @@ rule MergeMutectVarscan:
 
 rule create_rsID_table:
     input:
-        not_filtered = variants_filter + "{patient}_all_somatic_annotated.tsv",
+        tsv = variants_filter + "{patient}_all_somatic_annotated.tsv",
         maf = "/",
     output:
-        variants_filter + "{patient}_rsID.tsv",
+        out = variants_filter + "{patient}_rsID.tsv",
     params:
         scripts = scripts,
     message: ">> {wildcards.patient} : create rsID table"
@@ -1430,10 +1431,10 @@ rule filterExonicPolymorphic:
 
 rule checkMAFs:
     input:
-        not_filtered = variants_filter + "{patient}_all_somatic_annotated.tsv",
+        tsv = variants_filter + "{patient}_all_somatic_annotated.tsv",
         maf = "{patient}_rsID_maf.tsv",
     output:
-        variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",
+        out = variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",
     params:
         scripts = scripts,
     message: ">> {wildcards.patient} : checking MAFs"

@@ -139,4 +139,4 @@ Merge_MuTect_Varscan(snakemake.input['m_tsv'],
                      snakemake.input['vsn_tsv'],
                      snakemake.params['workdir'],
                      snakemake.params['name'],
-                     snakemake.output)
+                     snakemake.output['table_out'])

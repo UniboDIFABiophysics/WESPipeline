@@ -3,18 +3,11 @@ channels:
   - bioconda
   - cyclus
   - conda-forge
-  - r
 dependencies:
  - fastqc
- - picard
- - bwa
- - samtools
- - pyvcf
+ - picard = 1.126
+ - bwa = 0.7.12
+ - samtools = 1.5
  - java-jdk
- - r-ggplot2
- - r-reshape
- - r-gplots
- - r-gsalib
- - pysam
- - bedtools
- - varscan
+ - bedtools = 2.26
+ - varscan = 2.4.0

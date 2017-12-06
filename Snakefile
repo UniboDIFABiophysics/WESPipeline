@@ -157,7 +157,8 @@ sp.call(' '.join(['cp', input_list, processpath]), shell=True)
 
 
 data = currentpath + config['dataset']
-dataset = pd.read_table(data, sep = '\t',header=0, index_col='sample_id', dtype='str')
+dataset = pd.read_table(data, sep = '\t',header=0, dtype='str')
+dataset = dataset.set_index("sample_id")
 
 ##### BUILD TUMOR/NORMAL MATCHING LIST
 
@@ -247,6 +248,8 @@ def get_bed_patient(wildcards):
 
 def get_fastq_path(wildcards):
     path = dataset.loc[wildcards,'fastq_path_wes']
+    if not os.path.commonprefix([path,homepath]):
+         path = homepath + '/' + path
     if path == './':
         path = ''
     return path
@@ -401,7 +404,7 @@ rule downloadDecompressMergeFastq:
         logpath = fastq_logs,
     threads: 1
     log:
-         fastq_logs + '{sample}_cadaver.log',
+         log = fastq_logs + '{sample}_cadaver.log',
     script:
         "{params.scripts}"+"downloadDecompressMergeFastq.py"
 
@@ -1559,7 +1562,7 @@ rule fix_nextera_bed:
         nextera_bed + "_fixed.bed",
     params:
         scripts = scripts,
-        line_to_skip = None,
+        line_to_skip = 1,
     script:
         "{params.scripts}" + "editBEDChromField.py"
 

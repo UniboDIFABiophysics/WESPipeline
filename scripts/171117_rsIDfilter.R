@@ -40,4 +40,4 @@ rsIDfilter <- function(input_table,outtable) {
   sessionInfo()
 }
 
-rsIDfilter(snakemake@input[['not_filtered']], snakemake@output[['out']])
+rsIDfilter("P_3_rsID.tsv", "P_3_rsID_maf.tsv")

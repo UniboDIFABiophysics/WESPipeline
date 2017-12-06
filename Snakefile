@@ -299,19 +299,10 @@ def get_mpileup(wildcards, sample_type, dir):
     return (dir + patients_dict[wildcards][sample_type] + ".mpileup")
 
 
-# define align paths
-
-alignpath_genome = processpath + '/03_alignment_genome/'
-alignpath_exome = processpath + '/04_alignment_exome/'
-alignpath_MT = processpath + '/05_alignment_MT/'
-
-
 # define directories
-tmp_dir_genome = currentpath + '/wes_analyses/tmp/genome/'
-tmp_dir_exome = currentpath + '/wes_analyses/tmp/exome/'
-tmp_dir_MT = currentpath + '/wes_analyses/tmp/MT/'
-tmp_dir_genome_m = currentpath + '/wes_analyses/tmp/genome_m/'
-tmp_dir_MT_m = currentpath + '/wes_analyses/tmp/MT_m/'
+tmp_dir = currentpath + '/wes_analyses/tmp/'
+if not os.path.exists(tmp_dir):
+     os.makedirs(tmp_dir)
 preprocesspath = processpath + '/01_fastq/01_preprocess/'
 postprocesspath = processpath + '/01_fastq/02_postprocess/'
 trimmedpath = processpath + '/02_fastq_trimmed/'
@@ -328,6 +319,11 @@ exome_int = alignpath_exome + '01_intermediate/'
 exome_logs = alignpath_exome + 'logs/'
 MT_int = alignpath_MT + '01_intermediate/'
 MT_logs = alignpath_MT + 'logs/'
+
+
+alignpath_genome = processpath + '/03_alignment_genome/'
+alignpath_exome = processpath + '/04_alignment_exome/'
+alignpath_MT = processpath + '/05_alignment_MT/'
 
 mutectpath_genome = processpath + '/06_mutect_genome/'
 mutectpath_genome_logs = mutectpath_genome + 'logs/'
@@ -375,19 +371,6 @@ rule all:
     pass
 
 ###########################################################################################
-
-rule create_tmpdir:
-  output:
-    temp(tmp_dir_genome),
-    temp(tmp_dir_exome),
-    temp(tmp_dir_MT),
-    temp(tmp_dir_genome_m),
-    temp(tmp_dir_MT_m),
-  threads: 1
-  message: " Create tmp dir "
-  run:
-    pass
-
 
 rule downloadDecompressMergeFastq:
     input:
@@ -572,9 +555,10 @@ rule sorting_genome:
     """
     input:
         sam = genome_int + "{sample}.sam",
-        tmp = tmp_dir_genome,
     output:
         outdir = genome_int + "{sample}_sorted.bam",
+    params:
+        tmp = tmp_dir,
     log:
         alignpath_genome + '{sample}_sorting.log'
     conda:
@@ -583,7 +567,7 @@ rule sorting_genome:
         "benchmarks/benchmark_sorting_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting genome"
     shell:
-        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={input.tmp} 2> {log}"
+        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 rule marking_genome:
     """
@@ -591,9 +575,10 @@ rule marking_genome:
     """
     input:
         sorted_bam = genome_int + "{sample}_sorted.bam",
-        tmp = tmp_dir_genome_m,
     output:
         out = genome_int+"{sample}"+"_marked.bam",
+    paramas:
+        tmp = tmp_dir,
     log:
         mx = alignpath_genome + '{sample}_metrix.log',
         mark = alignpath_genome + '{sample}_marking.log',
@@ -605,7 +590,7 @@ rule marking_genome:
     shell:
         "picard MarkDuplicates"
         " INPUT={input.sorted_bam} OUTPUT={output.out} METRICS_FILE={log.mx} "
-        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={input.tmp} 2> {log.mark}"
+        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={params.tmp} 2> {log.mark}"
 
 rule indexing_genome:
     """
@@ -776,9 +761,10 @@ rule sorting_exome:
     """
     input:
         sam = exome_int + "{sample}.sam",
-        tmp = tmp_dir_exome,
     output:
         outdir = exome_int + "{sample}_sorted.bam",
+    params:
+        tmp = tmp_dir,
     log:
         exome_logs + '{sample}_sorting.log'
     conda:
@@ -787,7 +773,7 @@ rule sorting_exome:
         "benchmarks/benchmark_sorting_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting exome"
     shell:
-        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={input.tmp} 2> {log}"
+        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 
 rule extractUnmapped_extract:
@@ -862,9 +848,10 @@ rule sorting_MT:
     """
     input:
         sam = MT_int + "{sample}.sam",
-        tmp = tmp_dir_MT,
     output:
         outdir = MT_int + "{sample}_sorted.bam",
+    params:
+        tmp = tmp_dir,
     log:
         alignpath_MT + '{sample}_sorting.log'
     conda:
@@ -873,7 +860,7 @@ rule sorting_MT:
         "benchmarks/benchmark_sorting_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting MT"
     shell:
-        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={input.tmp} 2> {log}"
+        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 rule marking_MT:
     """
@@ -881,9 +868,10 @@ rule marking_MT:
     """
     input:
         sorted_bam = MT_int + "{sample}_sorted.bam",
-        tmp = tmp_dir_MT_m,
     output:
         out = MT_int+"{sample}"+"_marked.bam",
+    params:
+        tmp = tmp_dir,
     log:
         mx = alignpath_MT + '{sample}_metrix.log',
         mark = alignpath_MT + '{sample}_marking.log',
@@ -895,7 +883,7 @@ rule marking_MT:
     shell:
         "picard MarkDuplicates"
         " INPUT={input.sorted_bam} OUTPUT={output.out} METRICS_FILE={log.mx} "
-        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={input.tmp} 2> {log.mark}"
+        " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={params.tmp} 2> {log.mark}"
 
 rule indexing_MT:
     """

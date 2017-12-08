@@ -807,7 +807,7 @@ rule extractUnmapped_convert:
         "benchmarks/benchmark_Unmapped_convert_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : extractUnmapped convert"
     shell:
-        "picard SamToFastq I={input} F={output.unmapped1} F2={output.unmapped2} FU={output.unpair} 2> {log}"
+        "picard -Xmx4g SamToFastq I={input} F={output.unmapped1} F2={output.unmapped2} FU={output.unpair} VALIDATION_STRINGENCY=LENIENT 2> {log}"
 
 
 

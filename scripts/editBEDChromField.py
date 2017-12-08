@@ -11,7 +11,7 @@ def editBEDChromField(input_bed, line_to_skip,output_bed):
     # otherwise skip the line number provided in the 2nd argument
     rows_to_skip = None
     if line_to_skip:
-        rows_to_skip = line_to_skip
+        rows_to_skip = [int(r) for r in line_to_skip]
 
     # load file
     bed = pd.read_table(bed_name, sep='\t', header=None, dtype='str', skiprows=rows_to_skip)

@@ -8,6 +8,6 @@ dependencies:
  - picard = 1.126
  - bwa = 0.7.12
  - samtools = 1.5
- - java-jdk
+ - java-jdk = 8.45.14
  - bedtools = 2.26
  - varscan = 2.4.0

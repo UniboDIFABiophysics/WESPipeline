@@ -1,12 +1,12 @@
 # 171117
 
 
- # if rsnps is installed locally, load
- if("rsnps" %in% rownames(installed.packages()))
+# if rsnps is installed locally, load
+if("rsnps" %in% rownames(installed.packages())){
     do.call('library', list("rsnps"))
 
- # if rsnps is not installed locally, download, then load
- else {
+# if rsnps is not installed locally, download, then load
+} else {
     install.packages("rsnps", repos = "https://cloud.r-project.org/")
     do.call("library", list("rsnps"))
  }

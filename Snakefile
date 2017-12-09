@@ -49,7 +49,6 @@ storepath = currentpath
 # initialize storepath if necessary
 if custom_storepath:
     storepath = currentpath + custom_storepath + folder
-    processpath = storepath
     # storepath_tree = [['/'.join([storepath, d, d2,'']) for d2 in dirs[d]] for d in dirs]
 
 #/-----------------------------------------------------------------------------------------#/
@@ -80,7 +79,6 @@ cosmic = homepath+ config['ref-files']['cosmic'] # Catalog of somatic mutation i
 humandb = homepath+ config['ref-files']['humandb'] # Annovar human databases folder
 build_ver = config['ref-files']['build_ver'] # Set build version
 dbsnp_ver = config['ref-files']['dbsnp_ver'] # Set SNP database version
-kg_ver = config['ref-files']['kg_ver'] # Set  version # Set ethnicity groups based on time
 mitochondrial_ver = config['ref-files']['mitochondrial_ver'] # Set parameter command for annotating mitochondria variants
 
 # Softwares
@@ -88,13 +86,11 @@ gatk = homepath+ config['softwares']['gatk']
 muTect = homepath+ config['softwares']['muTect']
 annovar = homepath + config['folders']['annovar']
 annotate = homepath+ config['softwares']['annotate']
-convert2annovar = homepath+ config['softwares']['convert2annovar']
 tableannovar = homepath+ config['softwares']['tableannovar']
 adapter_removal = homepath + config['softwares']['adapter_removal']
 
 # Sample details
 platform = config['sample-details']['platform'] # Set platform for alignment
-library = config['sample-details']['library'] # Set library for alignment
 
 # bed files
 nextexp_bed = homepath + config['bed']['nextera_expanded'] # Set target intervals for exome analysis
@@ -132,14 +128,6 @@ RT_thrs = max_thrs
 BaseRecal_thrs = max_thrs
 BQSR2_thrs = max_thrs
 PrintReads_thrs = 4
-HC_thrs = 4
-HF1_thrs = 1
-HF2_thrs = 1
-HFC_thrs = 1
-M_thrs = 1
-LodnT_thrs = 1
-Lodnv_thrs = 1
-
 
 
 
@@ -156,7 +144,7 @@ with open(input_list) as infile:
 sp.call(' '.join(['cp', input_list, processpath]), shell=True)
 
 
-data = currentpath + config['dataset']
+data = homepath + config['dataset']
 dataset = pd.read_table(data, sep = '\t',header=0, dtype='str')
 dataset = dataset.set_index("sample_id")
 
@@ -366,6 +354,8 @@ rule all:
     expand(fastqcpath +"{sample}" + "_R2_fastqc.zip",sample=samples),
     expand(fastqcpath_trim +"{sample}" + "_R1_fastqc.zip",sample=samples),
     expand(fastqcpath_trim +"{sample}" + "_R2_fastqc.zip",sample=samples),
+    expand(genome_logs + "{sample}"+"_recalibrationPlots.pdf",sample=samples),
+    expand(MT_logs + "{sample}"+"_recalibrationPlots.pdf",sample=samples),
     expand(variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",patient=patients),
   message: " THE END "
   run:
@@ -403,8 +393,8 @@ rule fastq_checkpoint:
         unchecked1 = postprocesspath+"{sample}" + "_R1_unchecked.fastq",
         unchecked2 = postprocesspath+"{sample}" + "_R2_unchecked.fastq",
     output:
-        checked1 = postprocesspath+"{sample}" + "_R1.fastq",
-        checked2 = postprocesspath+"{sample}" + "_R2.fastq",
+        checked1 = temp(postprocesspath+"{sample}" + "_R1.fastq"),
+        checked2 = temp(postprocesspath+"{sample}" + "_R2.fastq"),
     params:
         name="{sample}",
     message: ">> {wildcards.sample} : Check fastq size "
@@ -533,7 +523,7 @@ rule map_to_genome:
         fastq1_trimmed = trimmedpath+"{sample}" + "_R1.fastq",
         fastq2_trimmed = trimmedpath+"{sample}" + "_R2.fastq",
     output:
-        outfile =  genome_int + "{sample}.sam",
+        outfile =  temp(genome_int + "{sample}.sam"),
     params:
         reference = hg,
         library = lambda wildcards: get_kit(wildcards.sample),
@@ -544,7 +534,7 @@ rule map_to_genome:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_mapping_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_mapping_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Aligning to reference NUCLEAR GENOME"
     threads: map_thrs
     shell:
@@ -557,7 +547,7 @@ rule sorting_genome:
     input:
         sam = genome_int + "{sample}.sam",
     output:
-        outdir = genome_int + "{sample}_sorted.bam",
+        outdir = temp(genome_int + "{sample}_sorted.bam"),
     params:
         tmp = tmp_dir,
     log:
@@ -577,7 +567,7 @@ rule marking_genome:
     input:
         sorted_bam = genome_int + "{sample}_sorted.bam",
     output:
-        out = genome_int+"{sample}"+"_marked.bam",
+        out = temp(genome_int+"{sample}"+"_marked.bam"),
     params:
         tmp = tmp_dir,
     log:
@@ -600,7 +590,7 @@ rule indexing_genome:
     input:
         marked_bam = genome_int+"{sample}"+"_marked.bam",
     output:
-        marked_bai = genome_int+"{sample}"+"_marked.bai",
+        marked_bai = temp(genome_int+"{sample}"+"_marked.bai"),
     log:
         alignpath_genome + '{sample}_indexing.log',
     conda:
@@ -633,7 +623,7 @@ rule RTC_genome:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_RTC_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_RTC_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : RTC genome"
     threads: RT_thrs
     shell:
@@ -649,8 +639,8 @@ rule IndelRealigner_genome:
         bam = genome_int+"{sample}"+"_marked.bam",
         idx = genome_int+"{sample}"+"_marked.bai",
     output:
-        r_bam = genome_int + "{sample}"+"_realigned.bam",
-        r_idx = genome_int + "{sample}"+"_realigned.bai",
+        r_bam = temp(genome_int + "{sample}"+"_realigned.bam"),
+        r_idx = temp(genome_int + "{sample}"+"_realigned.bai"),
     params:
         gatk = gatk,
         ref = hg,
@@ -687,11 +677,59 @@ rule BaseRecal_genome:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_BaseRecal_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_BaseRecal_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : BaseRecal genome"
     threads: BaseRecal_thrs
     shell:
         "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -L {input.bed} -ip 50 -knownSites {input.dbsnp} -knownSites {params.indels_ref} -nct {threads} -o {output.outtable} 2> {log}"
+
+rule PostRecalTable_genome:
+    """
+    This tool detects systematic errors in base quality scores.
+    This step produces a recalibrated data table.
+    """
+    input:
+        r_bam = genome_int +"{sample}"+"_realigned.bam",
+        r_idx = genome_int +"{sample}"+"_realigned.bai",
+        dbsnp = dbsnp,
+        bed = lambda wildcards: get_bed(wildcards.sample),
+        outtable = genome_logs + "{sample}"+"_recal_data.table",
+    output:
+        outtable_post = genome_logs + "{sample}"+"_post_recal_data.table",
+    params:
+        gatk = gatk,
+        ref=hg,
+        indels_ref=indels_ref
+    log:
+        genome_logs + "{sample}" + '_postrecalibrating.log'
+    conda:
+        "envs/wes_config_conda.yaml"
+    benchmark:
+        "benchmarks/benchmark_PostRecalTable_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
+    message: ">> {wildcards.sample} : PostRecalTable genome"
+    threads: BaseRecal_thrs
+    shell:
+        "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -L {input.bed} -ip 50 -knownSites {input.dbsnp} -knownSites {params.indels_ref} -BQSR {input.outtable} -nct {threads} -o {output.outtable_post} 2> {log}"
+
+rule AnalyzeCovariates_genome:
+    """
+    This tool creates plots to visualize base recalibration results.
+    """
+    input:
+        outtable1 = genome_logs + "{sample}"+"_recal_data.table",
+        outtable2 = genome_logs + "{sample}"+"_post_recal_data.table",
+    output:
+        plots = genome_logs + "{sample}"+"_recalibrationPlots.pdf",
+    params:
+        gatk = gatk,
+        ref=hg,
+    conda:
+        "envs/wes_config_conda.yaml"
+    benchmark:
+        "benchmarks/benchmark_AnalyzeCovariates_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    message: ">> {wildcards.sample} : AnalyzeCovariates genome"
+    shell:
+        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots}"
 
 rule PrintReads_genome:
     """
@@ -712,7 +750,7 @@ rule PrintReads_genome:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_PrintReads_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_PrintReads_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{PrintReads_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, PrintReads_thrs=PrintReads_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : PrintReads genome"
     threads: PrintReads_thrs
     shell:
@@ -740,7 +778,7 @@ rule map_to_exome:
         fastq1_trimmed = trimmedpath+"{sample}" + "_R1.fastq",
         fastq2_trimmed = trimmedpath+"{sample}" + "_R2.fastq",
     output:
-        outfile =  exome_int + "{sample}.sam",
+        outfile =  temp(exome_int + "{sample}.sam"),
     params:
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
@@ -750,7 +788,7 @@ rule map_to_exome:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_mapping_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_mapping_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Aligning to reference EXOME"
     threads: map_thrs
     shell:
@@ -763,7 +801,7 @@ rule sorting_exome:
     input:
         sam = exome_int + "{sample}.sam",
     output:
-        outdir = exome_int + "{sample}_sorted.bam",
+        outdir = temp(exome_int + "{sample}_sorted.bam"),
     params:
         tmp = tmp_dir,
     log:
@@ -781,7 +819,7 @@ rule extractUnmapped_extract:
     input:
         exome_int + "{sample}_sorted.bam",
     output:
-        exome_int + "{sample}_unmapped.bam",
+        temp(exome_int + "{sample}_unmapped.bam"),
     log:
         exome_logs + '{sample}_unmapped.log'
     conda:
@@ -827,7 +865,7 @@ rule map_to_MT:
         unmapped2 = alignpath_exomeunmapped + "{sample}_R2.unmapped.fastq",
         unpair = alignpath_exomeunmapped + "{sample}_unpaired.unmapped.fastq",
     output:
-        outfile =  MT_int + "{sample}.sam",
+        outfile =  temp(MT_int + "{sample}.sam"),
     params:
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
@@ -837,7 +875,7 @@ rule map_to_MT:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_mapping_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_mapping_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Aligning to reference MITOCHONDRIAL GENOME"
     threads: map_thrs
     shell:
@@ -850,7 +888,7 @@ rule sorting_MT:
     input:
         sam = MT_int + "{sample}.sam",
     output:
-        outdir = MT_int + "{sample}_sorted.bam",
+        outdir = temp(MT_int + "{sample}_sorted.bam"),
     params:
         tmp = tmp_dir,
     log:
@@ -870,7 +908,7 @@ rule marking_MT:
     input:
         sorted_bam = MT_int + "{sample}_sorted.bam",
     output:
-        out = MT_int+"{sample}"+"_marked.bam",
+        out = temp(MT_int+"{sample}"+"_marked.bam"),
     params:
         tmp = tmp_dir,
     log:
@@ -893,7 +931,7 @@ rule indexing_MT:
     input:
         marked_bam = MT_int+"{sample}"+"_marked.bam",
     output:
-        marked_bai = MT_int+"{sample}"+"_marked.bai",
+        marked_bai = temp(MT_int+"{sample}"+"_marked.bai"),
     log:
         alignpath_MT + '{sample}_indexing.log',
     conda:
@@ -926,7 +964,7 @@ rule RTC_MT:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_RTC_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_RTC_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : RTC MT"
     threads: RT_thrs
     shell:
@@ -942,8 +980,8 @@ rule IndelRealigner_MT:
         bam = MT_int+"{sample}"+"_marked.bam",
         idx = MT_int+"{sample}"+"_marked.bai",
     output:
-        r_bam = MT_int+"{sample}"+"_realigned.bam",
-        r_idx = MT_int+"{sample}"+"_realigned.bai",
+        r_bam = temp(MT_int+"{sample}"+"_realigned.bam"),
+        r_idx = temp(MT_int+"{sample}"+"_realigned.bai"),
     params:
         gatk = gatk,
         ref = MT,
@@ -980,11 +1018,61 @@ rule BaseRecal_MT:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_BaseRecal_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_BaseRecal_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : BaseRecal MT"
     threads: BaseRecal_thrs
     shell:
         "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -L {input.bed} -ip 50 -knownSites {input.dbsnp} -knownSites {params.indels_ref} -nct {threads} -o {output.outtable} 2> {log}"
+
+rule PostRecalTable_MT:
+    """
+    This tool detects systematic errors in base quality scores.
+    This step produces a recalibrated data table.
+    """
+    input:
+        r_bam = MT_int +"{sample}"+"_realigned.bam",
+        r_idx = MT_int +"{sample}"+"_realigned.bai",
+        dbsnp = dbsnp,
+        bed = MT_bed + ".bed",
+        outtable = MT_logs + "{sample}"+"_recal_data.table",
+    output:
+        outtable_post = MT_logs + "{sample}"+"_post_recal_data.table",
+    params:
+        gatk = gatk,
+        ref=MT,
+        indels_ref=indels_ref
+    log:
+        MT_logs + "{sample}" + '_postrecalibrating.log'
+    conda:
+        "envs/wes_config_conda.yaml"
+    benchmark:
+        "benchmarks/benchmark_PostRecalTable_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
+    message: ">> {wildcards.sample} : PostRecalTable MT"
+    threads: BaseRecal_thrs
+    shell:
+        "java -jar {params.gatk} -T BaseRecalibrator -R {params.ref} -I {input.r_bam} -L {input.bed} -ip 50 -knownSites {input.dbsnp} -knownSites {params.indels_ref} -BQSR {input.outtable} -nct {threads} -o {output.outtable_post} 2> {log}"
+
+rule AnalyzeCovariates_MT:
+    """
+    This tool creates plots to visualize base recalibration results.
+    """
+    input:
+        outtable1 = MT_logs + "{sample}"+"_recal_data.table",
+        outtable2 = MT_logs + "{sample}"+"_post_recal_data.table",
+    output:
+        plots = MT_logs + "{sample}"+"_recalibrationPlots.pdf",
+    params:
+        gatk = gatk,
+        ref=MT,
+    conda:
+        "envs/wes_config_conda.yaml"
+    benchmark:
+        "benchmarks/benchmark_AnalyzeCovariates_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    message: ">> {wildcards.sample} : AnalyzeCovariates MT"
+    shell:
+        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots}"
+
+
 
 rule PrintReads_MT:
     """
@@ -1005,7 +1093,7 @@ rule PrintReads_MT:
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
-        "benchmarks/benchmark_PrintReads_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        "benchmarks/benchmark_PrintReads_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{PrintReads_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, PrintReads_thrs=PrintReads_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : PrintReads MT"
     threads: PrintReads_thrs
     shell:
@@ -1099,7 +1187,7 @@ rule varscan_genome_sample:
         recal_bam = alignpath_genomebqsr + "{sample}"+"_recal.bam",
         recal_bai = alignpath_genomebqsr + "{sample}"+"_recal.bai",
     output:
-        out = mpileup_varscan_genome + "{sample}" + ".mpileup",
+        out = temp(mpileup_varscan_genome + "{sample}" + ".mpileup"),
     params:
         ref = hg,
     log:
@@ -1144,7 +1232,7 @@ rule varscan_MT_sample:
         recal_bam = alignpath_MTbqsr + "{sample}"+"_recal.bam",
         recal_bai = alignpath_MTbqsr + "{sample}"+"_recal.bai",
     output:
-        out = mpileup_varscan_MT + "{sample}" + ".mpileup",
+        out = temp(mpileup_varscan_MT + "{sample}" + ".mpileup"),
     params:
         ref = MT,
     log:
@@ -1196,8 +1284,8 @@ rule MergeWriteVariants:
         indel_MT = varscanpath_MT + "{patient}_indel.tsv",
     output:
         m = variants_filter + "{patient}_mutect.tsv",
-        snp = variants_filter + "{patient}_varscan_snv_temp1.tsv",
-        indel = variants_filter + "{patient}_varscan_indel_temp1.tsv",
+        snp = temp(variants_filter + "{patient}_varscan_snv_temp1.tsv"),
+        indel = temp(variants_filter + "{patient}_varscan_indel_temp1.tsv"),
         v_all = variants_filter + "{patient}_varscan.tsv",
     params:
         scripts=scripts,
@@ -1212,7 +1300,7 @@ rule filterSomatic_SNV:
         snp = variants_filter + "{patient}_varscan_snv_temp1.tsv",
         indel = variants_filter + "{patient}_varscan_indel_temp1.tsv",
     output:
-        variants_filter + "{patient}_varscan_snv_temp2.tsv",
+        temp(variants_filter + "{patient}_varscan_snv_temp2.tsv"),
     log:
         variants_filter_logs + "{patient}_somaticFilter_snv_err.log"
     conda:
@@ -1227,7 +1315,7 @@ rule filterSomatic_Indel:
     input:
         variants_filter + "{patient}_varscan_indel_temp1.tsv",
     output:
-        variants_filter + "{patient}_varscan_indel_temp2.tsv",
+        temp(variants_filter + "{patient}_varscan_indel_temp2.tsv"),
     log:
         variants_filter_logs + "{patient}_somaticFilter_indel_err.log"
     conda:
@@ -1402,7 +1490,7 @@ rule create_rsID_table:
         tsv = variants_filter + "{patient}_all_somatic_annotated.tsv",
         maf = "/",
     output:
-        out = variants_filter + "{patient}_rsID.tsv",
+        out = temp(variants_filter + "{patient}_rsID.tsv"),
     params:
         scripts = scripts,
     message: ">> {wildcards.patient} : create rsID table"
@@ -1413,7 +1501,7 @@ rule filterExonicPolymorphic:
     input:
         variants_filter + "{patient}_rsID.tsv",
     output:
-        "{patient}_rsID_maf.tsv"
+        temp("{patient}_rsID_maf.tsv")
     params:
         rsIDfilter = rsIDfilter,
     log:

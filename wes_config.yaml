@@ -1,6 +1,13 @@
+
+n_sim: '1'
+cpu_type: 'bio8'
+threads: '1'
+n_cpu: '1'
+
+
 input_list: "samples_eg.txt"
 
-dataset: "/Dati_Eugenio/dataset_Eugenio.tsv"
+dataset: "/WESPipeline/Dati_Eugenio/dataset_Eugenio.tsv"
 
 custom_match: ""
 
@@ -36,13 +43,6 @@ operations:
 
 rsIDfilter: "171117_rsIDfilter.R"
 
-########### old pipeline stuff
-
-n_sim: '1'
-cpu_type: 'bio8'
-threads: '1'
-n_cpu: '1'
-
 ref-files:
     ## For IndelRealigner
     indels_ref: '/data_ref/Mills_and_1000G_gold_standard.indels.b37.vcf' # The current best set of known indels to be used for local realignment
@@ -52,7 +52,6 @@ ref-files:
     humandb: '/softwares/annovar/humandb' # Annovar human databases folder
     build_ver: 'hg19' # Set build version
     dbsnp_ver: 'snp138' # Set SNP database version
-    kg_ver: '1000g2012apr_all' # Set ethnicity groups based on time
     mitochondrial_ver: 'GRCh37_MT' # Set parameter command for annotating mitochondria variants
 
 folders:
@@ -65,24 +64,11 @@ softwares:
     gatk: '/softwares/GenomeAnalysisTK.jar'
     muTect: '/softwares/muTect-1.1.4.jar'
     annotate: '/softwares/annovar/annotate_variation.pl'
-    convert2annovar: '/softwares/annovar/convert2annovar.pl'
     tableannovar: '/softwares/annovar/table_annovar.pl'
     adapter_removal: '/softwares/adapter_removal_1.5.4/AdapterRemoval'
 
 sample-details:
     platform: 'illumina' # Set platform for mapping
-    library: 'WES-Nextera-Rapid-Capture' # Set library for mapping
-
-hap-caller:
-    genotyping_mode: 'DISCOVERY' # Set genotyping mode
-    stand_emit_conf: 10 # stand_emit_conf 10.0 means that it won’t report any potential SNPs with a quality below 10.0;
-    stand_call_conf: 30 # but unless they meet the quality threshold set by -stand_call_conf (30.0, in this case), they will be listed as failing the quality filter
-
-hard-filter:
-    # Set command to define thresholds for snps
-    snps: '--filterExpression "QD < 2.0 || FS > 60.0 || MQ < 40.0 || HaplotypeScore > 13.0 || MappingQualityRankSum < -12.5 || ReadPosRankSum < -8.0" --filterName "snp_hardFilter"'
-    # Set command to define thresholds for indels
-    indels: '--filterExpression "QD < 2.0 || FS > 200.0 || ReadPosRankSum < -20.0" --filterName "indel_hardFilter"'
 
 annovar_dbs:
     hg19_refGene: "/softwares/annovar/humandb/hg19_refGene.txt"

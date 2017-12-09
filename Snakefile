@@ -1418,15 +1418,16 @@ rule filterExonicPolymorphic:
         rsIDfilter = rsIDfilter,
     log:
         info = variants_filter_logs + "{patient}_rsID_session_info.log",
-        err = variants_filter_logs + "{patient}_rsID_err.log",
+        err_1 = variants_filter_logs + "{patient}_rsID_err_script.log",
+        err_2 = variants_filter_logs + "{patient}_rsID_err.log",
     conda:
         "envs/wes_config_conda_R.yaml",
     benchmark:
         "benchmarks/benchmark_fEP_ref_null_subject_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.patient} : filtering exonic/non-synonymous/non-polymorphic"
     shell:
-        "Rscript {params.rsIDfilter} {input} {output} > {log.info} 2> {log.err} && "
-        "cat {log.info} {log.err} > {log.err}"
+        "Rscript {params.rsIDfilter} {input} {output} > {log.info} 2> {log.err_1} && "
+        "cat {log.info} {log.err_1} > {log.err_2}"
 
 rule checkMAFs:
     input:

@@ -723,13 +723,15 @@ rule AnalyzeCovariates_genome:
     params:
         gatk = gatk,
         ref=hg,
+    log:
+        genome_logs + "{sample}" + '_analyzecovariates.log'
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_AnalyzeCovariates_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : AnalyzeCovariates genome"
     shell:
-        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots}"
+        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} > {log}"
 
 rule PrintReads_genome:
     """
@@ -1064,13 +1066,15 @@ rule AnalyzeCovariates_MT:
     params:
         gatk = gatk,
         ref=MT,
+    log:
+        MT_logs + "{sample}" + '_recalibrating_02.log'
     conda:
         "envs/wes_config_conda.yaml"
     benchmark:
         "benchmarks/benchmark_AnalyzeCovariates_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : AnalyzeCovariates MT"
     shell:
-        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots}"
+        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} > {log}"
 
 
 

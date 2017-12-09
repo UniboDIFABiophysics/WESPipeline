@@ -3,6 +3,7 @@ channels:
   - bioconda
   - cyclus
   - conda-forge
+  - r
 dependencies:
  - fastqc
  - picard = 1.126
@@ -11,3 +12,7 @@ dependencies:
  - java-jdk = 8.45.14
  - bedtools = 2.26
  - varscan = 2.4.0
+ - r-ggplot2
+ - r-reshape
+ - r-gplots
+ - r-gsalib

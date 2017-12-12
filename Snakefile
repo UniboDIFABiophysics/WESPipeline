@@ -1721,7 +1721,7 @@ rule fix_nextera_bed:
         nextera_bed + "_fixed.bed",
     params:
         scripts = scripts,
-        line_to_skip = 1,
+        line_to_skip = "0",
     message: "editing nexterarapidcapture_exome_targetedregions"
     script:
         "{params.scripts}" + "editBEDChromField.py"

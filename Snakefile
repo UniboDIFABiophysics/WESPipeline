@@ -88,6 +88,8 @@ annovar = homepath + config['folders']['annovar']
 annotate = homepath+ config['softwares']['annotate']
 tableannovar = homepath+ config['softwares']['tableannovar']
 adapter_removal = homepath + config['softwares']['adapter_removal']
+picard = homepath + config['softwares']['picard']
+varscan = homepath + config['softwares']['varscan']
 
 # Sample details
 platform = config['sample-details']['platform'] # Set platform for alignment
@@ -122,12 +124,10 @@ thrs = config['threads']
 n_cpu = config['n_cpu']
 
 # Max threads per each multithreading rule
-max_thrs = int(thrs)
-map_thrs = max_thrs
-RT_thrs = max_thrs
-BaseRecal_thrs = max_thrs
-BQSR2_thrs = max_thrs
-PrintReads_thrs = 4
+map_thrs = config['map_thrs']
+RT_thrs = config['RT_thrs']
+BaseRecal_thrs = config['BaseRecal_thrs']
+PrintReads_thrs = config['PrintReads_thrs']
 
 
 
@@ -546,6 +546,7 @@ rule sorting_genome:
     """
     input:
         sam = genome_int + "{sample}.sam",
+        picard = picard,
     output:
         outdir = temp(genome_int + "{sample}_sorted.bam"),
     params:
@@ -558,7 +559,7 @@ rule sorting_genome:
         "benchmarks/benchmark_sorting_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting genome"
     shell:
-        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
+        "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 rule marking_genome:
     """
@@ -570,6 +571,7 @@ rule marking_genome:
         out = temp(genome_int+"{sample}"+"_marked.bam"),
     params:
         tmp = tmp_dir,
+        picard = picard,
     log:
         mx = alignpath_genome + '{sample}_metrix.log',
         mark = alignpath_genome + '{sample}_marking.log',
@@ -579,7 +581,7 @@ rule marking_genome:
         "benchmarks/benchmark_marking_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : marking genome"
     shell:
-        "picard MarkDuplicates"
+        "java -jar {params.picard}MarkDuplicates.jar"
         " INPUT={input.sorted_bam} OUTPUT={output.out} METRICS_FILE={log.mx} "
         " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={params.tmp} 2> {log.mark}"
 
@@ -591,6 +593,8 @@ rule indexing_genome:
         marked_bam = genome_int+"{sample}"+"_marked.bam",
     output:
         marked_bai = temp(genome_int+"{sample}"+"_marked.bai"),
+    params:
+        picard = picard,
     log:
         alignpath_genome + '{sample}_indexing.log',
     conda:
@@ -599,7 +603,7 @@ rule indexing_genome:
         "benchmarks/benchmark_indexing_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : indexing genome"
     shell:
-        "picard BuildBamIndex INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
+        "java -jar {params.picard}BuildBamIndex.jar INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
 
 
 rule RTC_genome:
@@ -802,6 +806,7 @@ rule sorting_exome:
     """
     input:
         sam = exome_int + "{sample}.sam",
+        picard = picard,
     output:
         outdir = temp(exome_int + "{sample}_sorted.bam"),
     params:
@@ -814,7 +819,7 @@ rule sorting_exome:
         "benchmarks/benchmark_sorting_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting exome"
     shell:
-        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
+        "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 
 rule extractUnmapped_extract:
@@ -839,6 +844,8 @@ rule extractUnmapped_convert:
         unmapped1 = alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq",
         unmapped2 = alignpath_exomeunmapped + "{sample}_R2.unmapped.fastq",
         unpair = alignpath_exomeunmapped + "{sample}_unpaired.unmapped.fastq",
+    params:
+        picard = picard,
     log:
         exome_logs + '{sample}_unmapped_fastq.log'
     conda:
@@ -847,7 +854,7 @@ rule extractUnmapped_convert:
         "benchmarks/benchmark_Unmapped_convert_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : extractUnmapped convert"
     shell:
-        "picard -Xmx4g SamToFastq I={input} F={output.unmapped1} F2={output.unmapped2} FU={output.unpair} VALIDATION_STRINGENCY=LENIENT 2> {log}"
+        "java -jar -Xmx4g {params.picard}SamToFastq.jar I={input} F={output.unmapped1} F2={output.unmapped2} FU={output.unpair} VALIDATION_STRINGENCY=LENIENT 2> {log}"
 
 
 
@@ -889,6 +896,7 @@ rule sorting_MT:
     """
     input:
         sam = MT_int + "{sample}.sam",
+        picard = picard,
     output:
         outdir = temp(MT_int + "{sample}_sorted.bam"),
     params:
@@ -901,7 +909,7 @@ rule sorting_MT:
         "benchmarks/benchmark_sorting_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting MT"
     shell:
-        "picard SortSam INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
+        "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 rule marking_MT:
     """
@@ -913,6 +921,7 @@ rule marking_MT:
         out = temp(MT_int+"{sample}"+"_marked.bam"),
     params:
         tmp = tmp_dir,
+        picard = picard,
     log:
         mx = alignpath_MT + '{sample}_metrix.log',
         mark = alignpath_MT + '{sample}_marking.log',
@@ -922,7 +931,7 @@ rule marking_MT:
         "benchmarks/benchmark_marking_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : marking MT"
     shell:
-        "picard MarkDuplicates"
+        "java -jar {params.picard}MarkDuplicates.jar"
         " INPUT={input.sorted_bam} OUTPUT={output.out} METRICS_FILE={log.mx} "
         " MAX_FILE_HANDLES_FOR_READ_ENDS_MAP=1000 TMP_DIR={params.tmp} 2> {log.mark}"
 
@@ -934,6 +943,8 @@ rule indexing_MT:
         marked_bam = MT_int+"{sample}"+"_marked.bam",
     output:
         marked_bai = temp(MT_int+"{sample}"+"_marked.bai"),
+    params:
+        picard = picard,
     log:
         alignpath_MT + '{sample}_indexing.log',
     conda:
@@ -942,7 +953,7 @@ rule indexing_MT:
         "benchmarks/benchmark_indexing_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : indexing MT"
     shell:
-        "picard BuildBamIndex INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
+        "java -jar {params.picard}BuildBamIndex.jar INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
 
 
 rule RTC_MT:
@@ -1209,6 +1220,7 @@ rule varscan_genome_patient:
     This step uses Varscan to call variants.
     """
     input:
+        varscan = varscan,
         normal = lambda wildcards: get_mpileup(wildcards.patient,'N', mpileup_varscan_genome),
         tumour = lambda wildcards: get_mpileup(wildcards.patient,'T', mpileup_varscan_genome),
     output:
@@ -1224,7 +1236,7 @@ rule varscan_genome_patient:
         "benchmarks/benchmark_varscan_ref_genome_subject_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.patient} : Varscan on patient genomic alignment"
     shell:
-        "varscan somatic {input.normal} {input.tumour} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
+        "java -jar {input.varscan} somatic {input.normal} {input.tumour} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
 
 
 rule varscan_MT_sample:
@@ -1254,6 +1266,7 @@ rule varscan_MT_patient:
     This step uses Varscan to call variants.
     """
     input:
+        varscan = varscan,
         normal = lambda wildcards: get_mpileup(wildcards.patient,'N', mpileup_varscan_MT),
         tumour = lambda wildcards: get_mpileup(wildcards.patient,'T', mpileup_varscan_MT),
     output:
@@ -1269,7 +1282,7 @@ rule varscan_MT_patient:
         "benchmarks/benchmark_varscan_ref_MT_subject_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.patient} : Varscan on patient MT alignment"
     shell:
-        "varscan somatic {input.normal} {input.tumour} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
+        "java -jar {input.varscan} somatic {input.normal} {input.tumour} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
 
 
 ######################
@@ -1305,6 +1318,8 @@ rule filterSomatic_SNV:
         indel = variants_filter + "{patient}_varscan_indel_temp1.tsv",
     output:
         temp(variants_filter + "{patient}_varscan_snv_temp2.tsv"),
+    params:
+        varscan = varscan,
     log:
         variants_filter_logs + "{patient}_somaticFilter_snv_err.log"
     conda:
@@ -1313,13 +1328,15 @@ rule filterSomatic_SNV:
         "benchmarks/benchmark_filterSomatic_SNV_ref_null_subject_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.patient} : Varscan Filter Somatic SNV"
     shell:
-        "varscan somaticFilter {input.snp} --indel-file {input.indel} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
+        "java -jar {params.varscan} somaticFilter {input.snp} --indel-file {input.indel} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
 
 rule filterSomatic_Indel:
     input:
         variants_filter + "{patient}_varscan_indel_temp1.tsv",
     output:
         temp(variants_filter + "{patient}_varscan_indel_temp2.tsv"),
+    params:
+        varscan = varscan,
     log:
         variants_filter_logs + "{patient}_somaticFilter_indel_err.log"
     conda:
@@ -1328,7 +1345,7 @@ rule filterSomatic_Indel:
         "benchmarks/benchmark_filterSomatic_Indel_ref_null_subject_{patient}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.patient} : Varscan Filter Somatic Indel"
     shell:
-        "varscan somaticFilter {input} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
+        "java -jar {params.varscan} somaticFilter {input} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
 
 
 rule KeepOnlyVariants:
@@ -1553,7 +1570,7 @@ rule download_reference:
         "wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/human_g1k_v37.fasta.gz && "
         "mv human_g1k_v37.fasta.gz {output.zipped} "
 
-rule gunzip_reference:
+rule varscan_reference:
     input:
         zipped = hg+'.gz'
     output:
@@ -1869,6 +1886,7 @@ rule index_picard_hg:
     """
     input:
         hg=hg,
+        picard = picard,
     output:
         hg.replace('fasta', 'dict'),
     conda:
@@ -1877,7 +1895,7 @@ rule index_picard_hg:
         "benchmarks/benchmark_hg_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing hg19 with picard"
     shell:
-        "picard CreateSequenceDictionary R={input.hg} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input.hg} O={output}"
 
 rule index_samtools_hg:
     """
@@ -1918,6 +1936,7 @@ rule index_picard_nextera:
     """
     input:
         nextera,
+        picard,
     output:
         nextera.replace('fasta', 'dict'),
     conda:
@@ -1926,7 +1945,7 @@ rule index_picard_nextera:
         "benchmarks/benchmark_nextera_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera with picard"
     shell:
-        "picard CreateSequenceDictionary R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
 
 rule index_samtools_nextera:
     """
@@ -1968,6 +1987,7 @@ rule index_picard_nextexp:
     """
     input:
         nextera_expanded,
+        picard,
     output:
         nextera_expanded.replace('fasta', 'dict'),
     conda:
@@ -1976,7 +1996,7 @@ rule index_picard_nextexp:
         "benchmarks/benchmark_nextera_expanded_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera expanded with picard"
     shell:
-        "picard CreateSequenceDictionary R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
 
 rule index_samtools_nextexp:
     """
@@ -2016,6 +2036,7 @@ rule index_picard_truseq:
     """
     input:
         truseq,
+        picard,
     output:
         truseq.replace('fasta', 'dict'),
     conda:
@@ -2024,7 +2045,7 @@ rule index_picard_truseq:
         "benchmarks/benchmark_truseq_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq with picard"
     shell:
-        "picard CreateSequenceDictionary R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
 
 rule index_samtools_truseq:
     """
@@ -2064,6 +2085,7 @@ rule index_picard_MT:
     """
     input:
         MT,
+        picard,
     output:
         MT.replace('fasta', 'dict'),
     conda:
@@ -2072,7 +2094,7 @@ rule index_picard_MT:
         "benchmarks/benchmark_MT_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing MT with picard"
     shell:
-        "picard CreateSequenceDictionary R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
 
 rule index_samtools_MT:
     """
@@ -2135,6 +2157,28 @@ rule all_fastq:
     shell:
         "echo 'Error. all_fastq.log not found.' && "
         "exit 1"
+
+############################################################
+#           DEFAULT TOOLS VERSIONS NOT ON CONDA            #
+############################################################
+
+rule download_picard1_119:
+    output:
+        picard,
+    shell:
+        "wget https://downloads.sourceforge.net/project/picard/picard-tools/1.119/picard-tools-1.119.zip && "
+        "unzip picard-tools-1.119.zip && "
+        "mv picard-tools-1.119/ {output}"
+
+rule download_varscan2_3_9:
+    output:
+        varscan,
+    shell:
+        "wget wget https://downloads.sourceforge.net/project/varscan/VarScan.v2.3.9.jar && "
+        "mv VarScan.v2.3.9.jar {output}"
+
+
+
 
 #########################################################
 #                        THE END                        #

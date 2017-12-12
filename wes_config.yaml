@@ -1,7 +1,10 @@
 
 n_sim: '1'
 cpu_type: 'bio8'
-threads: '1'
+map_thrs: 20
+RT_thrs: 2
+BaseRecal_thrs: 2
+PrintReads_thrs: 2
 n_cpu: '1'
 
 
@@ -66,6 +69,8 @@ softwares:
     annotate: '/softwares/annovar/annotate_variation.pl'
     tableannovar: '/softwares/annovar/table_annovar.pl'
     adapter_removal: '/softwares/adapter_removal_1.5.4/AdapterRemoval'
+    picard: '/softwares/picard-tools-1.119/'
+    varscan: '/softwares/VarScan.v2.3.9.jar'
 
 sample-details:
     platform: 'illumina' # Set platform for mapping

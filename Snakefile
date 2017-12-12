@@ -1935,8 +1935,8 @@ rule index_picard_nextera:
     Generate the index of the reference genome for the picard program.
     """
     input:
-        nextera,
-        picard,
+        nextera=nextera,
+        picard=picard,
     output:
         nextera.replace('fasta', 'dict'),
     conda:
@@ -1945,7 +1945,7 @@ rule index_picard_nextera:
         "benchmarks/benchmark_nextera_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera with picard"
     shell:
-        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input.nextera} O={output}"
 
 rule index_samtools_nextera:
     """
@@ -1986,8 +1986,8 @@ rule index_picard_nextexp:
     Generate the index of the reference genome for the picard program.
     """
     input:
-        nextera_expanded,
-        picard,
+        nextera_expanded=nextera_expanded,
+        picard=picard,
     output:
         nextera_expanded.replace('fasta', 'dict'),
     conda:
@@ -1996,7 +1996,7 @@ rule index_picard_nextexp:
         "benchmarks/benchmark_nextera_expanded_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera expanded with picard"
     shell:
-        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input.nextera_expanded} O={output}"
 
 rule index_samtools_nextexp:
     """
@@ -2035,8 +2035,8 @@ rule index_picard_truseq:
     Generate the index of the reference genome for the picard program.
     """
     input:
-        truseq,
-        picard,
+        truseq=truseq,
+        picard=picard,
     output:
         truseq.replace('fasta', 'dict'),
     conda:
@@ -2045,7 +2045,7 @@ rule index_picard_truseq:
         "benchmarks/benchmark_truseq_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq with picard"
     shell:
-        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input.truseq} O={output}"
 
 rule index_samtools_truseq:
     """
@@ -2084,8 +2084,8 @@ rule index_picard_MT:
     Generate the index of the reference genome for the picard program.
     """
     input:
-        MT,
-        picard,
+        MT=MT,
+        picard=picard,
     output:
         MT.replace('fasta', 'dict'),
     conda:
@@ -2094,7 +2094,7 @@ rule index_picard_MT:
         "benchmarks/benchmark_MT_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing MT with picard"
     shell:
-        "java -jar {input.picard}CreateSequenceDictionary.jar R={input} O={output}"
+        "java -jar {input.picard}CreateSequenceDictionary.jar R={input.MT} O={output}"
 
 rule index_samtools_MT:
     """
@@ -2174,7 +2174,7 @@ rule download_varscan2_3_9:
     output:
         varscan,
     shell:
-        "wget wget https://downloads.sourceforge.net/project/varscan/VarScan.v2.3.9.jar && "
+        "wget https://downloads.sourceforge.net/project/varscan/VarScan.v2.3.9.jar && "
         "mv VarScan.v2.3.9.jar {output}"
 
 

@@ -88,6 +88,7 @@ annovar = homepath + config['folders']['annovar']
 annotate = homepath+ config['softwares']['annotate']
 tableannovar = homepath+ config['softwares']['tableannovar']
 adapter_removal = homepath + config['softwares']['adapter_removal']
+softwares = homepath + config['folders']['softwares']
 picard = homepath + config['softwares']['picard']
 varscan = homepath + config['softwares']['varscan']
 
@@ -2165,10 +2166,12 @@ rule all_fastq:
 rule download_picard1_119:
     output:
         picard,
+    params:
+        softwares=softwares,
     shell:
         "wget https://downloads.sourceforge.net/project/picard/picard-tools/1.119/picard-tools-1.119.zip && "
         "unzip picard-tools-1.119.zip && "
-        "mv picard-tools-1.119/ {output}"
+        "mv picard-tools-1.119/ {params.softwares}"
 
 rule download_varscan2_3_9:
     output:

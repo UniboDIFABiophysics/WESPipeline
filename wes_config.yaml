@@ -62,6 +62,7 @@ folders:
     scripts: 'scripts/'
     resultdir: '/results'
     annovar: '/softwares/annovar/'
+    softwares: '/softwares/'
     custom_resultdir: ''  # NEW
 
 softwares:

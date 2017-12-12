@@ -1,10 +1,11 @@
 
 n_sim: '1'
 cpu_type: 'bio8'
-map_thrs: 20
-RT_thrs: 2
-BaseRecal_thrs: 2
-PrintReads_thrs: 2
+threads: 1
+map_thrs: 1
+RT_thrs: 1
+BaseRecal_thrs: 1
+PrintReads_thrs: 1
 n_cpu: '1'
 
 

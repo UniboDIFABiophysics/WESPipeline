@@ -6,12 +6,12 @@ channels:
   - r
 dependencies:
  - fastqc
- - picard = 1.126
+ #- picard = 1.126
  - bwa = 0.7.12
  - samtools = 1.5
  - java-jdk = 8.45.14
  - bedtools = 2.26
- - varscan = 2.4.0
+ #- varscan = 2.4.0
  - r-ggplot2
  - r-reshape
  - r-gplots

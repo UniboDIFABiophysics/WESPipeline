@@ -616,6 +616,7 @@ rule RTC_genome:
         marked_bai = genome_int+"{sample}"+"_marked.bai",
         ref=hg+'.fai',
         indels_ref=indels_ref,
+        indels_ref_idx = indels_ref + '.idx',
         gatk = gatk,
         marked_bam = genome_int+"{sample}"+"_marked.bam",
         bed = lambda wildcards: get_bed(wildcards.sample),
@@ -966,6 +967,7 @@ rule RTC_MT:
         marked_bai = MT_int+"{sample}"+"_marked.bai",
         ref = MT+'.fai',
         indels_ref=indels_ref,
+        indels_ref_idx = indels_ref + '.idx',
         gatk = gatk,
         marked_bam = MT_int+"{sample}"+"_marked.bam",
         bed = MT_bed + ".bed",
@@ -1642,12 +1644,31 @@ rule download_indels_ref:
         "wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz && "
         "mv Mills_and_1000G_gold_standard.indels.b37.vcf.gz {output.indel_zipped}"
 
+rule download_indels_ref_idx:
+    """download Mills_and_1000G_gold_standard.indels.b37.idx from 1000genome """
+    output:
+        indel_zipped= temp(indels_ref+'.idx.gz'),
+    message: "downloading Mills_and_1000G_gold_standard.indels.b37.idx from 1000genome"
+    shell:
+        "wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.idx.gz && "
+        "mv Mills_and_1000G_gold_standard.indels.b37.vcf.idx.gz {output.indel_zipped}"
+
+
 rule gunzip_indelref:
     input:
         indel_zipped = indels_ref+'.gz'
     output:
         indels_ref
     message: "unzipping Mills_and_1000G_gold_standard.indels.b37"
+    shell:
+        "gunzip {input.indel_zipped} || true"
+
+rule gunzip_indelref_idx:
+    input:
+        indel_zipped = indels_ref+'.idx.gz'
+    output:
+        indels_ref + '.idx'
+    message: "unzipping Mills_and_1000G_gold_standard.indels.b37.idx"
     shell:
         "gunzip {input.indel_zipped} || true"
 

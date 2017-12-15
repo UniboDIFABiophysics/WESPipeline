@@ -1675,7 +1675,7 @@ rule indelsref_idx:
     conda:
         "envs/wes_config_conda.yaml"
     shell:
-        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.indels_ref} --validationTypeToExclude ALL 2> {log} || true"
+        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.indel_ref} --validationTypeToExclude ALL 2> {log} || true"
 
 
 rule download_dbsnp:
@@ -1711,7 +1711,7 @@ rule dbsnp_idx:
     conda:
         "envs/wes_config_conda.yaml"
     shell:
-        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.dbsnp} --validationTypeToExclude ALL || true"
+        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.dbsnp} --validationTypeToExclude ALL 2> {log} || true"
 
 
 
@@ -1740,7 +1740,7 @@ rule cosmic_idx:
     conda:
         "envs/wes_config_conda.yaml"
     shell:
-        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.cosmic} --validationTypeToExclude ALL || true"
+        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.cosmic} --validationTypeToExclude ALL 2> {log} || true"
 
 
 

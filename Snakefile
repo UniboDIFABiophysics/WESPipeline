@@ -671,7 +671,7 @@ rule BaseRecal_genome:
         r_bam = genome_int +"{sample}"+"_realigned.bam",
         r_idx = genome_int +"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
-        dbsnp_idx = dbsnp + '.idx',
+        #dbsnp_idx = dbsnp + '.idx',
         bed = lambda wildcards: get_bed(wildcards.sample),
     output:
         outtable = genome_logs + "{sample}"+"_recal_data.table",
@@ -699,7 +699,7 @@ rule PostRecalTable_genome:
         r_bam = genome_int +"{sample}"+"_realigned.bam",
         r_idx = genome_int +"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
-        dbsnp_idx = dbsnp + '.idx',
+        #dbsnp_idx = dbsnp + '.idx',
         bed = lambda wildcards: get_bed(wildcards.sample),
         outtable = genome_logs + "{sample}"+"_recal_data.table",
     output:
@@ -1026,7 +1026,7 @@ rule BaseRecal_MT:
         r_bam = MT_int+"{sample}"+"_realigned.bam",
         r_idx = MT_int+"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
-        dbsnp_idx = dbsnp + '.idx',
+        #dbsnp_idx = dbsnp + '.idx',
         bed = MT_bed + ".bed",
     output:
         outtable = MT_logs + "{sample}"+"_recal_data.table",
@@ -1054,7 +1054,7 @@ rule PostRecalTable_MT:
         r_bam = MT_int +"{sample}"+"_realigned.bam",
         r_idx = MT_int +"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
-        dbsnp_idx = dbsnp + '.idx',
+        #dbsnp_idx = dbsnp + '.idx',
         bed = MT_bed + ".bed",
         outtable = MT_logs + "{sample}"+"_recal_data.table",
     output:
@@ -1697,22 +1697,22 @@ rule gunzip_dbsnp:
         "gunzip {input.dbsnp_zipped} || true"
 
 
-rule index_dbsnp:
-    input:
-        hg = hg,
-        dbsnp = dbsnp,
-    output:
-        dbsnp + '.idx'
-    params:
-        gatk = gatk,
-    log:
-        currentpath + '/wes_analyses/logs/index_dbsnp.log',
-    message: "Performing ValidateVariants on dbsnp to index it"
-    conda:
-        "envs/wes_config_conda.yaml"
-    shell:
-        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.dbsnp} --validationTypeToExclude ALL 2> {log} || true"
-
+# rule index_dbsnp:
+#     input:
+#         hg = hg,
+#         dbsnp = dbsnp,
+#     output:
+#         dbsnp + '.idx'
+#     params:
+#         gatk = gatk,
+#     log:
+#         currentpath + '/wes_analyses/logs/index_dbsnp.log',
+#     message: "Performing ValidateVariants on dbsnp to index it"
+#     conda:
+#         "envs/wes_config_conda.yaml"
+#     shell:
+#         "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.dbsnp} --validationTypeToExclude ALL 2> {log} || true"
+#
 
 
 # https://downloads.sourceforge.net/project/bio-bwa/bwakit/bwakit-0.7.12_x64-linux.tar.bz2

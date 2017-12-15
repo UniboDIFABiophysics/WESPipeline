@@ -1,0 +1,5 @@
+channels:
+  - bioconda
+dependencies:
+ - java-jdk = 8.45.14
+ - igvtools

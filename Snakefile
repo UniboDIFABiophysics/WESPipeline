@@ -521,12 +521,12 @@ rule map_to_genome:
     """
     input:
         hg_indexes,
+        reference = hg,
         fastq1_trimmed = trimmedpath+"{sample}" + "_R1.fastq",
         fastq2_trimmed = trimmedpath+"{sample}" + "_R2.fastq",
     output:
         outfile =  temp(genome_int + "{sample}.sam"),
     params:
-        reference = hg,
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
         name = "{sample}",
@@ -539,7 +539,7 @@ rule map_to_genome:
     message: ">> {wildcards.sample} : Aligning to reference NUCLEAR GENOME"
     threads: map_thrs
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {params.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} > {output.outfile} 2> {log}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} > {output.outfile} 2> {log}"
 
 rule sorting_genome:
     """
@@ -671,6 +671,7 @@ rule BaseRecal_genome:
         r_bam = genome_int +"{sample}"+"_realigned.bam",
         r_idx = genome_int +"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
+        dbsnp_idx = dbsnp + '.idx',
         bed = lambda wildcards: get_bed(wildcards.sample),
     output:
         outtable = genome_logs + "{sample}"+"_recal_data.table",
@@ -698,6 +699,7 @@ rule PostRecalTable_genome:
         r_bam = genome_int +"{sample}"+"_realigned.bam",
         r_idx = genome_int +"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
+        dbsnp_idx = dbsnp + '.idx',
         bed = lambda wildcards: get_bed(wildcards.sample),
         outtable = genome_logs + "{sample}"+"_recal_data.table",
     output:
@@ -737,7 +739,7 @@ rule AnalyzeCovariates_genome:
         "benchmarks/benchmark_AnalyzeCovariates_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : AnalyzeCovariates genome"
     shell:
-        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} > {log}"
+        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} 2> {log}"
 
 rule PrintReads_genome:
     """
@@ -779,6 +781,8 @@ rule map_to_exome:
     It does append a header necessary for the GATK analysis.
     """
     input:
+        hg = hg,
+        hg_indexes = hg_indexes,
         fai = lambda wildcards: get_ref_fai(wildcards.sample),
         fasta_dict = lambda wildcards: get_ref_dict(wildcards.sample),
         indexes = lambda wildcards: get_ref_indexes(wildcards.sample),
@@ -1022,6 +1026,7 @@ rule BaseRecal_MT:
         r_bam = MT_int+"{sample}"+"_realigned.bam",
         r_idx = MT_int+"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
+        dbsnp_idx = dbsnp + '.idx',
         bed = MT_bed + ".bed",
     output:
         outtable = MT_logs + "{sample}"+"_recal_data.table",
@@ -1049,6 +1054,7 @@ rule PostRecalTable_MT:
         r_bam = MT_int +"{sample}"+"_realigned.bam",
         r_idx = MT_int +"{sample}"+"_realigned.bai",
         dbsnp = dbsnp,
+        dbsnp_idx = dbsnp + '.idx',
         bed = MT_bed + ".bed",
         outtable = MT_logs + "{sample}"+"_recal_data.table",
     output:
@@ -1088,7 +1094,7 @@ rule AnalyzeCovariates_MT:
         "benchmarks/benchmark_AnalyzeCovariates_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : AnalyzeCovariates MT"
     shell:
-        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} > {log}"
+        "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} 2> {log}"
 
 
 
@@ -1136,6 +1142,7 @@ rule muTect_genome:
     input:
         muTect = muTect,
         cosmic = cosmic,
+        cosmic_idx = cosmic + '.idx',
         target = lambda wildcards: get_bed_patient(wildcards.patient),
         normal_bam = lambda wildcards: get_bam(wildcards.patient,'N', alignpath_genomebqsr),
         tumour_bam = lambda wildcards: get_bam(wildcards.patient,'T', alignpath_genomebqsr),
@@ -1165,6 +1172,7 @@ rule muTect_MT:
     input:
         muTect = muTect,
         cosmic = cosmic,
+        cosmic_idx = cosmic + '.idx',
         target = MT_bed + ".bed",
         normal_bam = lambda wildcards: get_bam(wildcards.patient,'N', alignpath_MTbqsr),
         tumour_bam = lambda wildcards: get_bam(wildcards.patient,'T', alignpath_MTbqsr),
@@ -1573,7 +1581,7 @@ rule download_reference:
         "wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/human_g1k_v37.fasta.gz && "
         "mv human_g1k_v37.fasta.gz {output.zipped} "
 
-rule varscan_reference:
+rule gunzip_reference:
     input:
         zipped = hg+'.gz'
     output:
@@ -1644,16 +1652,6 @@ rule download_indels_ref:
         "wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.gz && "
         "mv Mills_and_1000G_gold_standard.indels.b37.vcf.gz {output.indel_zipped}"
 
-rule download_indels_ref_idx:
-    """download Mills_and_1000G_gold_standard.indels.b37.idx from 1000genome """
-    output:
-        indel_zipped= temp(indels_ref+'.idx.gz'),
-    message: "downloading Mills_and_1000G_gold_standard.indels.b37.idx from 1000genome"
-    shell:
-        "wget ftp://gsapubftp-anonymous@ftp.broadinstitute.org/bundle/b37/Mills_and_1000G_gold_standard.indels.b37.vcf.idx.gz && "
-        "mv Mills_and_1000G_gold_standard.indels.b37.vcf.idx.gz {output.indel_zipped}"
-
-
 rule gunzip_indelref:
     input:
         indel_zipped = indels_ref+'.gz'
@@ -1663,14 +1661,16 @@ rule gunzip_indelref:
     shell:
         "gunzip {input.indel_zipped} || true"
 
-rule gunzip_indelref_idx:
+rule indelsref_idx:
     input:
-        indel_zipped = indels_ref+'.idx.gz'
+        indel_zipped = indels_ref
     output:
         indels_ref + '.idx'
-    message: "unzipping Mills_and_1000G_gold_standard.indels.b37.idx"
+    message: "generating Mills_and_1000G_gold_standard.indels.b37.idx"
+    conda:
+        "envs/wes_config_conda_vcfidx.yaml"
     shell:
-        "gunzip {input.indel_zipped} || true"
+        "igvtools index {input}"
 
 
 rule download_dbsnp:
@@ -1692,6 +1692,18 @@ rule gunzip_dbsnp:
         "gunzip {input.dbsnp_zipped} || true"
 
 
+rule dbsnp_idx:
+    input:
+        dbsnp
+    output:
+        dbsnp + '.idx'
+    message: "generating dbsnp vcf index"
+    conda:
+        "envs/wes_config_conda_vcfidx.yaml"
+    shell:
+        "igvtools index {input}"
+
+
 # https://downloads.sourceforge.net/project/bio-bwa/bwakit/bwakit-0.7.12_x64-linux.tar.bz2
 
 rule download_cosmic:
@@ -1702,6 +1714,19 @@ rule download_cosmic:
     shell:
         "wget http://www.broadinstitute.org/cancer/cga/sites/default/files/data/tools/mutect/b37_cosmic_v54_120711.vcf && "
         "mv b37_cosmic_v54_120711.vcf {output.cosmic}"
+
+rule cosmic_idx:
+    input:
+        cosmic
+    output:
+        cosmic + '.idx'
+    message: "generating cosmic vcf index"
+    conda:
+        "envs/wes_config_conda_vcfidx.yaml"
+    shell:
+        "igvtools index {input}"
+
+
 
 rule download_nextexp_bed:
     """download target from illumina"""

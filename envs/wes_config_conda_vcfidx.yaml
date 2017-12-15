@@ -1,6 +1,0 @@
-channels:
-  - bioconda
-  - cyclus
-dependencies:
- - java-jdk = 8.45.14
- - igvtools

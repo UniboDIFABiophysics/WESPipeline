@@ -1663,14 +1663,19 @@ rule gunzip_indelref:
 
 rule indelsref_idx:
     input:
-        indel_zipped = indels_ref
+        hg=hg,
+        indel_ref = indels_ref,
     output:
         indels_ref + '.idx'
-    message: "generating Mills_and_1000G_gold_standard.indels.b37.idx"
+    params:
+        gatk = gatk,
+    log:
+        currentpath + '/wes_analyses/logs/',
+    message: "Performing ValidateVariants on Mills_and_1000G_gold_standard.indels.b37 to index it"
     conda:
-        "envs/wes_config_conda_vcfidx.yaml"
+        "envs/wes_config_conda.yaml"
     shell:
-        "igvtools index {input}"
+        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.indels_ref} --validationTypeToExclude ALL 2> {log} || true"
 
 
 rule download_dbsnp:
@@ -1694,14 +1699,20 @@ rule gunzip_dbsnp:
 
 rule dbsnp_idx:
     input:
-        dbsnp
+        hg = hg,
+        dbsnp = dbsnp,
     output:
         dbsnp + '.idx'
-    message: "generating dbsnp vcf index"
+    params:
+        gatk = gatk,
+    log:
+        currentpath + '/wes_analyses/logs/',
+    message: "Performing ValidateVariants on dbsnp to index it"
     conda:
-        "envs/wes_config_conda_vcfidx.yaml"
+        "envs/wes_config_conda.yaml"
     shell:
-        "igvtools index {input}"
+        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.dbsnp} --validationTypeToExclude ALL || true"
+
 
 
 # https://downloads.sourceforge.net/project/bio-bwa/bwakit/bwakit-0.7.12_x64-linux.tar.bz2
@@ -1717,14 +1728,19 @@ rule download_cosmic:
 
 rule cosmic_idx:
     input:
-        cosmic
+        hg = hg,
+        cosmic = cosmic,
     output:
         cosmic + '.idx'
-    message: "generating cosmic vcf index"
+    params:
+        gatk = gatk,
+    log:
+        currentpath + '/wes_analyses/logs/',
+    message: "Performing ValidateVariants on cosmic to index it"
     conda:
-        "envs/wes_config_conda_vcfidx.yaml"
+        "envs/wes_config_conda.yaml"
     shell:
-        "igvtools index {input}"
+        "java -jar {params.gatk} -T ValidateVariants -R {input.hg} -V {input.cosmic} --validationTypeToExclude ALL || true"
 
 
 

@@ -1664,6 +1664,9 @@ rule gunzip_indelref:
 rule index_indelref:
     input:
         hg=hg,
+        hg_dict = hg.replace('fasta', 'dict'),
+        hg_indexes = hg_indexes,
+        hg_fai = hg+'.fai',
         indel_ref = indels_ref,
     output:
         indels_ref + '.idx'
@@ -1729,6 +1732,9 @@ rule download_cosmic:
 rule index_cosmic:
     input:
         hg = hg,
+        hg_dict = hg.replace('fasta', 'dict'),
+        hg_indexes = hg_indexes,
+        hg_fai = hg+'.fai',
         cosmic = cosmic,
     output:
         cosmic + '.idx'

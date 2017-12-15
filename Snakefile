@@ -1661,7 +1661,7 @@ rule gunzip_indelref:
     shell:
         "gunzip {input.indel_zipped} || true"
 
-rule indelsref_idx:
+rule index_indelref:
     input:
         hg=hg,
         indel_ref = indels_ref,
@@ -1670,7 +1670,7 @@ rule indelsref_idx:
     params:
         gatk = gatk,
     log:
-        currentpath + '/wes_analyses/logs/',
+        currentpath + '/wes_analyses/logs/index_indels.log',
     message: "Performing ValidateVariants on Mills_and_1000G_gold_standard.indels.b37 to index it"
     conda:
         "envs/wes_config_conda.yaml"
@@ -1697,7 +1697,7 @@ rule gunzip_dbsnp:
         "gunzip {input.dbsnp_zipped} || true"
 
 
-rule dbsnp_idx:
+rule index_dbsnp:
     input:
         hg = hg,
         dbsnp = dbsnp,
@@ -1706,7 +1706,7 @@ rule dbsnp_idx:
     params:
         gatk = gatk,
     log:
-        currentpath + '/wes_analyses/logs/',
+        currentpath + '/wes_analyses/logs/index_dbsnp.log',
     message: "Performing ValidateVariants on dbsnp to index it"
     conda:
         "envs/wes_config_conda.yaml"
@@ -1726,7 +1726,7 @@ rule download_cosmic:
         "wget http://www.broadinstitute.org/cancer/cga/sites/default/files/data/tools/mutect/b37_cosmic_v54_120711.vcf && "
         "mv b37_cosmic_v54_120711.vcf {output.cosmic}"
 
-rule cosmic_idx:
+rule index_cosmic:
     input:
         hg = hg,
         cosmic = cosmic,
@@ -1735,7 +1735,7 @@ rule cosmic_idx:
     params:
         gatk = gatk,
     log:
-        currentpath + '/wes_analyses/logs/',
+        currentpath + '/wes_analyses/logs/index_cosmic.log',
     message: "Performing ValidateVariants on cosmic to index it"
     conda:
         "envs/wes_config_conda.yaml"

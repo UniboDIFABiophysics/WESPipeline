@@ -357,7 +357,7 @@ rule all:
     expand(fastqcpath_trim +"{sample}" + "_R2_fastqc.zip",sample=samples),
     expand(genome_logs + "{sample}"+"_recalibrationPlots.pdf",sample=samples),
     expand(MT_logs + "{sample}"+"_recalibrationPlots.pdf",sample=samples),
-    expand(variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",patient=patients),
+    expand(variants_filter + "{patient}_all_somatic_annotated_filtered_final.tsv",patient=patients),
   message: " THE END "
   run:
     pass
@@ -1560,6 +1560,27 @@ rule checkMAFs:
     message: ">> {wildcards.patient} : checking MAFs"
     script:
         "{params.scripts}"+"fEP_script.py"
+
+
+rule Remove_segdups:
+    input:
+        variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",
+    output:
+        variants_filter + "{patient}_all_somatic_annotated_filtered_final.tsv",
+    message: ">> {wildcards.patient} : Removing segdups variants"
+    run:
+        import pandas as pd
+        T = pd.read_table(input,sep='\t')
+        rows_to_drop=[]
+        for index,row in T.iterrows():
+            if not pd.isnull(row['segdups']):
+                rows_to_drop.append(index)
+        T = T.drop(rows_to_drop)
+        T.to_csv(output,sep='\t',index=False)
+
+
+
+
 
 ###############################################################################
 #                           SINGLE-TIME-RUN RULES                             #

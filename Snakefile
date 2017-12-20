@@ -1564,19 +1564,19 @@ rule checkMAFs:
 
 rule Remove_segdups:
     input:
-        variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",
+        segdups = variants_filter + "{patient}_all_somatic_annotated_filtered.tsv",
     output:
-        variants_filter + "{patient}_all_somatic_annotated_filtered_final.tsv",
+        no_segdups = variants_filter + "{patient}_all_somatic_annotated_filtered_final.tsv",
     message: ">> {wildcards.patient} : Removing segdups variants"
     run:
         import pandas as pd
-        T = pd.read_table(input,sep='\t')
+        T = pd.read_table(input['segdups'],sep='\t')
         rows_to_drop=[]
         for index,row in T.iterrows():
             if not pd.isnull(row['segdups']):
                 rows_to_drop.append(index)
         T = T.drop(rows_to_drop)
-        T.to_csv(output,sep='\t',index=False)
+        T.to_csv(output['no_segdups'],sep='\t',index=False)
 
 
 

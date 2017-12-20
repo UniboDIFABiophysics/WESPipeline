@@ -226,7 +226,10 @@ for patient in match_list:
         patients_dict[patient]['kit'] = kit_tumor
 
 patients  = [p for p in checked_match_list]
+patients = list(set(patients))
 samples = [s for p in patients for s in checked_match_list[p].split('_')]
+samples = list(set(samples))
+
 
 def get_kit(wildcards):
     return dataset.loc[wildcards, 'kit_wes']

@@ -240,7 +240,7 @@ def get_bed_patient(wildcards):
 
 def get_fastq_path(wildcards):
     path = dataset.loc[wildcards,'fastq_path_wes']
-    if not os.path.commonprefix([path,homepath]):
+    if not cadaver:
          path = homepath + '/' + path
     if path == './':
         path = ''

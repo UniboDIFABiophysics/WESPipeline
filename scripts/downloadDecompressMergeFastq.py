@@ -29,7 +29,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         inpath = inpath.replace('NAS/', '')
 
         # import list of all fastq
-        with open(homepath + all_fastq) as infile:
+        with open(all_fastq) as infile:
             all_fastq = infile.read().splitlines()
 
         # list all fastq.gz files that contain fastq_id

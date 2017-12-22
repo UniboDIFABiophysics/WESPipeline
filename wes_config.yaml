@@ -15,7 +15,7 @@ dataset: "/data_ref/20171119_aml_dataset.tsv"
 
 custom_match: ""
 
-cadaver: True
+cadaver: False
 
 adapter:
   nextera: {adapter1: CTGTCTCTTATACACATCTCCGAGCCCACGAGAC, adapter2: TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG}
@@ -60,7 +60,7 @@ ref-files:
 
 folders:
     scripts: 'scripts/'
-    resultdir: 'prova'
+    resultdir: '/prova'
     annovar: '/softwares/annovar/'
     softwares: '/softwares/'
     custom_resultdir: ''  # NEW

@@ -36,7 +36,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         gz_list = [gz for gz in all_fastq if re.search(fastq_id, gz)]
 
         # open file connection
-        with open(processpath + 'cadaver_get.sh', 'w') as outfile:
+        with open(processpath + '/cadaver_get.sh', 'w') as outfile:
 
             # loop over fastq files of current sample
             for gz in gz_list:
@@ -52,11 +52,11 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         # run cadaver script
         sp.call(' '.join(['cadaver',
                           'https://ngs-ptl.unibo.it:5006',
-                          '-r', processpath + 'cadaver_get.sh',
+                          '-r', processpath + '/cadaver_get.sh',
                           '>', log]), shell=True)
 
         # delete script
-        sp.call(' '.join(['rm', processpath + 'cadaver_get.sh']), shell=True)
+        sp.call(' '.join(['rm', processpath + '/cadaver_get.sh']), shell=True)
 
         # loop over fastq
         for gz in gz_list:

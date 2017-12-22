@@ -60,7 +60,7 @@ ref-files:
 
 folders:
     scripts: 'scripts/'
-    resultdir: '/results'
+    resultdir: 'prova'
     annovar: '/softwares/annovar/'
     softwares: '/softwares/'
     custom_resultdir: ''  # NEW

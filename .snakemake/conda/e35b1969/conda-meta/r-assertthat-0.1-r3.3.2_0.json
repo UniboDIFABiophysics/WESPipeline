@@ -1,0 +1,52 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "r3.3.2_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [
+    "r-base 3.3.2*"
+  ],
+  "files": [
+    "lib/R/library/assertthat/DESCRIPTION",
+    "lib/R/library/assertthat/INDEX",
+    "lib/R/library/assertthat/Meta/Rd.rds",
+    "lib/R/library/assertthat/Meta/hsearch.rds",
+    "lib/R/library/assertthat/Meta/links.rds",
+    "lib/R/library/assertthat/Meta/nsInfo.rds",
+    "lib/R/library/assertthat/Meta/package.rds",
+    "lib/R/library/assertthat/NAMESPACE",
+    "lib/R/library/assertthat/R/assertthat",
+    "lib/R/library/assertthat/R/assertthat.rdb",
+    "lib/R/library/assertthat/R/assertthat.rdx",
+    "lib/R/library/assertthat/help/AnIndex",
+    "lib/R/library/assertthat/help/aliases.rds",
+    "lib/R/library/assertthat/help/assertthat.rdb",
+    "lib/R/library/assertthat/help/assertthat.rdx",
+    "lib/R/library/assertthat/help/paths.rds",
+    "lib/R/library/assertthat/html/00Index.html",
+    "lib/R/library/assertthat/html/R.css",
+    "lib/R/library/assertthat/tests/test-base.R"
+  ],
+  "fn": "r-assertthat-0.1-r3.3.2_0.tar.bz2",
+  "has_prefix": false,
+  "license": "GPL-3",
+  "license_family": "GPL3",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/r-assertthat-0.1-r3.3.2_0",
+    "type": 1
+  },
+  "md5": "5cfd171bc472e13cc569d461b63327c0",
+  "name": "r-assertthat",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 47582,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/r-assertthat-0.1-r3.3.2_0.tar.bz2",
+  "version": "0.1",
+  "with_features_depends": {}
+}

@@ -1,0 +1,5 @@
+Building DAG of jobs...
+InputFunctionException in line 386 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py:
+NameError: name 'sample' is not defined
+Wildcards:
+patient=48

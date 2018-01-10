@@ -1,0 +1,8 @@
+gsalib-package	gsalib-package
+.gsa.assignGATKTableToEnvironment	gsalib-internal
+.gsa.splitFixedWidth	gsalib-internal
+gatkreport_test_v1.table	test_gatkreport.table
+gsa.read.gatkreport	gsa.read.gatkreport
+gsa.read.gatkreportv0	gsa.read.gatkreportv0
+gsa.read.gatkreportv1	gsa.read.gatkreportv1
+gsalib	gsalib-package

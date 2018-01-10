@@ -1,0 +1,52 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "r3.3.2_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [
+    "r-base 3.3.2*"
+  ],
+  "files": [
+    "lib/R/library/backports/DESCRIPTION",
+    "lib/R/library/backports/INDEX",
+    "lib/R/library/backports/Meta/Rd.rds",
+    "lib/R/library/backports/Meta/hsearch.rds",
+    "lib/R/library/backports/Meta/links.rds",
+    "lib/R/library/backports/Meta/nsInfo.rds",
+    "lib/R/library/backports/Meta/package.rds",
+    "lib/R/library/backports/NAMESPACE",
+    "lib/R/library/backports/NEWS.md",
+    "lib/R/library/backports/R/backports",
+    "lib/R/library/backports/R/backports.rdb",
+    "lib/R/library/backports/R/backports.rdx",
+    "lib/R/library/backports/help/AnIndex",
+    "lib/R/library/backports/help/aliases.rds",
+    "lib/R/library/backports/help/backports.rdb",
+    "lib/R/library/backports/help/backports.rdx",
+    "lib/R/library/backports/help/paths.rds",
+    "lib/R/library/backports/html/00Index.html",
+    "lib/R/library/backports/html/R.css"
+  ],
+  "fn": "r-backports-1.0.5-r3.3.2_0.tar.bz2",
+  "has_prefix": false,
+  "license": "GPL-2",
+  "license_family": "GPL2",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/r-backports-1.0.5-r3.3.2_0",
+    "type": 1
+  },
+  "md5": "c9f2339592d464c39e4b14fe92675fda",
+  "name": "r-backports",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 30005,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/r-backports-1.0.5-r3.3.2_0.tar.bz2",
+  "version": "1.0.5",
+  "with_features_depends": {}
+}

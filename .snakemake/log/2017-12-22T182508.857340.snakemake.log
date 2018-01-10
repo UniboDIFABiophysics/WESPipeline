@@ -1,0 +1,3 @@
+KeyError in line 21 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_01.py:
+'outfolder'
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_01.py", line 21, in <module>

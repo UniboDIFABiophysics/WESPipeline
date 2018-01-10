@@ -1,0 +1,13 @@
+prefix=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include
+modules=1
+
+Name: libXML
+Version: 2.9.5
+Description: libXML library version2.
+Requires:
+Libs: -L${libdir} -lxml2
+Libs.private: -L/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib -licui18n -licuuc -licudata  -L/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib -lz -L/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib -llzma -L/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib -liconv -lm  
+Cflags: -I${includedir}/libxml2 -I/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/include 

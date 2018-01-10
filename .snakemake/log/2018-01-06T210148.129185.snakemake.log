@@ -1,0 +1,279 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	6	AnalyzeCovariates_MT
+	6	AnalyzeCovariates_genome
+	6	BaseRecal_MT
+	6	BaseRecal_genome
+	6	IndelRealigner_MT
+	6	IndelRealigner_genome
+	3	KeepOnlyVariants
+	3	MergeMutectVarscan
+	3	MergeWriteVariants
+	3	MutectSplitVariants
+	6	PostRecalTable_MT
+	6	PostRecalTable_genome
+	6	PrintReads_MT
+	6	PrintReads_genome
+	6	RTC_MT
+	6	RTC_genome
+	3	Remove_segdups
+	3	VarscanSplitVariants
+	1	all
+	3	annovar_MT_mutect
+	3	annovar_MT_varscan
+	3	annovar_genome_mutect
+	3	annovar_genome_varscan
+	3	checkMAFs
+	3	create_rsID_table
+	6	downloadDecompressMergeFastq
+	6	extractUnmapped_convert
+	6	extractUnmapped_extract
+	6	fastqc_R1
+	6	fastqc_R2
+	6	fastqc_trimmed_R1
+	6	fastqc_trimmed_R2
+	3	filterExonicPolymorphic
+	3	filterSomatic_Indel
+	3	filterSomatic_SNV
+	6	indexing_MT
+	6	indexing_genome
+	6	map_to_MT
+	6	map_to_exome
+	6	map_to_genome
+	6	marking_MT
+	6	marking_genome
+	3	muTect_MT
+	3	muTect_genome
+	6	sorting_MT
+	6	sorting_exome
+	6	sorting_genome
+	6	trim
+	3	varscan_MT_patient
+	6	varscan_MT_sample
+	3	varscan_genome_patient
+	6	varscan_genome_sample
+	250
+
+Job 47: >> 1905 : downloading, decompressing and merging fastq 
+
+Job 43: >> 218 : downloading, decompressing and merging fastq 
+
+Job 63: >> B2044D : downloading, decompressing and merging fastq 
+
+Job 40: >> 3165 : downloading, decompressing and merging fastq 
+
+Job 49: >> B2044S : downloading, decompressing and merging fastq 
+
+Job 56: >> 273 : downloading, decompressing and merging fastq 
+
+Finished job 43.
+1 of 250 steps (0.40%) done
+
+Job 7: >> 218 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 4: >> 218 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 48: >> 218 : Trimming
+
+Finished job 7.
+2 of 250 steps (0.80%) done
+Finished job 4.
+3 of 250 steps (1%) done
+Finished job 47.
+4 of 250 steps (2%) done
+
+Job 9: >> 1905 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 57: >> 1905 : Trimming
+
+
+Job 19: >> 1905 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 19.
+5 of 250 steps (2%) done
+Finished job 9.
+6 of 250 steps (2%) done
+Finished job 49.
+7 of 250 steps (3%) done
+
+Job 12: >> B2044S : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 11: >> B2044S : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 45: >> B2044S : Trimming
+
+Finished job 11.
+8 of 250 steps (3%) done
+Finished job 12.
+9 of 250 steps (4%) done
+Finished job 56.
+10 of 250 steps (4%) done
+
+Job 33: >> 273 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 16: >> 273 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 60: >> 273 : Trimming
+
+Finished job 16.
+11 of 250 steps (4%) done
+Finished job 33.
+12 of 250 steps (5%) done
+Finished job 63.
+13 of 250 steps (5%) done
+
+Job 24: >> B2044D : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 46: >> B2044D : Trimming
+
+
+Job 23: >> B2044D : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 23.
+14 of 250 steps (6%) done
+Finished job 24.
+15 of 250 steps (6%) done
+Finished job 40.
+16 of 250 steps (6%) done
+
+Job 44: >> 3165 : Trimming
+
+
+Job 1: >> 3165 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 2: >> 3165 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 2.
+17 of 250 steps (7%) done
+Finished job 1.
+18 of 250 steps (7%) done
+Finished job 48.
+19 of 250 steps (8%) done
+
+Job 230: >> 218 : Aligning to reference NUCLEAR GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 284: >> 218 : Aligning to reference EXOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 25: >> 218 : fastqc1 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 10: >> 218 : fastqc2 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 10.
+20 of 250 steps (8%) done
+Finished job 25.
+21 of 250 steps (8%) done
+Finished job 57.
+22 of 250 steps (9%) done
+
+Job 39: >> 1905 : fastqc2 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 279: >> 1905 : Aligning to reference EXOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 17: >> 1905 : fastqc1 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 207: >> 1905 : Aligning to reference NUCLEAR GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 17.
+23 of 250 steps (9%) done
+Finished job 39.
+24 of 250 steps (10%) done
+Finished job 284.
+25 of 250 steps (10%) done
+
+Job 278: >> 218 : sorting exome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Error in rule map_to_exome:
+    jobid: 279
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/01_intermediate/1905.sam
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/logs/1905_alignment.log
+
+RuleException:
+CalledProcessError in line 831 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  bwa mem -M -t 4 -R '@RG\tID:1905\tSM:1905\tPL:illumina\tLB:nextera\tPU:PE' /home/PERSONALE/eugenio.fonzi2/data_ref/nextera.fasta /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/1905_R1.fastq /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/1905_R2.fastq > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/01_intermediate/1905.sam 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/logs/1905_alignment.log ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 831, in __rule_map_to_exome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job map_to_exome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/01_intermediate/1905.sam
+Will exit after finishing currently running jobs.
+Finished job 45.
+26 of 250 steps (10%) done
+Will exit after finishing currently running jobs.
+Error in rule sorting_exome:
+    jobid: 278
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/01_intermediate/218_sorted.bam
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/logs/218_sorting.log
+
+RuleException:
+CalledProcessError in line 852 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  java -jar /home/PERSONALE/eugenio.fonzi2/softwares/picard-tools-1.119/SortSam.jar INPUT=/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/01_intermediate/218.sam OUTPUT=/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/01_intermediate/218_sorted.bam SORT_ORDER=coordinate TMP_DIR=/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/tmp/ 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/logs/218_sorting.log ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 852, in __rule_sorting_exome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job sorting_exome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/04_alignment_exome/01_intermediate/218_sorted.bam
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/218_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/218_R2.fastq.
+Finished job 230.
+27 of 250 steps (11%) done
+Will exit after finishing currently running jobs.
+Finished job 207.
+28 of 250 steps (11%) done
+Will exit after finishing currently running jobs.
+Finished job 46.
+29 of 250 steps (12%) done
+Will exit after finishing currently running jobs.
+Finished job 60.
+30 of 250 steps (12%) done
+Will exit after finishing currently running jobs.
+Terminating processes on user request.
+Error in rule trim:
+    jobid: 44
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/3165_R1.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/3165_R2.fastq
+
+RuleException:
+CalledProcessError in line 497 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/softwares/adapter_removal_1.5.4/AdapterRemoval --file1 /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/01_fastq/02_postprocess/3165_R1.fastq --file2 /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/01_fastq/02_postprocess/3165_R2.fastq --stats --trimns --trimqualities --minquality 20 --minlength 79 --output1 /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/3165_R1.fastq --output2 /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/3165_R2.fastq ' died with <Signals.SIGINT: 2>.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 497, in __rule_trim
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job trim since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/3165_R1.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_contaminated/02_fastq_trimmed/3165_R2.fastq
+Complete log: .snakemake/log/2018-01-06T210148.129185.snakemake.log

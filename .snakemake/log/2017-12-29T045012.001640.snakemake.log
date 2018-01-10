@@ -1,0 +1,158 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	8	AnalyzeCovariates_MT
+	8	AnalyzeCovariates_genome
+	8	BaseRecal_MT
+	8	BaseRecal_genome
+	8	IndelRealigner_MT
+	8	IndelRealigner_genome
+	4	KeepOnlyVariants
+	4	MergeMutectVarscan
+	4	MergeWriteVariants
+	4	MutectSplitVariants
+	8	PostRecalTable_MT
+	8	PostRecalTable_genome
+	8	PrintReads_MT
+	8	PrintReads_genome
+	8	RTC_MT
+	8	RTC_genome
+	4	Remove_segdups
+	4	VarscanSplitVariants
+	1	all
+	4	annovar_MT_mutect
+	4	annovar_MT_varscan
+	4	annovar_genome_mutect
+	4	annovar_genome_varscan
+	4	checkMAFs
+	4	create_rsID_table
+	8	downloadDecompressMergeFastq
+	8	extractUnmapped_convert
+	8	extractUnmapped_extract
+	8	fastq_checkpoint
+	8	fastqc_R1
+	8	fastqc_R2
+	8	fastqc_trimmed_R1
+	8	fastqc_trimmed_R2
+	4	filterExonicPolymorphic
+	4	filterSomatic_Indel
+	4	filterSomatic_SNV
+	8	indexing_MT
+	8	indexing_genome
+	8	map_to_MT
+	8	map_to_exome
+	8	map_to_genome
+	8	marking_MT
+	8	marking_genome
+	4	muTect_MT
+	4	muTect_genome
+	8	sorting_MT
+	8	sorting_exome
+	8	sorting_genome
+	8	trim
+	4	varscan_MT_patient
+	8	varscan_MT_sample
+	4	varscan_genome_patient
+	8	varscan_genome_sample
+	341
+
+Job 105: >> 05 : downloading, decompressing and merging fastq 
+
+Job 133: >> 08 : downloading, decompressing and merging fastq 
+
+Job 124: >> 03 : downloading, decompressing and merging fastq 
+
+Job 107: >> 04 : downloading, decompressing and merging fastq 
+
+Job 108: >> 07 : downloading, decompressing and merging fastq 
+
+Job 106: >> 06 : downloading, decompressing and merging fastq 
+
+
+Job 121: >> 02 : downloading, decompressing and merging fastq 
+
+Job 119: >> 01 : downloading, decompressing and merging fastq 
+
+Error in rule downloadDecompressMergeFastq:
+    jobid: 119
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/01_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/01_R2_unchecked.fastq
+Error in rule downloadDecompressMergeFastq:
+
+    jobid: 133
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/08_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/08_R2_unchecked.fastq
+
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.o90txpjq.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.1xd3r5_z.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Error in rule downloadDecompressMergeFastq:
+    jobid: 106
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/06_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/06_R2_unchecked.fastq
+
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.7bd3emzu.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Error in rule downloadDecompressMergeFastq:
+    jobid: 121
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/02_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/02_R2_unchecked.fastq
+
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.e0zjrjpf.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Error in rule downloadDecompressMergeFastq:
+    jobid: 107
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/04_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/04_R2_unchecked.fastq
+
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.nf2_58c8.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Error in rule downloadDecompressMergeFastq:
+    jobid: 108
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/07_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/07_R2_unchecked.fastq
+
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.7739s42x.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Error in rule downloadDecompressMergeFastq:
+Error in rule downloadDecompressMergeFastq:
+    jobid: 124
+    jobid: 105
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/03_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/03_R2_unchecked.fastq
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/05_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_4/01_fastq/02_postprocess/05_R2_unchecked.fastq
+
+
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.5aushera.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.n082e5rm.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2017-12-29T045012.001640.snakemake.log

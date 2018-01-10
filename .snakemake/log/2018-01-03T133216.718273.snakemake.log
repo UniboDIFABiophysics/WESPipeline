@@ -1,0 +1,10 @@
+FileNotFoundError in line 164 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_03.py:
+File b'' does not exist
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_03.py", line 164, in <module>
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/io/parsers.py", line 709, in parser_f
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/io/parsers.py", line 449, in _read
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/io/parsers.py", line 818, in __init__
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/io/parsers.py", line 1049, in _make_engine
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/io/parsers.py", line 1695, in __init__
+  File "pandas/_libs/parsers.pyx", line 402, in pandas._libs.parsers.TextReader.__cinit__
+  File "pandas/_libs/parsers.pyx", line 718, in pandas._libs.parsers.TextReader._setup_parser_source

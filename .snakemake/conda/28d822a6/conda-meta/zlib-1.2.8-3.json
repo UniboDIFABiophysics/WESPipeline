@@ -1,0 +1,37 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "3",
+  "build_number": 3,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [],
+  "files": [
+    "include/zconf.h",
+    "include/zlib.h",
+    "lib/libz.a",
+    "lib/libz.so",
+    "lib/libz.so.1",
+    "lib/libz.so.1.2.8",
+    "lib/pkgconfig/zlib.pc"
+  ],
+  "fn": "zlib-1.2.8-3.tar.bz2",
+  "license": "zlib (http://zlib.net/zlib_license.html)",
+  "license_family": "Other",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/zlib-1.2.8-3",
+    "type": 1
+  },
+  "md5": "6b3dbbf50432b3e2a271b5e46877bcfc",
+  "name": "zlib",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 89463,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/zlib-1.2.8-3.tar.bz2",
+  "version": "1.2.8",
+  "with_features_depends": {}
+}

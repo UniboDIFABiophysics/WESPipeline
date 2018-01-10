@@ -1,0 +1,6 @@
+Building DAG of jobs...
+AmbiguousRuleException:
+Rules two and three are ambiguous for the file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina1/56.tsv.
+Expected input files:
+	two: 
+	three: 

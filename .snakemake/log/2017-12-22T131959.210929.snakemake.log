@@ -1,0 +1,84 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	10	AnalyzeCovariates_MT
+	10	AnalyzeCovariates_genome
+	10	BaseRecal_MT
+	10	BaseRecal_genome
+	10	IndelRealigner_MT
+	10	IndelRealigner_genome
+	5	KeepOnlyVariants
+	5	MergeMutectVarscan
+	5	MergeWriteVariants
+	5	MutectSplitVariants
+	10	PostRecalTable_MT
+	10	PostRecalTable_genome
+	10	PrintReads_MT
+	10	PrintReads_genome
+	10	RTC_MT
+	10	RTC_genome
+	5	Remove_segdups
+	5	VarscanSplitVariants
+	1	all
+	5	annovar_MT_mutect
+	5	annovar_MT_varscan
+	5	annovar_genome_mutect
+	5	annovar_genome_varscan
+	5	checkMAFs
+	5	create_rsID_table
+	10	downloadDecompressMergeFastq
+	10	extractUnmapped_convert
+	10	extractUnmapped_extract
+	10	fastq_checkpoint
+	10	fastqc_R1
+	10	fastqc_R2
+	10	fastqc_trimmed_R1
+	10	fastqc_trimmed_R2
+	5	filterExonicPolymorphic
+	5	filterSomatic_Indel
+	5	filterSomatic_SNV
+	10	indexing_MT
+	10	indexing_genome
+	10	map_to_MT
+	10	map_to_exome
+	10	map_to_genome
+	10	marking_MT
+	10	marking_genome
+	5	muTect_MT
+	5	muTect_genome
+	10	sorting_MT
+	10	sorting_exome
+	10	sorting_genome
+	10	trim_02
+	5	varscan_MT_patient
+	10	varscan_MT_sample
+	5	varscan_genome_patient
+	10	varscan_genome_sample
+	426
+
+Job 139: >> 3154 : downloading, decompressing and merging fastq 
+
+Job 145: >> 3010 : downloading, decompressing and merging fastq 
+
+Job 148: >> 245 : downloading, decompressing and merging fastq 
+
+Job 154: >> 239 : downloading, decompressing and merging fastq 
+
+Job 142: >> 242 : downloading, decompressing and merging fastq 
+
+
+Job 135: >> 2973 : downloading, decompressing and merging fastq 
+
+
+Job 147: >> 246 : downloading, decompressing and merging fastq 
+
+
+Job 152: >> 3062 : downloading, decompressing and merging fastq 
+
+
+Job 143: >> 224 : downloading, decompressing and merging fastq 
+
+Job 131: >> 3108 : downloading, decompressing and merging fastq 
+

@@ -1,0 +1,4 @@
+TypeError in line 249 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py:
+list indices must be integers or slices, not str
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py", line 249, in <module>
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py", line 249, in <listcomp>

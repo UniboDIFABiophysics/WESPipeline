@@ -1,0 +1,50 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "r3.3.2_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [
+    "r-base 3.3.2*"
+  ],
+  "files": [
+    "lib/R/library/repr/DESCRIPTION",
+    "lib/R/library/repr/INDEX",
+    "lib/R/library/repr/Meta/Rd.rds",
+    "lib/R/library/repr/Meta/hsearch.rds",
+    "lib/R/library/repr/Meta/links.rds",
+    "lib/R/library/repr/Meta/nsInfo.rds",
+    "lib/R/library/repr/Meta/package.rds",
+    "lib/R/library/repr/NAMESPACE",
+    "lib/R/library/repr/R/repr",
+    "lib/R/library/repr/R/repr.rdb",
+    "lib/R/library/repr/R/repr.rdx",
+    "lib/R/library/repr/help/AnIndex",
+    "lib/R/library/repr/help/aliases.rds",
+    "lib/R/library/repr/help/paths.rds",
+    "lib/R/library/repr/help/repr.rdb",
+    "lib/R/library/repr/help/repr.rdx",
+    "lib/R/library/repr/html/00Index.html",
+    "lib/R/library/repr/html/R.css"
+  ],
+  "fn": "r-repr-0.10-r3.3.2_0.tar.bz2",
+  "has_prefix": false,
+  "license": "GPL-3",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/r-repr-0.10-r3.3.2_0",
+    "type": 1
+  },
+  "md5": "ea08e3b66abc45f41efb1914e6b9e6d1",
+  "name": "r-repr",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 62437,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/r-repr-0.10-r3.3.2_0.tar.bz2",
+  "version": "0.10",
+  "with_features_depends": {}
+}

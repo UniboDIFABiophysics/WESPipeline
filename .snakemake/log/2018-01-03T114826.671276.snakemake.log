@@ -1,0 +1,173 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	6	AnalyzeCovariates_MT
+	6	AnalyzeCovariates_genome
+	6	BaseRecal_MT
+	6	BaseRecal_genome
+	6	IndelRealigner_MT
+	6	IndelRealigner_genome
+	3	KeepOnlyVariants
+	3	MergeMutectVarscan
+	3	MergeWriteVariants
+	3	MutectSplitVariants
+	6	PostRecalTable_MT
+	6	PostRecalTable_genome
+	6	PrintReads_MT
+	6	PrintReads_genome
+	6	RTC_MT
+	6	RTC_genome
+	3	Remove_segdups
+	3	VarscanSplitVariants
+	1	all
+	3	annovar_MT_mutect
+	3	annovar_MT_varscan
+	3	annovar_genome_mutect
+	3	annovar_genome_varscan
+	3	checkMAFs
+	3	create_rsID_table
+	6	downloadDecompressMergeFastq
+	1	download_nextexp_bed
+	6	extractUnmapped_convert
+	6	extractUnmapped_extract
+	6	fastq_checkpoint
+	6	fastqc_R1
+	6	fastqc_R2
+	6	fastqc_trimmed_R1
+	6	fastqc_trimmed_R2
+	3	filterExonicPolymorphic
+	3	filterSomatic_Indel
+	3	filterSomatic_SNV
+	1	fix_nextexp_bed
+	1	get_nextexp_fasta
+	1	index_picard_nextexp
+	1	index_samtools_nextexp
+	6	indexing_MT
+	6	indexing_genome
+	6	map_to_MT
+	6	map_to_exome
+	6	map_to_genome
+	6	marking_MT
+	6	marking_genome
+	3	muTect_MT
+	3	muTect_genome
+	1	nextexp_index_bwa
+	6	sorting_MT
+	6	sorting_exome
+	6	sorting_genome
+	6	trim
+	3	varscan_MT_patient
+	6	varscan_MT_sample
+	3	varscan_genome_patient
+	6	varscan_genome_sample
+	262
+
+Job 80: >> 1905 : downloading, decompressing and merging fastq 
+
+Job 118: downloading nexterarapidcapture_expandedexome_targetedregions from illumina
+
+
+Job 86: >> 272 : downloading, decompressing and merging fastq 
+
+Job 89: >> 218 : downloading, decompressing and merging fastq 
+
+Job 94: >> B2044D : downloading, decompressing and merging fastq 
+
+Job 79: >> B2044S : downloading, decompressing and merging fastq 
+
+
+Job 87: >> 3094 : downloading, decompressing and merging fastq 
+
+Finished job 118.
+1 of 262 steps (0.38%) done
+
+Job 85: editing nexterarapidcapture_expandedexome_targetedregions
+
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/data_ref/nexterarapidcapture_expandedexome_targetedregions.bed.
+Finished job 85.
+2 of 262 steps (0.76%) done
+
+Job 295: generating nextera expanded fasta
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 295.
+3 of 262 steps (1%) done
+
+Job 298: indexing nextera expanded with samtools
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 298.
+4 of 262 steps (2%) done
+
+Job 296: indexing nextera expanded with picard
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 297: indexing nextera expanded with bwa
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 296.
+5 of 262 steps (2%) done
+Finished job 297.
+6 of 262 steps (2%) done
+Finished job 89.
+7 of 262 steps (3%) done
+
+Job 52: >> 218 : Check fastq size 
+
+Finished job 52.
+8 of 262 steps (3%) done
+
+Job 15: >> 218 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 14: >> 218 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 67: >> 218 : Trimming
+
+Finished job 80.
+9 of 262 steps (3%) done
+
+Job 41: >> 1905 : Check fastq size 
+
+Finished job 41.
+10 of 262 steps (4%) done
+
+Job 2: >> 1905 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 59: >> 1905 : Trimming
+
+
+Job 8: >> 1905 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 15.
+11 of 262 steps (4%) done
+Finished job 14.
+12 of 262 steps (5%) done
+Finished job 2.
+13 of 262 steps (5%) done
+Finished job 8.
+14 of 262 steps (5%) done
+Finished job 79.
+15 of 262 steps (6%) done
+
+Job 40: >> B2044S : Check fastq size 
+
+Will exit after finishing currently running jobs.
+Finished job 87.
+16 of 262 steps (6%) done
+Will exit after finishing currently running jobs.
+Finished job 94.
+17 of 262 steps (6%) done
+Will exit after finishing currently running jobs.
+Finished job 86.
+18 of 262 steps (7%) done
+Will exit after finishing currently running jobs.

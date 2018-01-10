@@ -1,0 +1,9 @@
+Error in rule one:
+    jobid: 0
+
+RuleException:
+CalledProcessError in line 378 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py:
+Command ' set -euo pipefail;  > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina1/12.txt ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py", line 378, in __rule_one
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Exiting because a job execution failed. Look above for error message

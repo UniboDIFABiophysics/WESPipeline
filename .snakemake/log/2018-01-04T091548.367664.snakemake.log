@@ -1,0 +1,3 @@
+NameError in line 159 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py:
+name 'processpath' is not defined
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py", line 159, in <module>

@@ -1,0 +1,264 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	10	AnalyzeCovariates_MT
+	10	AnalyzeCovariates_genome
+	10	BaseRecal_MT
+	10	BaseRecal_genome
+	10	IndelRealigner_MT
+	10	IndelRealigner_genome
+	5	KeepOnlyVariants
+	5	MergeMutectVarscan
+	5	MergeWriteVariants
+	5	MutectSplitVariants
+	10	PostRecalTable_MT
+	10	PostRecalTable_genome
+	10	PrintReads_MT
+	10	PrintReads_genome
+	10	RTC_MT
+	10	RTC_genome
+	5	Remove_segdups
+	5	VarscanSplitVariants
+	1	all
+	5	annovar_MT_mutect
+	5	annovar_MT_varscan
+	5	annovar_genome_mutect
+	5	annovar_genome_varscan
+	5	checkMAFs
+	5	create_rsID_table
+	1	downloadDecompressMergeFastq
+	10	extractUnmapped_convert
+	10	extractUnmapped_extract
+	1	fastq_checkpoint
+	10	fastqc_R1
+	10	fastqc_R2
+	10	fastqc_trimmed_R1
+	10	fastqc_trimmed_R2
+	5	filterExonicPolymorphic
+	5	filterSomatic_Indel
+	5	filterSomatic_SNV
+	10	indexing_MT
+	10	indexing_genome
+	10	map_to_MT
+	10	map_to_exome
+	10	map_to_genome
+	10	marking_MT
+	10	marking_genome
+	5	muTect_MT
+	5	muTect_genome
+	10	sorting_MT
+	10	sorting_exome
+	10	sorting_genome
+	10	trim_02
+	5	varscan_MT_patient
+	10	varscan_MT_sample
+	5	varscan_genome_patient
+	10	varscan_genome_sample
+	408
+
+Job 7: >> 224 : fastqc2
+
+
+Job 72: >> 3154 : Trimming
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 109: >> 3108 : Trimming
+
+
+Job 16: >> 3154 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 62: >> 245 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 63: >> 3062 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 97: >> 2973 : Trimming
+
+
+Job 140: >> 242 : downloading, decompressing and merging fastq 
+
+Job 79: >> 3010 : Trimming
+
+
+Job 59: >> 246 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 97.
+1 of 408 steps (0.25%) done
+Finished job 79.
+2 of 408 steps (0.49%) done
+Finished job 109.
+3 of 408 steps (0.74%) done
+Finished job 72.
+4 of 408 steps (0.98%) done
+
+Job 45: >> 239 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 74: >> 224 : Trimming
+
+
+Job 5: >> 3154 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 35: >> 3108 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 56: >> 239 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 26: >> 246 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 17: >> 3108 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 14: >> 3010 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 73: >> 246 : Trimming
+
+
+Job 15: >> 3062 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 74.
+5 of 408 steps (1%) done
+Finished job 73.
+6 of 408 steps (1%) done
+
+Job 21: >> 2973 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 40: >> 2973 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 70: >> 3062 : Trimming
+
+
+Job 41: >> 3010 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 106: >> 245 : Trimming
+
+
+Job 2: >> 224 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 91: >> 239 : Trimming
+
+Waiting at most 5 seconds for missing files.
+
+Job 1: >> 245 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/224_R2_fastqc.zip
+Will exit after finishing currently running jobs.
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/245_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3154_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/246_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3062_R2_fastqc.zip
+Finished job 70.
+7 of 408 steps (2%) done
+Finished job 106.
+8 of 408 steps (2%) done
+Finished job 91.
+9 of 408 steps (2%) done
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/239_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/246_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3154_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/239_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3108_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3108_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3010_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3062_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/2973_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/2973_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/3010_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/224_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_8_bwa_threads/01_fastq/03_fastqc/245_R1_fastqc.zip
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Finished job 140.
+10 of 408 steps (2%) done
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2017-12-24T180702.576111.snakemake.log

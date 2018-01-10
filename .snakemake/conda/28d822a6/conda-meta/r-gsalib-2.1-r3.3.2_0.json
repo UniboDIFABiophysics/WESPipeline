@@ -1,0 +1,52 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "r3.3.2_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/bioconda/linux-64",
+  "depends": [
+    "r-base 3.3.2*"
+  ],
+  "files": [
+    "lib/R/library/gsalib/DESCRIPTION",
+    "lib/R/library/gsalib/INDEX",
+    "lib/R/library/gsalib/LICENSE",
+    "lib/R/library/gsalib/Meta/Rd.rds",
+    "lib/R/library/gsalib/Meta/hsearch.rds",
+    "lib/R/library/gsalib/Meta/links.rds",
+    "lib/R/library/gsalib/Meta/nsInfo.rds",
+    "lib/R/library/gsalib/Meta/package.rds",
+    "lib/R/library/gsalib/NAMESPACE",
+    "lib/R/library/gsalib/R/gsalib",
+    "lib/R/library/gsalib/R/gsalib.rdb",
+    "lib/R/library/gsalib/R/gsalib.rdx",
+    "lib/R/library/gsalib/extdata/test_gatkreport.table",
+    "lib/R/library/gsalib/help/AnIndex",
+    "lib/R/library/gsalib/help/aliases.rds",
+    "lib/R/library/gsalib/help/gsalib.rdb",
+    "lib/R/library/gsalib/help/gsalib.rdx",
+    "lib/R/library/gsalib/help/paths.rds",
+    "lib/R/library/gsalib/html/00Index.html",
+    "lib/R/library/gsalib/html/R.css"
+  ],
+  "fn": "r-gsalib-2.1-r3.3.2_0.tar.bz2",
+  "has_prefix": false,
+  "license": "MIT + file LICENSE",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/r-gsalib-2.1-r3.3.2_0",
+    "type": 1
+  },
+  "md5": "37d19b77a3b7311f3ee10a3df802df04",
+  "name": "r-gsalib",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 0,
+  "requires": [],
+  "schannel": "bioconda",
+  "size": 22885,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/bioconda/linux-64/r-gsalib-2.1-r3.3.2_0.tar.bz2",
+  "version": "2.1",
+  "with_features_depends": {}
+}

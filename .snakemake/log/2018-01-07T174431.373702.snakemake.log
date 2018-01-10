@@ -1,0 +1,141 @@
+Building DAG of jobs...
+Provided cores: 1
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	10	one
+	5	two
+	16
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/3062.bam
+    jobid: 8
+    wildcards: sample=3062
+
+Finished job 8.
+1 of 16 steps (6%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/241.bam
+    jobid: 13
+    wildcards: sample=241
+
+Finished job 13.
+2 of 16 steps (12%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/224.bam
+    jobid: 14
+    wildcards: sample=224
+
+Finished job 14.
+3 of 16 steps (19%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/1905a.bam
+    jobid: 15
+    wildcards: sample=1905a
+
+Finished job 15.
+4 of 16 steps (25%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/242.bam
+    jobid: 2
+    wildcards: sample=242
+
+Finished job 2.
+5 of 16 steps (31%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/2306.bam
+    jobid: 1
+    wildcards: sample=2306
+
+Finished job 1.
+6 of 16 steps (38%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/3010.bam
+    jobid: 4
+    wildcards: sample=3010
+
+Finished job 4.
+7 of 16 steps (44%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/222.bam
+    jobid: 3
+    wildcards: sample=222
+
+Finished job 3.
+8 of 16 steps (50%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/239.bam
+    jobid: 6
+    wildcards: sample=239
+
+Finished job 6.
+9 of 16 steps (56%) done
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/2973.bam
+    jobid: 5
+    wildcards: sample=2973
+
+Finished job 5.
+10 of 16 steps (62%) done
+
+rule two:
+    input: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/1905a.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/241.bam
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/50.tsv
+    jobid: 11
+    wildcards: patient=50
+
+Finished job 11.
+11 of 16 steps (69%) done
+
+rule two:
+    input: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/2973.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/224.bam
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/42.tsv
+    jobid: 10
+    wildcards: patient=42
+
+Finished job 10.
+12 of 16 steps (75%) done
+
+rule two:
+    input: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/3010.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/239.bam
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/48.tsv
+    jobid: 12
+    wildcards: patient=48
+
+Finished job 12.
+13 of 16 steps (81%) done
+
+rule two:
+    input: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/3062.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/242.bam
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/51.tsv
+    jobid: 9
+    wildcards: patient=51
+
+Finished job 9.
+14 of 16 steps (88%) done
+
+rule two:
+    input: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/2306.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/222.bam
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/40.tsv
+    jobid: 7
+    wildcards: patient=40
+
+Finished job 7.
+15 of 16 steps (94%) done
+
+localrule all:
+    input: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/242.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/1905a.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/3062.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/3010.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/222.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/2973.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/241.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/224.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/239.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/2306.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/51.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/48.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/40.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/42.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina3/persone/50.tsv
+    jobid: 0
+
+Finished job 0.
+16 of 16 steps (100%) done

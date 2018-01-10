@@ -1,0 +1,30 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/bioconda/linux-64",
+  "depends": [],
+  "files": [
+    "bin/bwa"
+  ],
+  "fn": "bwa-0.7.12-1.tar.bz2",
+  "license": "MIT",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/bwa-0.7.12-1",
+    "type": 1
+  },
+  "md5": "a8b7ab9bf15249e2943a16504e6126dd",
+  "name": "bwa",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 0,
+  "requires": [],
+  "schannel": "bioconda",
+  "size": 518674,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/bioconda/linux-64/bwa-0.7.12-1.tar.bz2",
+  "version": "0.7.12",
+  "with_features_depends": {}
+}

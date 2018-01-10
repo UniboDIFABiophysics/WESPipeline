@@ -1,0 +1,96 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	2	AnalyzeCovariates_MT
+	2	AnalyzeCovariates_genome
+	2	BaseRecal_MT
+	2	BaseRecal_genome
+	2	IndelRealigner_MT
+	2	IndelRealigner_genome
+	1	KeepOnlyVariants
+	1	MergeMutectVarscan
+	1	MergeWriteVariants
+	1	MutectSplitVariants
+	2	PostRecalTable_MT
+	2	PostRecalTable_genome
+	2	PrintReads_MT
+	2	PrintReads_genome
+	2	RTC_MT
+	2	RTC_genome
+	1	Remove_segdups
+	1	VarscanSplitVariants
+	1	all
+	1	annovar_MT_mutect
+	1	annovar_MT_varscan
+	1	annovar_genome_mutect
+	1	annovar_genome_varscan
+	1	checkMAFs
+	1	create_rsID_table
+	1	downloadDecompressMergeFastq
+	2	extractUnmapped_convert
+	2	extractUnmapped_extract
+	2	fastq_checkpoint
+	2	fastqc_R1
+	2	fastqc_R2
+	2	fastqc_trimmed_R1
+	2	fastqc_trimmed_R2
+	1	filterExonicPolymorphic
+	1	filterSomatic_Indel
+	1	filterSomatic_SNV
+	1	fix_nextera_bed
+	1	get_nextera_fasta
+	1	hg_index_bwa
+	1	index_cosmic
+	1	index_indelref
+	1	index_picard_nextera
+	1	index_samtools_nextera
+	2	indexing_MT
+	2	indexing_genome
+	2	map_to_MT
+	2	map_to_exome
+	2	map_to_genome
+	2	marking_MT
+	2	marking_genome
+	1	muTect_MT
+	1	muTect_genome
+	1	nextera_index_bwa
+	2	sorting_MT
+	2	sorting_exome
+	2	sorting_genome
+	2	trim
+	1	varscan_MT_patient
+	2	varscan_MT_sample
+	1	varscan_genome_patient
+	2	varscan_genome_sample
+	93
+
+Job 34: >> 3062 : downloading, decompressing and merging fastq 
+
+Job 21: >> 242 : Check fastq size 
+
+Job 86: indexing hg19 with bwa
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 28: editing nexterarapidcapture_exome_targetedregions_v1.2
+
+Error in rule downloadDecompressMergeFastq:
+    jobid: 34
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provissima/01_fastq/02_postprocess/3062_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provissima/01_fastq/02_postprocess/3062_R2_unchecked.fastq
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provissima/01_fastq/logs/3062_cadaver.log
+
+RuleException:
+CalledProcessError in line 399 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_03.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.97uyy_c_.downloadDecompressMergeFastq_01.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_03.py", line 399, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/data_ref/nexterarapidcapture_exome_targetedregions_v1.2.bed.
+Finished job 28.
+1 of 93 steps (1%) done
+Will exit after finishing currently running jobs.
+Finished job 21.
+2 of 93 steps (2%) done
+Will exit after finishing currently running jobs.

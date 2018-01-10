@@ -1,0 +1,10 @@
+KeyError in line 196 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+'the label [01] is not in the [index]'
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 196, in <module>
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py", line 196, in <listcomp>
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/core/indexing.py", line 1367, in __getitem__
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/core/indexing.py", line 858, in _getitem_tuple
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/core/indexing.py", line 991, in _getitem_lowerdim
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/core/indexing.py", line 1626, in _getitem_axis
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/core/indexing.py", line 1514, in _has_valid_type
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/site-packages/pandas/core/indexing.py", line 1501, in error

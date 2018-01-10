@@ -1,0 +1,611 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	2	AnalyzeCovariates_MT
+	2	AnalyzeCovariates_genome
+	2	BaseRecal_MT
+	2	BaseRecal_genome
+	2	IndelRealigner_MT
+	2	IndelRealigner_genome
+	1	KeepOnlyVariants
+	1	MergeMutectVarscan
+	1	MergeWriteVariants
+	1	MutectSplitVariants
+	2	PostRecalTable_MT
+	2	PostRecalTable_genome
+	2	PrintReads_MT
+	2	PrintReads_genome
+	2	RTC_MT
+	2	RTC_genome
+	1	Remove_segdups
+	1	VarscanSplitVariants
+	1	all
+	1	annovar_MT_mutect
+	1	annovar_MT_varscan
+	1	annovar_genome_mutect
+	1	annovar_genome_varscan
+	1	checkMAFs
+	1	create_rsID_table
+	2	downloadDecompressMergeFastq
+	2	extractUnmapped_convert
+	2	extractUnmapped_extract
+	2	fastq_checkpoint
+	2	fastqc_R1
+	2	fastqc_R2
+	2	fastqc_trimmed_R1
+	2	fastqc_trimmed_R2
+	1	filterExonicPolymorphic
+	1	filterSomatic_Indel
+	1	filterSomatic_SNV
+	2	indexing_MT
+	2	indexing_genome
+	2	map_to_MT
+	2	map_to_exome
+	2	map_to_genome
+	2	marking_MT
+	2	marking_genome
+	1	muTect_MT
+	1	muTect_genome
+	2	sorting_MT
+	2	sorting_exome
+	2	sorting_genome
+	2	trim
+	1	varscan_MT_patient
+	2	varscan_MT_sample
+	1	varscan_genome_patient
+	2	varscan_genome_sample
+	86
+
+Job 27: >> 01 : downloading, decompressing and merging fastq 
+
+Job 31: >> 02 : downloading, decompressing and merging fastq 
+
+Finished job 31.
+1 of 86 steps (1%) done
+
+Job 18: >> 02 : Check fastq size 
+
+Finished job 18.
+2 of 86 steps (2%) done
+
+Job 5: >> 02 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 4: >> 02 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 15: >> 02 : Trimming
+
+Finished job 4.
+3 of 86 steps (3%) done
+Finished job 5.
+4 of 86 steps (5%) done
+Finished job 27.
+5 of 86 steps (6%) done
+
+Job 14: >> 01 : Check fastq size 
+
+Finished job 14.
+6 of 86 steps (7%) done
+
+Job 7: >> 01 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 21: >> 01 : Trimming
+
+
+Job 1: >> 01 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 1.
+7 of 86 steps (8%) done
+Finished job 7.
+8 of 86 steps (9%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/01_fastq/02_postprocess/02_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/01_fastq/02_postprocess/02_R2.fastq.
+Finished job 15.
+9 of 86 steps (10%) done
+
+Job 6: >> 02 : fastqc2 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 90: >> 02 : Aligning to reference NUCLEAR GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 117: >> 02 : Aligning to reference EXOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 2: >> 02 : fastqc1 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 6.
+10 of 86 steps (12%) done
+Finished job 2.
+11 of 86 steps (13%) done
+Finished job 117.
+12 of 86 steps (14%) done
+
+Job 115: >> 02 : sorting exome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/01_fastq/02_postprocess/01_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/01_fastq/02_postprocess/01_R2.fastq.
+Finished job 21.
+13 of 86 steps (15%) done
+
+Job 11: >> 01 : fastqc1 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 83: >> 01 : Aligning to reference NUCLEAR GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 118: >> 01 : Aligning to reference EXOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 9: >> 01 : fastqc2 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 11.
+14 of 86 steps (16%) done
+Finished job 9.
+15 of 86 steps (17%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/01_intermediate/02.sam.
+Finished job 115.
+16 of 86 steps (19%) done
+
+Job 113: >> 02 : extractUnmapped extract
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/01_intermediate/02_sorted.bam.
+Finished job 113.
+17 of 86 steps (20%) done
+
+Job 98: >> 02 : extractUnmapped convert
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/01_intermediate/02_unmapped.bam.
+Finished job 98.
+18 of 86 steps (21%) done
+
+Job 89: >> 02 : Aligning to reference MITOCHONDRIAL GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/02_unmapped_fastq/02_R2.unmapped.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/02_unmapped_fastq/02_R1.unmapped.fastq.
+Finished job 89.
+19 of 86 steps (22%) done
+
+Job 67: >> 02 : sorting MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/02.sam.
+Finished job 67.
+20 of 86 steps (23%) done
+
+Job 46: >> 02 : marking MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/02_fastq_trimmed/02_R2.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/02_fastq_trimmed/02_R1.fastq.
+Finished job 90.
+21 of 86 steps (24%) done
+
+Job 68: >> 02 : sorting genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/02_sorted.bam.
+Finished job 46.
+22 of 86 steps (26%) done
+
+Job 44: >> 02 : indexing MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 44.
+23 of 86 steps (27%) done
+
+Job 45: >> 02 : RTC MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 45.
+24 of 86 steps (28%) done
+
+Job 33: >> 02 : IndelRealigner MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/02_marked.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/02_marked.bam.
+Finished job 33.
+25 of 86 steps (29%) done
+
+Job 20: >> 02 : BaseRecal MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 20.
+26 of 86 steps (30%) done
+
+Job 108: >> 02 : PrintReads MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 19: >> 02 : PostRecalTable MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 19.
+27 of 86 steps (31%) done
+
+Job 8: >> 02 : AnalyzeCovariates MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 8.
+28 of 86 steps (33%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/02.sam.
+Finished job 68.
+29 of 86 steps (34%) done
+
+Job 49: >> 02 : marking genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/02_realigned.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/02_realigned.bai.
+Finished job 108.
+30 of 86 steps (35%) done
+
+Job 104: >> 02 : Varscan on sample MT alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 104.
+31 of 86 steps (36%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/02_sorted.bam.
+Finished job 49.
+32 of 86 steps (37%) done
+
+Job 47: >> 02 : indexing genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 47.
+33 of 86 steps (38%) done
+
+Job 48: >> 02 : RTC genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 118.
+34 of 86 steps (40%) done
+
+Job 116: >> 01 : sorting exome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 48.
+35 of 86 steps (41%) done
+
+Job 34: >> 02 : IndelRealigner genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/02_marked.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/02_marked.bam.
+Finished job 34.
+36 of 86 steps (42%) done
+
+Job 23: >> 02 : BaseRecal genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/01_intermediate/01.sam.
+Finished job 116.
+37 of 86 steps (43%) done
+
+Job 114: >> 01 : extractUnmapped extract
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 23.
+38 of 86 steps (44%) done
+
+Job 22: >> 02 : PostRecalTable genome
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 110: >> 02 : PrintReads genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/01_intermediate/01_sorted.bam.
+Finished job 114.
+39 of 86 steps (45%) done
+
+Job 112: >> 01 : extractUnmapped convert
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/01_intermediate/01_unmapped.bam.
+Finished job 112.
+40 of 86 steps (47%) done
+
+Job 96: >> 01 : Aligning to reference MITOCHONDRIAL GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/02_unmapped_fastq/01_R2.unmapped.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/04_alignment_exome/02_unmapped_fastq/01_R1.unmapped.fastq.
+Finished job 96.
+41 of 86 steps (48%) done
+
+Job 82: >> 01 : sorting MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/02_fastq_trimmed/01_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/02_fastq_trimmed/01_R2.fastq.
+Finished job 83.
+42 of 86 steps (49%) done
+
+Job 59: >> 01 : sorting genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/01.sam.
+Finished job 82.
+43 of 86 steps (50%) done
+
+Job 56: >> 01 : marking MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/01_sorted.bam.
+Finished job 56.
+44 of 86 steps (51%) done
+
+Job 58: >> 01 : indexing MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 58.
+45 of 86 steps (52%) done
+
+Job 57: >> 01 : RTC MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 57.
+46 of 86 steps (53%) done
+
+Job 37: >> 01 : IndelRealigner MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/01_marked.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/01_marked.bai.
+Finished job 37.
+47 of 86 steps (55%) done
+
+Job 25: >> 01 : BaseRecal MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 25.
+48 of 86 steps (56%) done
+
+Job 107: >> 01 : PrintReads MT
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 26: >> 01 : PostRecalTable MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 26.
+49 of 86 steps (57%) done
+
+Job 13: >> 01 : AnalyzeCovariates MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 13.
+50 of 86 steps (58%) done
+Finished job 110.
+51 of 86 steps (59%) done
+
+Job 102: >> 02 : Varscan on sample genomic alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/02_realigned.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/02_realigned.bam.
+Finished job 22.
+52 of 86 steps (60%) done
+
+Job 10: >> 02 : AnalyzeCovariates genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 10.
+53 of 86 steps (62%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/01.sam.
+Finished job 59.
+54 of 86 steps (63%) done
+
+Job 41: >> 01 : marking genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 102.
+55 of 86 steps (64%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/01_realigned.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/01_intermediate/01_realigned.bai.
+Finished job 107.
+56 of 86 steps (65%) done
+
+Job 94: >> first : MuTect on MT alignment
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/a055426f.
+Job 103: >> 01 : Varscan on sample MT alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/02_bqsr/02.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/02_bqsr/02.bai.
+Finished job 94.
+57 of 86 steps (66%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/02_bqsr/01.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/05_alignment_MT/02_bqsr/01.bam.
+Finished job 103.
+58 of 86 steps (67%) done
+
+Job 93: >> first : Varscan on patient MT alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/09_varscan_MT/01_mpileup/01.mpileup.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/09_varscan_MT/01_mpileup/02.mpileup.
+Finished job 93.
+59 of 86 steps (69%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/01_sorted.bam.
+Finished job 41.
+60 of 86 steps (70%) done
+
+Job 42: >> 01 : indexing genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 42.
+61 of 86 steps (71%) done
+
+Job 43: >> 01 : RTC genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 43.
+62 of 86 steps (72%) done
+
+Job 30: >> 01 : IndelRealigner genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/01_marked.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/01_marked.bai.
+Finished job 30.
+63 of 86 steps (73%) done
+
+Job 17: >> 01 : BaseRecal genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 17.
+64 of 86 steps (74%) done
+
+Job 111: >> 01 : PrintReads genome
+
+
+Job 16: >> 01 : PostRecalTable genome
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 16.
+65 of 86 steps (76%) done
+
+Job 3: >> 01 : AnalyzeCovariates genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 3.
+66 of 86 steps (77%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/01_realigned.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/01_intermediate/01_realigned.bam.
+Finished job 111.
+67 of 86 steps (78%) done
+
+Job 95: >> first : MuTect on genomic alignment
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/a055426f.
+Job 101: >> 01 : Varscan on sample genomic alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 101.
+68 of 86 steps (79%) done
+
+Job 92: >> first : Varscan on patient genomic alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/08_varscan_genome/01_mpileup/01.mpileup.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/08_varscan_genome/01_mpileup/02.mpileup.
+Finished job 92.
+69 of 86 steps (80%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/02_bqsr/02.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/02_bqsr/02.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/02_bqsr/01.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/03_alignment_genome/02_bqsr/01.bai.
+Finished job 95.
+70 of 86 steps (81%) done
+
+Job 79: >> first : Merge and Write Variants
+
+Finished job 79.
+71 of 86 steps (83%) done
+
+Job 80: >> first : Varscan Filter Somatic SNV
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 78: >> first : Varscan Filter Somatic Indel
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 78.
+72 of 86 steps (84%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/10_variants_filter/first_varscan_snv_temp1.tsv.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/10_variants_filter/first_varscan_indel_temp1.tsv.
+Finished job 80.
+73 of 86 steps (85%) done
+
+Job 51: >> first : Keep Only Variants
+
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/10_variants_filter/first_varscan_indel_temp2.tsv.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/10_variants_filter/first_varscan_snv_temp2.tsv.
+Finished job 51.
+74 of 86 steps (86%) done
+
+Job 81: >> first : Split muTect Variants
+
+Job 75: >> first : Split Varscan Variants
+
+Finished job 81.
+75 of 86 steps (87%) done
+Finished job 75.
+76 of 86 steps (88%) done
+
+Job 52: >> first : annotating with ANNOVAR muTect genome variants
+
+Job 53: >> first : annotating with ANNOVAR muTect MT variants
+
+Job 50: >> first : annotating with ANNOVAR varscan MT variants
+
+Job 54: >> first : annotating with ANNOVAR varscan genome variants
+
+Finished job 53.
+77 of 86 steps (90%) done
+Finished job 50.
+78 of 86 steps (91%) done
+Finished job 52.
+79 of 86 steps (92%) done
+Finished job 54.
+80 of 86 steps (93%) done
+
+Job 35: >> first : merging muTect and Varscan Variants
+
+Finished job 35.
+81 of 86 steps (94%) done
+
+Job 55: >> first : create rsID table
+
+Finished job 55.
+82 of 86 steps (95%) done
+
+Job 36: >> first : filtering exonic/non-synonymous/non-polymorphic
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_2_patients_1/10_variants_filter/first_rsID.tsv.
+Finished job 36.
+83 of 86 steps (97%) done
+
+Job 24: >> first : checking MAFs
+
+Removing temporary output file first_rsID_maf.tsv.
+Finished job 24.
+84 of 86 steps (98%) done
+
+Job 12: >> first : Removing segdups variants
+
+Finished job 12.
+85 of 86 steps (99%) done
+
+Job 0:  THE END 
+
+Finished job 0.
+86 of 86 steps (100%) done

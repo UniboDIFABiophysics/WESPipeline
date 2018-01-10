@@ -1,0 +1,40 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [],
+  "files": [
+    "include/graphite2/Font.h",
+    "include/graphite2/Log.h",
+    "include/graphite2/Segment.h",
+    "include/graphite2/Types.h",
+    "lib/libgraphite2.so",
+    "lib/libgraphite2.so.3",
+    "lib/libgraphite2.so.3.0.1",
+    "lib/pkgconfig/graphite2.pc",
+    "share/graphite2/graphite2-release.cmake",
+    "share/graphite2/graphite2.cmake"
+  ],
+  "fn": "graphite2-1.3.10-0.tar.bz2",
+  "has_prefix": true,
+  "license": "LGPLv2",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/graphite2-1.3.10-0",
+    "type": 1
+  },
+  "md5": "cfc982678cab29ab08dd8a6904d7ad44",
+  "name": "graphite2",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 121597,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/graphite2-1.3.10-0.tar.bz2",
+  "version": "1.3.10",
+  "with_features_depends": {}
+}

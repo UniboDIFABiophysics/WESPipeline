@@ -1,0 +1,256 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	10	AnalyzeCovariates_MT
+	10	AnalyzeCovariates_genome
+	10	BaseRecal_MT
+	10	BaseRecal_genome
+	10	IndelRealigner_MT
+	10	IndelRealigner_genome
+	5	KeepOnlyVariants
+	5	MergeMutectVarscan
+	5	MergeWriteVariants
+	5	MutectSplitVariants
+	10	PostRecalTable_MT
+	10	PostRecalTable_genome
+	10	PrintReads_MT
+	10	PrintReads_genome
+	10	RTC_MT
+	10	RTC_genome
+	5	Remove_segdups
+	5	VarscanSplitVariants
+	1	all
+	5	annovar_MT_mutect
+	5	annovar_MT_varscan
+	5	annovar_genome_mutect
+	5	annovar_genome_varscan
+	5	checkMAFs
+	5	create_rsID_table
+	10	downloadDecompressMergeFastq
+	10	extractUnmapped_convert
+	10	extractUnmapped_extract
+	10	fastq_checkpoint
+	10	fastqc_R1
+	10	fastqc_R2
+	10	fastqc_trimmed_R1
+	10	fastqc_trimmed_R2
+	5	filterExonicPolymorphic
+	5	filterSomatic_Indel
+	5	filterSomatic_SNV
+	10	indexing_MT
+	10	indexing_genome
+	10	map_to_MT
+	10	map_to_exome
+	10	map_to_genome
+	10	marking_MT
+	10	marking_genome
+	5	muTect_MT
+	5	muTect_genome
+	10	sorting_MT
+	10	sorting_exome
+	10	sorting_genome
+	10	trim_02
+	5	varscan_MT_patient
+	10	varscan_MT_sample
+	5	varscan_genome_patient
+	10	varscan_genome_sample
+	426
+
+Job 141: >> 3062 : downloading, decompressing and merging fastq 
+
+Job 158: >> 245 : downloading, decompressing and merging fastq 
+
+
+Job 151: >> 239 : downloading, decompressing and merging fastq 
+
+
+Job 159: >> 224 : downloading, decompressing and merging fastq 
+
+
+Job 136: >> 3010 : downloading, decompressing and merging fastq 
+
+Job 131: >> 242 : downloading, decompressing and merging fastq 
+
+
+Job 147: >> 246 : downloading, decompressing and merging fastq 
+
+
+Job 142: >> 3154 : downloading, decompressing and merging fastq 
+
+
+Job 148: >> 3108 : downloading, decompressing and merging fastq 
+
+
+Job 146: >> 2973 : downloading, decompressing and merging fastq 
+
+Finished job 131.
+1 of 426 steps (0.23%) done
+
+Job 67: >> 242 : Check fastq size 
+
+Finished job 67.
+2 of 426 steps (0.47%) done
+
+Job 66: >> 242 : Trimming
+
+
+Job 49: >> 242 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 2: >> 242 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 49.
+3 of 426 steps (0.70%) done
+Finished job 2.
+4 of 426 steps (0.94%) done
+Finished job 151.
+5 of 426 steps (1%) done
+
+Job 92: >> 239 : Check fastq size 
+
+Finished job 92.
+6 of 426 steps (1%) done
+
+Job 94: >> 239 : Trimming
+
+
+Job 23: >> 239 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 41: >> 239 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 23.
+7 of 426 steps (2%) done
+Finished job 41.
+8 of 426 steps (2%) done
+Finished job 147.
+9 of 426 steps (2%) done
+
+Job 87: >> 246 : Check fastq size 
+
+Finished job 87.
+10 of 426 steps (2%) done
+
+Job 63: >> 246 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 19: >> 246 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 69: >> 246 : Trimming
+
+Finished job 158.
+11 of 426 steps (3%) done
+
+Job 104: >> 245 : Check fastq size 
+
+Finished job 104.
+12 of 426 steps (3%) done
+
+Job 93: >> 245 : Trimming
+
+
+Job 51: >> 245 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 40: >> 245 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 63.
+13 of 426 steps (3%) done
+Finished job 19.
+14 of 426 steps (3%) done
+Finished job 136.
+15 of 426 steps (4%) done
+
+Job 73: >> 3010 : Check fastq size 
+
+Finished job 73.
+16 of 426 steps (4%) done
+
+Job 47: >> 3010 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 8: >> 3010 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 71: >> 3010 : Trimming
+
+Finished job 40.
+17 of 426 steps (4%) done
+Finished job 51.
+18 of 426 steps (4%) done
+Finished job 8.
+19 of 426 steps (4%) done
+Finished job 47.
+20 of 426 steps (5%) done
+Finished job 159.
+21 of 426 steps (5%) done
+Finished job 148.
+22 of 426 steps (5%) done
+Finished job 146.
+23 of 426 steps (5%) done
+Finished job 141.
+24 of 426 steps (6%) done
+Finished job 142.
+25 of 426 steps (6%) done
+
+Job 78: >> 3062 : Check fastq size 
+
+Job 105: >> 224 : Check fastq size 
+
+Job 86: >> 2973 : Check fastq size 
+
+Job 88: >> 3108 : Check fastq size 
+
+
+Job 79: >> 3154 : Check fastq size 
+
+Failed to set marker file for job started ([Errno 28] No space left on device: '/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/metadata/L2hvbWUvUEVSU09OQUxFL2V1Z2VuaW8uZm9uemkyL0FOQUxZU0VTX1dFUy8xNzEyMjJfdGVzdF8yMF9id2FfdGhyZWFkcy8wMV9mYXN0cS8wMl9wb3N0cHJvY2Vzcy8zMTU0X1IyLmZhc3Rx'). Snakemake will work, but cannot ensure that output files are complete in case of a kill signal or power loss. Please ensure write permissions for the directory /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/242_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/242_R2.fastq.
+Finished job 66.
+26 of 426 steps (6%) done
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/239_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/239_R2.fastq.
+Finished job 94.
+27 of 426 steps (6%) done
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/246_R2.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/246_R1.fastq.
+Finished job 69.
+28 of 426 steps (7%) done
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/245_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/245_R2.fastq.
+Finished job 93.
+29 of 426 steps (7%) done
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/3010_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_20_bwa_threads/01_fastq/02_postprocess/3010_R2.fastq.
+Finished job 71.
+30 of 426 steps (7%) done
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2017-12-26T030330.888275.snakemake.log

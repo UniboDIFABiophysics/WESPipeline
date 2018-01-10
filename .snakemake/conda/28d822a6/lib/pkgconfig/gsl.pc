@@ -1,0 +1,11 @@
+prefix=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6
+exec_prefix=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6
+libdir=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib
+includedir=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/include
+GSL_CBLAS_LIB=-lgslcblas
+
+Name: GSL
+Description: GNU Scientific Library
+Version: 2.1
+Libs: -L/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib -lgsl ${GSL_CBLAS_LIB} -lm -lm 
+Cflags: -I/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/include

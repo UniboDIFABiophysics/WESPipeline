@@ -1,0 +1,39 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "py36_1",
+  "build_number": 1,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [
+    "python 3.6*"
+  ],
+  "files": [
+    "lib/python3.6/site-packages/__pycache__/six.cpython-36.pyc",
+    "lib/python3.6/site-packages/six-1.11.0-py3.6.egg-info/PKG-INFO",
+    "lib/python3.6/site-packages/six-1.11.0-py3.6.egg-info/SOURCES.txt",
+    "lib/python3.6/site-packages/six-1.11.0-py3.6.egg-info/dependency_links.txt",
+    "lib/python3.6/site-packages/six-1.11.0-py3.6.egg-info/top_level.txt",
+    "lib/python3.6/site-packages/six.py"
+  ],
+  "fn": "six-1.11.0-py36_1.tar.bz2",
+  "has_prefix": false,
+  "license": "MIT",
+  "license_family": "MIT",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/six-1.11.0-py36_1",
+    "type": 1
+  },
+  "md5": "30debff68f9e2daa8cb1cd08210c282f",
+  "name": "six",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 21129,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/six-1.11.0-py36_1.tar.bz2",
+  "version": "1.11.0",
+  "with_features_depends": {}
+}

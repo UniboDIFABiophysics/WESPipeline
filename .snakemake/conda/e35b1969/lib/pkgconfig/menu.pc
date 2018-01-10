@@ -1,0 +1,13 @@
+prefix=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969
+exec_prefix=${prefix}
+libdir=${exec_prefix}/lib
+includedir=${prefix}/include/ncurses
+major_version=5
+version=5.9.20110404
+
+Name: menu
+Description: ncurses 5.9 add-on library
+Version: ${version}
+Requires: ncurses tinfo
+Libs: -L${libdir} -lmenu
+Cflags: -I${includedir}

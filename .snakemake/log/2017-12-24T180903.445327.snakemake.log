@@ -1,0 +1,105 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	10	AnalyzeCovariates_MT
+	10	AnalyzeCovariates_genome
+	10	BaseRecal_MT
+	10	BaseRecal_genome
+	10	IndelRealigner_MT
+	10	IndelRealigner_genome
+	5	KeepOnlyVariants
+	5	MergeMutectVarscan
+	5	MergeWriteVariants
+	5	MutectSplitVariants
+	10	PostRecalTable_MT
+	10	PostRecalTable_genome
+	10	PrintReads_MT
+	10	PrintReads_genome
+	10	RTC_MT
+	10	RTC_genome
+	5	Remove_segdups
+	5	VarscanSplitVariants
+	1	all
+	5	annovar_MT_mutect
+	5	annovar_MT_varscan
+	5	annovar_genome_mutect
+	5	annovar_genome_varscan
+	5	checkMAFs
+	5	create_rsID_table
+	10	downloadDecompressMergeFastq
+	10	extractUnmapped_convert
+	10	extractUnmapped_extract
+	10	fastq_checkpoint
+	10	fastqc_R1
+	10	fastqc_R2
+	10	fastqc_trimmed_R1
+	10	fastqc_trimmed_R2
+	5	filterExonicPolymorphic
+	5	filterSomatic_Indel
+	5	filterSomatic_SNV
+	10	indexing_MT
+	10	indexing_genome
+	10	map_to_MT
+	10	map_to_exome
+	10	map_to_genome
+	10	marking_MT
+	10	marking_genome
+	5	muTect_MT
+	5	muTect_genome
+	10	sorting_MT
+	10	sorting_exome
+	10	sorting_genome
+	10	trim_02
+	5	varscan_MT_patient
+	10	varscan_MT_sample
+	5	varscan_genome_patient
+	10	varscan_genome_sample
+	426
+
+Job 159: >> 242 : downloading, decompressing and merging fastq 
+
+Job 158: >> 245 : downloading, decompressing and merging fastq 
+
+Job 166: >> 3108 : downloading, decompressing and merging fastq 
+
+Job 138: >> 3062 : downloading, decompressing and merging fastq 
+
+Job 139: >> 3010 : downloading, decompressing and merging fastq 
+
+
+Job 135: >> 2973 : downloading, decompressing and merging fastq 
+
+Job 153: >> 239 : downloading, decompressing and merging fastq 
+
+
+Job 152: >> 246 : downloading, decompressing and merging fastq 
+
+
+Job 137: >> 3154 : downloading, decompressing and merging fastq 
+
+Job 136: >> 224 : downloading, decompressing and merging fastq 
+
+Error in rule downloadDecompressMergeFastq:
+Error in rule downloadDecompressMergeFastq:
+    jobid: 138
+    jobid: 158
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_16_bwa_threads/01_fastq/02_postprocess/3062_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_16_bwa_threads/01_fastq/02_postprocess/3062_R2_unchecked.fastq
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_16_bwa_threads/01_fastq/02_postprocess/245_R1_unchecked.fastq, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_16_bwa_threads/01_fastq/02_postprocess/245_R2_unchecked.fastq
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_16_bwa_threads/01_fastq/logs/3062_cadaver.log
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171222_test_16_bwa_threads/01_fastq/logs/245_cadaver.log
+
+
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_01.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.ht0v5w2n.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_01.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+RuleException:
+CalledProcessError in line 396 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_01.py:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/python /home/PERSONALE/eugenio.fonzi2/WESPipeline/scripts/.snakemake.2bi1qu70.downloadDecompressMergeFastq.py ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_01.py", line 396, in __rule_downloadDecompressMergeFastq
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.

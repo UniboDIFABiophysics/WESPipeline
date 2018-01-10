@@ -1,0 +1,5 @@
+Building DAG of jobs...
+MissingInputException in line 1145 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_02.py:
+Missing input files for rule muTect_genome:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_6_patients_1/03_alignment_genome/02_bqsr/01_recal.bai
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/171228_test_threads_6_patients_1/03_alignment_genome/02_bqsr/02_recal.bai

@@ -1,0 +1,10 @@
+Error in rule one:
+    jobid: 0
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina1/56.txt
+
+RuleException:
+NameError in line 381 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py:
+name 'sam' is not defined
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py", line 381, in __rule_one
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Exiting because a job execution failed. Look above for error message

@@ -1,0 +1,40 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [
+    "libsodium"
+  ],
+  "files": [
+    "bin/curve_keygen",
+    "include/zmq.h",
+    "include/zmq_utils.h",
+    "lib/libzmq.a",
+    "lib/libzmq.la",
+    "lib/libzmq.so",
+    "lib/libzmq.so.5",
+    "lib/libzmq.so.5.0.1",
+    "lib/pkgconfig/libzmq.pc"
+  ],
+  "fn": "zeromq-4.1.5-0.tar.bz2",
+  "license": "LGPL 3",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/zeromq-4.1.5-0",
+    "type": 1
+  },
+  "md5": "8148084633bf0981de7ab0ea78b7a7d6",
+  "name": "zeromq",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 5192046,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/zeromq-4.1.5-0.tar.bz2",
+  "version": "4.1.5",
+  "with_features_depends": {}
+}

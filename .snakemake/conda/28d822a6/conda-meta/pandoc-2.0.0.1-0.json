@@ -1,0 +1,35 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [
+    "gmp",
+    "zlib 1.2.*"
+  ],
+  "files": [
+    "bin/pandoc",
+    "bin/pandoc-citeproc"
+  ],
+  "fn": "pandoc-2.0.0.1-0.tar.bz2",
+  "has_prefix": false,
+  "license": "GPL-2.0",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/pandoc-2.0.0.1-0",
+    "type": 1
+  },
+  "md5": "9f20353e2fc22756a1eeb19be035cc2c",
+  "name": "pandoc",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 20985377,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/pandoc-2.0.0.1-0.tar.bz2",
+  "version": "2.0.0.1",
+  "with_features_depends": {}
+}

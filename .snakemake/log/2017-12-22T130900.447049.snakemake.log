@@ -1,0 +1,108 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	2	AnalyzeCovariates_MT
+	2	AnalyzeCovariates_genome
+	2	BaseRecal_MT
+	2	BaseRecal_genome
+	2	IndelRealigner_MT
+	2	IndelRealigner_genome
+	1	KeepOnlyVariants
+	1	MergeMutectVarscan
+	1	MergeWriteVariants
+	1	MutectSplitVariants
+	2	PostRecalTable_MT
+	2	PostRecalTable_genome
+	2	PrintReads_MT
+	2	PrintReads_genome
+	2	RTC_MT
+	2	RTC_genome
+	1	Remove_segdups
+	1	VarscanSplitVariants
+	1	all
+	1	annovar_MT_mutect
+	1	annovar_MT_varscan
+	1	annovar_genome_mutect
+	1	annovar_genome_varscan
+	1	checkMAFs
+	1	create_rsID_table
+	2	downloadDecompressMergeFastq
+	2	extractUnmapped_convert
+	2	extractUnmapped_extract
+	2	fastq_checkpoint
+	2	fastqc_R1
+	2	fastqc_R2
+	2	fastqc_trimmed_R1
+	2	fastqc_trimmed_R2
+	1	filterExonicPolymorphic
+	1	filterSomatic_Indel
+	1	filterSomatic_SNV
+	2	indexing_MT
+	2	indexing_genome
+	2	map_to_MT
+	2	map_to_exome
+	2	map_to_genome
+	2	marking_MT
+	2	marking_genome
+	1	muTect_MT
+	1	muTect_genome
+	2	sorting_MT
+	2	sorting_exome
+	2	sorting_genome
+	2	trim_02
+	1	varscan_MT_patient
+	2	varscan_MT_sample
+	1	varscan_genome_patient
+	2	varscan_genome_sample
+	86
+
+Job 31: >> 242 : downloading, decompressing and merging fastq 
+
+Job 30: >> 3062 : downloading, decompressing and merging fastq 
+
+Finished job 31.
+1 of 86 steps (1%) done
+
+Job 17: >> 242 : Check fastq size 
+
+Finished job 17.
+2 of 86 steps (2%) done
+
+Job 20: >> 242 : Trimming
+
+
+Job 8: >> 242 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 3: >> 242 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 30.
+3 of 86 steps (3%) done
+
+Job 16: >> 3062 : Check fastq size 
+
+Finished job 16.
+4 of 86 steps (5%) done
+
+Job 5: >> 3062 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 2: >> 3062 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 21: >> 3062 : Trimming
+
+Finished job 8.
+5 of 86 steps (6%) done
+Finished job 3.
+6 of 86 steps (7%) done
+Finished job 5.
+7 of 86 steps (8%) done
+Finished job 2.
+8 of 86 steps (9%) done

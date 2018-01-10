@@ -1,0 +1,13 @@
+prefix=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6
+exec_prefix=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6
+libdir=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib
+includedir=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/include
+
+Name: harfbuzz
+Description: HarfBuzz text shaping library ICU integration
+Version: 1.4.3
+
+Requires: harfbuzz
+Requires.private: icu-uc
+Libs: -L${libdir} -lharfbuzz-icu
+Cflags: -I${includedir}/harfbuzz

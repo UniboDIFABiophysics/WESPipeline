@@ -1,0 +1,52 @@
+{
+  "arch": "x86_64",
+  "auth": null,
+  "build": "r3.3.2_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/linux-64",
+  "depends": [
+    "r-base 3.3.2*"
+  ],
+  "files": [
+    "lib/R/library/gtable/DESCRIPTION",
+    "lib/R/library/gtable/INDEX",
+    "lib/R/library/gtable/Meta/Rd.rds",
+    "lib/R/library/gtable/Meta/hsearch.rds",
+    "lib/R/library/gtable/Meta/links.rds",
+    "lib/R/library/gtable/Meta/nsInfo.rds",
+    "lib/R/library/gtable/Meta/package.rds",
+    "lib/R/library/gtable/NAMESPACE",
+    "lib/R/library/gtable/NEWS.md",
+    "lib/R/library/gtable/R/gtable",
+    "lib/R/library/gtable/R/gtable.rdb",
+    "lib/R/library/gtable/R/gtable.rdx",
+    "lib/R/library/gtable/help/AnIndex",
+    "lib/R/library/gtable/help/aliases.rds",
+    "lib/R/library/gtable/help/gtable.rdb",
+    "lib/R/library/gtable/help/gtable.rdx",
+    "lib/R/library/gtable/help/paths.rds",
+    "lib/R/library/gtable/html/00Index.html",
+    "lib/R/library/gtable/html/R.css"
+  ],
+  "fn": "r-gtable-0.2.0-r3.3.2_0.tar.bz2",
+  "has_prefix": false,
+  "license": "GPL-2",
+  "license_family": "GPL2",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/r-gtable-0.2.0-r3.3.2_0",
+    "type": 1
+  },
+  "md5": "d394675e54a7805683c10c9d1b94d921",
+  "name": "r-gtable",
+  "noarch": null,
+  "platform": "linux",
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 61119,
+  "subdir": "linux-64",
+  "url": "https://conda.anaconda.org/conda-forge/linux-64/r-gtable-0.2.0-r3.3.2_0.tar.bz2",
+  "version": "0.2.0",
+  "with_features_depends": {}
+}

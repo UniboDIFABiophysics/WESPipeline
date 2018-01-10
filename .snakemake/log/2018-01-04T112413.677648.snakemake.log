@@ -1,0 +1,21 @@
+Building DAG of jobs...
+IncompleteFilesException:
+The files below seem to be incomplete. If you are sure that certain files are not incomplete, mark them as complete with
+
+    snakemake --cleanup-metadata <filenames>
+
+To re-generate the files rerun your command with the --rerun-incomplete flag.
+Incomplete files:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/03_alignment_genome/logs/1905_post_recal_data.table
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/03_alignment_genome/logs/218_post_recal_data.table
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/03_alignment_genome/01_intermediate/3094_sorted.bam
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/03_alignment_genome/01_intermediate/272_sorted.bam
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/03_alignment_genome/01_intermediate/B2044D_sorted.bam
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/03_alignment_genome/02_bqsr/1905.bam
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/03_alignment_genome/02_bqsr/1905.bai
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/04_alignment_exome/02_unmapped_fastq/B2044S_R1.unmapped.fastq
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/04_alignment_exome/02_unmapped_fastq/B2044S_R2.unmapped.fastq
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/04_alignment_exome/02_unmapped_fastq/B2044S_unpaired.unmapped.fastq
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/04_alignment_exome/01_intermediate/272_sorted.bam
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/04_alignment_exome/01_intermediate/B2044D_sorted.bam
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180103_test_adapters_YES_on_contaminated/04_alignment_exome/01_intermediate/3094_sorted.bam

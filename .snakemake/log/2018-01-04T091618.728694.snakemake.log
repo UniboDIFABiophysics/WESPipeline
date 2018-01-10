@@ -1,0 +1,3 @@
+NameError in line 357 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py:
+name 'sample' is not defined
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py", line 357, in <module>

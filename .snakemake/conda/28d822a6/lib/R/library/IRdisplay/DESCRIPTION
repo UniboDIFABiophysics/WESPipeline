@@ -1,0 +1,20 @@
+Package: IRdisplay
+Title: 'Jupyter' Display Machinery
+Description: 
+    An interface to the rich display capabilities of 'Jupyter' front-ends (e.g. 'Jupyter Notebook').
+    Designed to be used from a running 'IRkernel'.
+Version: 0.4.4
+Authors@R: c(person("Thomas", "Kluyver", role = c("aut"), email = "thomas@kluyver.me.uk"),
+    person("Philipp", "Angerer", role = c("aut", "cre"), email = "phil.angerer@gmail.com"),
+    person("Jan", "Schulz", role = "aut", email = "jasc@gmx.net"))
+Depends: R (>= 3.0.1)
+Suggests: testthat, withr
+Imports: repr
+License: MIT + file LICENSE
+LazyData: true
+RoxygenNote: 5.0.1
+Author: Thomas Kluyver [aut],
+  Philipp Angerer [aut, cre],
+  Jan Schulz [aut]
+Maintainer: Philipp Angerer <phil.angerer@gmail.com>
+Built: R 3.3.2; ; 2017-02-18 16:08:16 UTC; unix

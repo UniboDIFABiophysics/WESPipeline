@@ -1,0 +1,3 @@
+==> 2017-12-19 10:23:58 <==
+# cmd: /home/PERSONALE/eugenio.fonzi2/miniconda3/bin/conda-env create --file /home/PERSONALE/eugenio.fonzi2/WESPipeline/envs/wes_config_conda_muTect.yaml --prefix /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/a055426f
++bioconda::java-jdk-6.0.77-0

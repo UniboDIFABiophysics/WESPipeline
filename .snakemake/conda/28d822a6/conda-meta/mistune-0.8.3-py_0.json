@@ -1,0 +1,42 @@
+{
+  "arch": null,
+  "auth": null,
+  "build": "py_0",
+  "build_number": 0,
+  "channel": "https://conda.anaconda.org/conda-forge/noarch",
+  "depends": [
+    "python"
+  ],
+  "files": [
+    "lib/python3.6/site-packages/mistune-0.8.3.dist-info/DESCRIPTION.rst",
+    "lib/python3.6/site-packages/mistune-0.8.3.dist-info/INSTALLER",
+    "lib/python3.6/site-packages/mistune-0.8.3.dist-info/METADATA",
+    "lib/python3.6/site-packages/mistune-0.8.3.dist-info/RECORD",
+    "lib/python3.6/site-packages/mistune-0.8.3.dist-info/WHEEL",
+    "lib/python3.6/site-packages/mistune-0.8.3.dist-info/metadata.json",
+    "lib/python3.6/site-packages/mistune-0.8.3.dist-info/top_level.txt",
+    "lib/python3.6/site-packages/mistune.py",
+    "lib/python3.6/site-packages/__pycache__/mistune.cpython-36.pyc"
+  ],
+  "fn": "mistune-0.8.3-py_0.tar.bz2",
+  "has_prefix": false,
+  "license": "BSD 3-Clause",
+  "license_family": "BSD",
+  "link": {
+    "source": "/home/PERSONALE/eugenio.fonzi2/miniconda3/pkgs/mistune-0.8.3-py_0",
+    "type": 1
+  },
+  "md5": "d8b9556a4ab228bba9387b89fe446928",
+  "name": "mistune",
+  "noarch": "python",
+  "platform": null,
+  "preferred_env": null,
+  "priority": 2,
+  "requires": [],
+  "schannel": "conda-forge",
+  "size": 16149,
+  "subdir": "noarch",
+  "url": "https://conda.anaconda.org/conda-forge/noarch/mistune-0.8.3-py_0.tar.bz2",
+  "version": "0.8.3",
+  "with_features_depends": {}
+}

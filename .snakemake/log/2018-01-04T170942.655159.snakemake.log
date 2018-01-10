@@ -1,0 +1,36 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	all
+	4	one
+	4	two
+	9
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina1/12.txt
+    jobid: 5
+    wildcards: samp=12
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina1/78.txt
+    jobid: 8
+    wildcards: samp=78
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina1/34.txt
+    jobid: 7
+    wildcards: samp=34
+
+rule one:
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/provina1/56.txt
+    jobid: 6
+    wildcards: samp=56
+
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2018-01-04T170942.655159.snakemake.log

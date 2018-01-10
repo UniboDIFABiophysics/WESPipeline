@@ -1,0 +1,136 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	2	AnalyzeCovariates_MT
+	2	AnalyzeCovariates_genome
+	2	BaseRecal_MT
+	2	BaseRecal_genome
+	2	IndelRealigner_MT
+	2	IndelRealigner_genome
+	1	KeepOnlyVariants
+	1	MergeMutectVarscan
+	1	MergeWriteVariants
+	1	MutectSplitVariants
+	2	PostRecalTable_MT
+	2	PostRecalTable_genome
+	2	PrintReads_MT
+	2	PrintReads_genome
+	2	RTC_MT
+	2	RTC_genome
+	1	Remove_segdups
+	1	VarscanSplitVariants
+	1	all
+	1	annovar_MT_mutect
+	1	annovar_MT_varscan
+	1	annovar_genome_mutect
+	1	annovar_genome_varscan
+	1	checkMAFs
+	1	create_rsID_table
+	2	downloadDecompressMergeFastq
+	2	extractUnmapped_convert
+	2	extractUnmapped_extract
+	2	fastq_checkpoint
+	2	fastqc_R1
+	2	fastqc_R2
+	2	fastqc_trimmed_R1
+	2	fastqc_trimmed_R2
+	1	filterExonicPolymorphic
+	1	filterSomatic_Indel
+	1	filterSomatic_SNV
+	2	indexing_MT
+	2	indexing_genome
+	2	map_to_MT
+	2	map_to_exome
+	2	map_to_genome
+	2	marking_MT
+	2	marking_genome
+	1	muTect_MT
+	1	muTect_genome
+	2	sorting_MT
+	2	sorting_exome
+	2	sorting_genome
+	2	trim_02
+	1	varscan_MT_patient
+	2	varscan_MT_sample
+	1	varscan_genome_patient
+	2	varscan_genome_sample
+	86
+
+Job 37: >> 3062 : downloading, decompressing and merging fastq 
+
+Job 32: >> 242 : downloading, decompressing and merging fastq 
+
+Finished job 32.
+1 of 86 steps (1%) done
+Finished job 37.
+2 of 86 steps (2%) done
+
+Job 26: >> 3062 : Check fastq size 
+
+Job 20: >> 242 : Check fastq size 
+
+Finished job 20.
+3 of 86 steps (3%) done
+
+Job 5: >> 242 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 13: >> 242 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 17: >> 242 : Trimming
+
+Finished job 26.
+4 of 86 steps (5%) done
+
+Job 12: >> 3062 : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 11: >> 3062 : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 14: >> 3062 : Trimming
+
+Error in rule trim_02:
+    jobid: 17
+    output: /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/242_R1.fastq, /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/242_R2.fastq
+    log: /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/242_discarded.log, /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/242_stats.log, /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/242_singleton.log
+
+RuleException:
+CalledProcessError in line 475 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/softwares/adapter_removal_1.5.4/AdapterRemoval --file1 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/02_postprocess/242_R1.fastq --file2 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/02_postprocess/242_R2.fastq --pcr1 CTGTCTCTTATACACATCTCCGAGCCCACGAGAC --pcr2 TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG --stats --trimns --trimqualities --minquality 20 --minlength 80 --output1 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/242_R1.fastq --output2 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/242_R2.fastq --discarded /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/242_discarded.log --outputstats /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/242_stats.log --singleton /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/242_singleton.log ' returned non-zero exit status 127.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile", line 475, in __rule_trim_02
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Error in rule trim_02:
+    jobid: 14
+    output: /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/3062_R1.fastq, /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/3062_R2.fastq
+    log: /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/3062_discarded.log, /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/3062_stats.log, /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/3062_singleton.log
+
+RuleException:
+CalledProcessError in line 475 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile:
+Command ' set -euo pipefail;  /home/PERSONALE/eugenio.fonzi2/softwares/adapter_removal_1.5.4/AdapterRemoval --file1 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/02_postprocess/3062_R1.fastq --file2 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/02_postprocess/3062_R2.fastq --pcr1 CTGTCTCTTATACACATCTCCGAGCCCACGAGAC --pcr2 TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG --stats --trimns --trimqualities --minquality 20 --minlength 80 --output1 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/3062_R1.fastq --output2 /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/3062_R2.fastq --discarded /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/3062_discarded.log --outputstats /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/3062_stats.log --singleton /home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/02_fastq_trimmed/logs/3062_singleton.log ' returned non-zero exit status 127.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile", line 475, in __rule_trim_02
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Will exit after finishing currently running jobs.
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/03_fastqc/242_R2_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/03_fastqc/242_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R1 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/03_fastqc/3062_R1_fastqc.zip
+Waiting at most 5 seconds for missing files.
+Removing output files of failed job fastqc_R2 since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/WESPipeline/wes_analyses/results/01_fastq/03_fastqc/3062_R2_fastqc.zip
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2017-12-20T121600.797266.snakemake.log

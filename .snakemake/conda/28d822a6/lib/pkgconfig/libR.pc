@@ -1,0 +1,10 @@
+rhome=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib/R
+rlibdir=${rhome}/lib
+rincludedir=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib/R/include
+
+Name: libR
+Description: R as a library
+Version: 3.3.2
+Libs: -Wl,--export-dynamic -fopenmp  -L/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/lib -lgfortran -L${rlibdir} -lR
+Cflags: -I${rincludedir} -I${rincludedir}
+Libs.private:

@@ -1,0 +1,150 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	AnalyzeCovariates_genome
+	3	KeepOnlyVariants
+	3	MergeMutectVarscan
+	3	MergeWriteVariants
+	3	MutectSplitVariants
+	1	PostRecalTable_genome
+	1	PrintReads_genome
+	3	Remove_segdups
+	3	VarscanSplitVariants
+	1	all
+	3	annovar_MT_mutect
+	3	annovar_MT_varscan
+	3	annovar_genome_mutect
+	3	annovar_genome_varscan
+	3	checkMAFs
+	3	create_rsID_table
+	3	filterExonicPolymorphic
+	3	filterSomatic_Indel
+	3	filterSomatic_SNV
+	3	muTect_genome
+	1	varscan_MT_patient
+	1	varscan_MT_sample
+	3	varscan_genome_patient
+	1	varscan_genome_sample
+	58
+
+Job 219: >> 101 : MuTect on genomic alignment
+
+
+Job 226: >> 67 : MuTect on genomic alignment
+
+
+Job 218: >> 101 : Varscan on patient genomic alignment
+
+
+Job 230: >> B2002S : Varscan on sample MT alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/a055426f.
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/a055426f.
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 67: >> B2002D : PostRecalTable genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 223: >> 67 : Varscan on patient genomic alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 238: >> B2002D : PrintReads genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 230.
+1 of 58 steps (2%) done
+
+Job 205: >> 77 : Varscan on patient MT alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Terminating processes on user request.
+Error in rule varscan_MT_patient:
+    jobid: 205
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/77_snv.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/77_indel.tsv
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/logs/77_varscan.log
+
+RuleException:
+CalledProcessError in line 1321 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  java -jar /home/PERSONALE/eugenio.fonzi2/softwares/VarScan.v2.3.9.jar somatic /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/01_mpileup/B2002S.mpileup /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/01_mpileup/B2002D.mpileup --output-snp /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/77_snv.tsv --output-indel /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/77_indel.tsv --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/logs/77_varscan.log ' returned non-zero exit status 130.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 1321, in __rule_varscan_MT_patient
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job varscan_MT_patient since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/77_snv.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/09_varscan_MT/77_indel.tsv
+Error in rule muTect_genome:
+    jobid: 219
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/101.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/101_cov_wig.log
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/101_mutect.log, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/101_mutect_err.log
+
+RuleException:
+CalledProcessError in line 1191 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/a055426f; set -euo pipefail;  java -Xmx2g -jar /home/PERSONALE/eugenio.fonzi2/softwares/muTect-1.1.4.jar --analysis_type MuTect --reference_sequence /home/PERSONALE/eugenio.fonzi2/data_ref/human_g1k_v37.fasta --cosmic /home/PERSONALE/eugenio.fonzi2/data_ref/b37_cosmic_v54_120711.vcf --dbsnp /home/PERSONALE/eugenio.fonzi2/data_ref/dbsnp_138.b37.vcf --intervals /home/PERSONALE/eugenio.fonzi2/data_ref/truseq-exome-targeted-regions-manifest-v1-2_fixed.bed --input_file:normal /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/C0017S.bam --input_file:tumor /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/C0017D.bam --out /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/101.tsv --coverage_file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/101_cov_wig.log > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/101_mutect.log 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/101_mutect_err.log ' returned non-zero exit status 130.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 1191, in __rule_muTect_genome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job muTect_genome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/101.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/101_cov_wig.log
+Error in rule muTect_genome:
+    jobid: 226
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/67.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/67_cov_wig.log
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/67_mutect.log, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/67_mutect_err.log
+
+RuleException:
+CalledProcessError in line 1191 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/a055426f; set -euo pipefail;  java -Xmx2g -jar /home/PERSONALE/eugenio.fonzi2/softwares/muTect-1.1.4.jar --analysis_type MuTect --reference_sequence /home/PERSONALE/eugenio.fonzi2/data_ref/human_g1k_v37.fasta --cosmic /home/PERSONALE/eugenio.fonzi2/data_ref/b37_cosmic_v54_120711.vcf --dbsnp /home/PERSONALE/eugenio.fonzi2/data_ref/dbsnp_138.b37.vcf --intervals /home/PERSONALE/eugenio.fonzi2/data_ref/truseq-exome-targeted-regions-manifest-v1-2_fixed.bed --input_file:normal /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/A1015S.bam --input_file:tumor /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/A1015Dbis.bam --out /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/67.tsv --coverage_file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/67_cov_wig.log > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/67_mutect.log 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/logs/67_mutect_err.log ' returned non-zero exit status 130.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 1191, in __rule_muTect_genome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job muTect_genome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/67.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/06_mutect_genome/67_cov_wig.log
+Error in rule varscan_genome_patient:
+    jobid: 218
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/101_snv.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/101_indel.tsv
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/logs/101_varscan.log
+
+RuleException:
+CalledProcessError in line 1275 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  java -jar /home/PERSONALE/eugenio.fonzi2/softwares/VarScan.v2.3.9.jar somatic /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/01_mpileup/C0017S.mpileup /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/01_mpileup/C0017D.mpileup --output-snp /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/101_snv.tsv --output-indel /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/101_indel.tsv --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/logs/101_varscan.log ' returned non-zero exit status 130.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 1275, in __rule_varscan_genome_patient
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job varscan_genome_patient since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/101_snv.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/101_indel.tsv
+Error in rule varscan_genome_patient:
+    jobid: 223
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/67_snv.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/67_indel.tsv
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/logs/67_varscan.log
+
+RuleException:
+CalledProcessError in line 1275 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  java -jar /home/PERSONALE/eugenio.fonzi2/softwares/VarScan.v2.3.9.jar somatic /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/01_mpileup/A1015S.mpileup /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/01_mpileup/A1015Dbis.mpileup --output-snp /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/67_snv.tsv --output-indel /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/67_indel.tsv --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/logs/67_varscan.log ' returned non-zero exit status 130.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 1275, in __rule_varscan_genome_patient
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job varscan_genome_patient since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/67_snv.tsv, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/08_varscan_genome/67_indel.tsv
+Error in rule PrintReads_genome:
+    jobid: 238
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/B2002D.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/B2002D.bai
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_recalibrating_02.log
+
+RuleException:
+CalledProcessError in line 791 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  java -jar /home/PERSONALE/eugenio.fonzi2/softwares/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar -T PrintReads -R /home/PERSONALE/eugenio.fonzi2/data_ref/human_g1k_v37.fasta -I /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/01_intermediate/B2002D_realigned.bam -BQSR /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_recal_data.table -nct 4 -o /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/B2002D.bam 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_recalibrating_02.log ' returned non-zero exit status 130.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 791, in __rule_PrintReads_genome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job PrintReads_genome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/B2002D.bam, /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/02_bqsr/B2002D.bai
+Error in rule PostRecalTable_genome:
+    jobid: 67
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_post_recal_data.table
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_postrecalibrating.log
+
+RuleException:
+CalledProcessError in line 744 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  java -jar /home/PERSONALE/eugenio.fonzi2/softwares/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar -T BaseRecalibrator -R /home/PERSONALE/eugenio.fonzi2/data_ref/human_g1k_v37.fasta -I /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/01_intermediate/B2002D_realigned.bam -L /home/PERSONALE/eugenio.fonzi2/data_ref/truseq-exome-targeted-regions-manifest-v1-2_fixed.bed -ip 50 -knownSites /home/PERSONALE/eugenio.fonzi2/data_ref/dbsnp_138.b37.vcf -knownSites /home/PERSONALE/eugenio.fonzi2/data_ref/Mills_and_1000G_gold_standard.indels.b37.vcf -BQSR /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_recal_data.table -nct 4 -o /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_post_recal_data.table 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_postrecalibrating.log ' returned non-zero exit status 130.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 744, in __rule_PostRecalTable_genome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job PostRecalTable_genome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_YES_on_clean/03_alignment_genome/logs/B2002D_post_recal_data.table
+Complete log: .snakemake/log/2018-01-09T182348.225673.snakemake.log

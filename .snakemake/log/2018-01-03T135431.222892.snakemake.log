@@ -1,0 +1,105 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	10	AnalyzeCovariates_MT
+	10	AnalyzeCovariates_genome
+	10	BaseRecal_MT
+	10	BaseRecal_genome
+	10	IndelRealigner_MT
+	10	IndelRealigner_genome
+	5	KeepOnlyVariants
+	5	MergeMutectVarscan
+	5	MergeWriteVariants
+	5	MutectSplitVariants
+	10	PostRecalTable_MT
+	10	PostRecalTable_genome
+	10	PrintReads_MT
+	10	PrintReads_genome
+	10	RTC_MT
+	10	RTC_genome
+	5	Remove_segdups
+	5	VarscanSplitVariants
+	1	all
+	5	annovar_MT_mutect
+	5	annovar_MT_varscan
+	5	annovar_genome_mutect
+	5	annovar_genome_varscan
+	5	checkMAFs
+	5	create_rsID_table
+	10	downloadDecompressMergeFastq
+	10	extractUnmapped_convert
+	10	extractUnmapped_extract
+	10	fastqc_R1
+	10	fastqc_R2
+	10	fastqc_trimmed_R1
+	10	fastqc_trimmed_R2
+	5	filterExonicPolymorphic
+	5	filterSomatic_Indel
+	5	filterSomatic_SNV
+	1	index_picard_truseq_rapid
+	1	index_samtools_truseq_rapid
+	10	indexing_MT
+	10	indexing_genome
+	10	map_to_MT
+	10	map_to_exome
+	10	map_to_genome
+	10	marking_MT
+	10	marking_genome
+	5	muTect_MT
+	5	muTect_genome
+	10	sorting_MT
+	10	sorting_exome
+	10	sorting_genome
+	10	trim
+	1	truseq_rapid_index_bwa
+	5	varscan_MT_patient
+	10	varscan_MT_sample
+	5	varscan_genome_patient
+	10	varscan_genome_sample
+	419
+
+Job 101: >> B2044D : downloading, decompressing and merging fastq 
+
+Job 103: >> 426 : downloading, decompressing and merging fastq 
+
+Job 67: >> 218 : downloading, decompressing and merging fastq 
+
+
+Job 70: >> 272 : downloading, decompressing and merging fastq 
+
+
+Job 69: >> 3094 : downloading, decompressing and merging fastq 
+
+
+Job 75: >> 1905 : downloading, decompressing and merging fastq 
+
+Job 73: >> 416 : downloading, decompressing and merging fastq 
+
+
+Job 78: >> 449 : downloading, decompressing and merging fastq 
+
+Job 83: >> 461 : downloading, decompressing and merging fastq 
+
+
+Job 456: indexing truseq_rapid with samtools
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 87: >> B2044S : downloading, decompressing and merging fastq 
+
+Finished job 456.
+1 of 419 steps (0.24%) done
+
+Job 454: indexing truseq_rapid with picard
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 453: indexing truseq_rapid with bwa
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 454.
+2 of 419 steps (0.48%) done
+Finished job 453.
+3 of 419 steps (0.72%) done

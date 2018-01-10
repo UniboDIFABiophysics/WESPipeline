@@ -1,0 +1,14 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	1	one
+	1
+
+rule one:
+    jobid: 0
+
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2018-01-04T164417.551425.snakemake.log

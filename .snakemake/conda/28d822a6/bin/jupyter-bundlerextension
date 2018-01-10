@@ -1,0 +1,6 @@
+#!/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/bin/python
+if __name__ == '__main__':
+    import sys
+    import notebook.bundler.bundlerextensions
+
+    sys.exit(notebook.bundler.bundlerextensions.main())

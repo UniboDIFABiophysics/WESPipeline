@@ -1,0 +1,693 @@
+Building DAG of jobs...
+Provided cores: 32
+Rules claiming more threads will be scaled down.
+Job counts:
+	count	jobs
+	6	AnalyzeCovariates_MT
+	6	AnalyzeCovariates_genome
+	6	BaseRecal_MT
+	6	BaseRecal_genome
+	6	IndelRealigner_MT
+	6	IndelRealigner_genome
+	3	KeepOnlyVariants
+	3	MergeMutectVarscan
+	3	MergeWriteVariants
+	3	MutectSplitVariants
+	6	PostRecalTable_MT
+	6	PostRecalTable_genome
+	6	PrintReads_MT
+	6	PrintReads_genome
+	6	RTC_MT
+	6	RTC_genome
+	3	Remove_segdups
+	3	VarscanSplitVariants
+	1	all
+	3	annovar_MT_mutect
+	3	annovar_MT_varscan
+	3	annovar_genome_mutect
+	3	annovar_genome_varscan
+	3	checkMAFs
+	3	create_rsID_table
+	6	downloadDecompressMergeFastq
+	6	extractUnmapped_convert
+	6	extractUnmapped_extract
+	6	fastqc_R1
+	6	fastqc_R2
+	6	fastqc_trimmed_R1
+	6	fastqc_trimmed_R2
+	3	filterExonicPolymorphic
+	3	filterSomatic_Indel
+	3	filterSomatic_SNV
+	6	indexing_MT
+	6	indexing_genome
+	6	map_to_MT
+	6	map_to_exome
+	6	map_to_genome
+	6	marking_MT
+	6	marking_genome
+	3	muTect_MT
+	3	muTect_genome
+	6	sorting_MT
+	6	sorting_exome
+	6	sorting_genome
+	6	trim
+	3	varscan_MT_patient
+	6	varscan_MT_sample
+	3	varscan_genome_patient
+	6	varscan_genome_sample
+	250
+
+Job 59: >> A1015S : downloading, decompressing and merging fastq 
+
+Job 54: >> C0017S : downloading, decompressing and merging fastq 
+
+Job 42: >> A1015Dbis : downloading, decompressing and merging fastq 
+
+Job 51: >> B2002S : downloading, decompressing and merging fastq 
+
+Job 57: >> C0017D : downloading, decompressing and merging fastq 
+
+
+Job 43: >> B2002D : downloading, decompressing and merging fastq 
+
+Finished job 51.
+1 of 250 steps (0.40%) done
+
+Job 12: >> B2002S : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 49: >> B2002S : Trimming
+
+
+Job 26: >> B2002S : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 26.
+2 of 250 steps (0.80%) done
+Finished job 12.
+3 of 250 steps (1%) done
+Finished job 59.
+4 of 250 steps (2%) done
+
+Job 45: >> A1015S : Trimming
+
+
+Job 23: >> A1015S : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 32: >> A1015S : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 23.
+5 of 250 steps (2%) done
+Finished job 32.
+6 of 250 steps (2%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/B2002S_R2.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/B2002S_R1.fastq.
+Finished job 49.
+7 of 250 steps (3%) done
+
+Job 279: >> B2002S : Aligning to reference EXOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 214: >> B2002S : Aligning to reference NUCLEAR GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 29: >> B2002S : fastqc2 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 9: >> B2002S : fastqc1 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 29.
+8 of 250 steps (3%) done
+Finished job 9.
+9 of 250 steps (4%) done
+Finished job 54.
+10 of 250 steps (4%) done
+
+Job 19: >> C0017S : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 69: >> C0017S : Trimming
+
+
+Job 15: >> C0017S : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/A1015S_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/A1015S_R2.fastq.
+Finished job 45.
+11 of 250 steps (4%) done
+
+Job 278: >> A1015S : Aligning to reference EXOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 5: >> A1015S : fastqc1 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 14: >> A1015S : fastqc2 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 220: >> A1015S : Aligning to reference NUCLEAR GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 15.
+12 of 250 steps (5%) done
+Finished job 57.
+13 of 250 steps (5%) done
+
+Job 22: >> C0017D : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 46: >> C0017D : Trimming
+
+
+Job 18: >> C0017D : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 19.
+14 of 250 steps (6%) done
+Finished job 5.
+15 of 250 steps (6%) done
+Finished job 14.
+16 of 250 steps (6%) done
+Finished job 42.
+17 of 250 steps (7%) done
+
+Job 24: >> A1015Dbis : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 50: >> A1015Dbis : Trimming
+
+
+Job 2: >> A1015Dbis : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 18.
+18 of 250 steps (7%) done
+Finished job 2.
+19 of 250 steps (8%) done
+Finished job 22.
+20 of 250 steps (8%) done
+Finished job 24.
+21 of 250 steps (8%) done
+Finished job 279.
+22 of 250 steps (9%) done
+
+Job 273: >> B2002S : sorting exome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 43.
+23 of 250 steps (9%) done
+
+Job 3: >> B2002D : fastqc2
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Job 44: >> B2002D : Trimming
+
+
+Job 6: >> B2002D : fastqc1
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/B2002S_R2.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/B2002S_R1.fastq.
+Finished job 214.
+24 of 250 steps (10%) done
+
+Job 182: >> B2002S : sorting genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 3.
+25 of 250 steps (10%) done
+Finished job 6.
+26 of 250 steps (10%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/B2002S.sam.
+Finished job 273.
+27 of 250 steps (11%) done
+
+Job 267: >> B2002S : extractUnmapped extract
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 220.
+28 of 250 steps (11%) done
+
+Job 189: >> A1015S : sorting genome
+
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/A1015S_R1.fastq.
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/A1015S_R2.fastq.
+Finished job 278.
+29 of 250 steps (12%) done
+
+Job 272: >> A1015S : sorting exome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/B2002S.sam.
+Finished job 182.
+30 of 250 steps (12%) done
+
+Job 125: >> B2002S : marking genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/B2002S_sorted.bam.
+Finished job 267.
+31 of 250 steps (12%) done
+
+Job 233: >> B2002S : extractUnmapped convert
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/B2002S_unmapped.bam.
+Finished job 233.
+32 of 250 steps (13%) done
+
+Job 207: >> B2002S : Aligning to reference MITOCHONDRIAL GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/B2002S_sorted.bam.
+Finished job 125.
+33 of 250 steps (13%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/02_unmapped_fastq/B2002S_R1.unmapped.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/02_unmapped_fastq/B2002S_R2.unmapped.fastq.
+Finished job 207.
+34 of 250 steps (14%) done
+
+Job 167: >> B2002S : sorting MT
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 126: >> B2002S : indexing genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 126.
+35 of 250 steps (14%) done
+
+Job 124: >> B2002S : RTC genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015S.sam.
+Finished job 189.
+36 of 250 steps (14%) done
+
+Job 136: >> A1015S : marking genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/A1015S.sam.
+Finished job 272.
+37 of 250 steps (15%) done
+
+Job 266: >> A1015S : extractUnmapped extract
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/B2002S.sam.
+Finished job 167.
+38 of 250 steps (15%) done
+
+Job 114: >> B2002S : marking MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 124.
+39 of 250 steps (16%) done
+
+Job 90: >> B2002S : IndelRealigner genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/B2002S_sorted.bam.
+Finished job 114.
+40 of 250 steps (16%) done
+
+Job 113: >> B2002S : indexing MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 113.
+41 of 250 steps (16%) done
+
+Job 112: >> B2002S : RTC MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 112.
+42 of 250 steps (17%) done
+
+Job 86: >> B2002S : IndelRealigner MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/B2002S_marked.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/B2002S_marked.bam.
+Finished job 86.
+43 of 250 steps (17%) done
+
+Job 55: >> B2002S : BaseRecal MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 55.
+44 of 250 steps (18%) done
+
+Job 56: >> B2002S : PostRecalTable MT
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 245: >> B2002S : PrintReads MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 56.
+45 of 250 steps (18%) done
+
+Job 16: >> B2002S : AnalyzeCovariates MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 16.
+46 of 250 steps (18%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/A1015S_sorted.bam.
+Finished job 266.
+47 of 250 steps (19%) done
+
+Job 232: >> A1015S : extractUnmapped convert
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/A1015S_unmapped.bam.
+Finished job 232.
+48 of 250 steps (19%) done
+
+Job 206: >> A1015S : Aligning to reference MITOCHONDRIAL GENOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015S_sorted.bam.
+Finished job 136.
+49 of 250 steps (20%) done
+
+Job 137: >> A1015S : indexing genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/B2002S_marked.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/B2002S_marked.bai.
+Finished job 90.
+50 of 250 steps (20%) done
+
+Job 62: >> B2002S : BaseRecal genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/B2002S_realigned.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/B2002S_realigned.bam.
+Finished job 245.
+51 of 250 steps (20%) done
+
+Job 235: >> B2002S : Varscan on sample MT alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 137.
+52 of 250 steps (21%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/02_unmapped_fastq/A1015S_R1.unmapped.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/02_unmapped_fastq/A1015S_R2.unmapped.fastq.
+Finished job 206.
+53 of 250 steps (21%) done
+
+Job 166: >> A1015S : sorting MT
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 138: >> A1015S : RTC genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 235.
+54 of 250 steps (22%) done
+Finished job 138.
+55 of 250 steps (22%) done
+
+Job 94: >> A1015S : IndelRealigner genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/A1015S.sam.
+Finished job 166.
+56 of 250 steps (22%) done
+
+Job 110: >> A1015S : marking MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/A1015S_sorted.bam.
+Finished job 110.
+57 of 250 steps (23%) done
+
+Job 109: >> A1015S : indexing MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 109.
+58 of 250 steps (23%) done
+
+Job 111: >> A1015S : RTC MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 111.
+59 of 250 steps (24%) done
+
+Job 85: >> A1015S : IndelRealigner MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/A1015S_marked.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/A1015S_marked.bam.
+Finished job 85.
+60 of 250 steps (24%) done
+
+Job 52: >> A1015S : BaseRecal MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 52.
+61 of 250 steps (24%) done
+
+Job 261: >> A1015S : PrintReads MT
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 53: >> A1015S : PostRecalTable MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 53.
+62 of 250 steps (25%) done
+
+Job 13: >> A1015S : AnalyzeCovariates MT
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 13.
+63 of 250 steps (25%) done
+Finished job 62.
+64 of 250 steps (26%) done
+
+Job 63: >> B2002S : PostRecalTable genome
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 240: >> B2002S : PrintReads genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015S_marked.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015S_marked.bai.
+Finished job 94.
+65 of 250 steps (26%) done
+
+Job 68: >> A1015S : BaseRecal genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/A1015S_realigned.bam.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/05_alignment_MT/01_intermediate/A1015S_realigned.bai.
+Finished job 261.
+66 of 250 steps (26%) done
+
+Job 257: >> A1015S : Varscan on sample MT alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 257.
+67 of 250 steps (27%) done
+Finished job 68.
+68 of 250 steps (27%) done
+
+Job 264: >> A1015S : PrintReads genome
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 67: >> A1015S : PostRecalTable genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 240.
+69 of 250 steps (28%) done
+
+Job 242: >> B2002S : Varscan on sample genomic alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/B2002S_realigned.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/B2002S_realigned.bam.
+Finished job 63.
+70 of 250 steps (28%) done
+
+Job 27: >> B2002S : AnalyzeCovariates genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 27.
+71 of 250 steps (28%) done
+Finished job 242.
+72 of 250 steps (29%) done
+Finished job 264.
+73 of 250 steps (29%) done
+
+Job 259: >> A1015S : Varscan on sample genomic alignment
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 259.
+74 of 250 steps (30%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015S_realigned.bai.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015S_realigned.bam.
+Finished job 67.
+75 of 250 steps (30%) done
+
+Job 31: >> A1015S : AnalyzeCovariates genome
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 31.
+76 of 250 steps (30%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/C0017S_R2.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/C0017S_R1.fastq.
+Finished job 69.
+77 of 250 steps (31%) done
+
+Job 33: >> C0017S : fastqc2 on trimmed fastq
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 282: >> C0017S : Aligning to reference EXOME
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 39: >> C0017S : fastqc1 on trimmed fastq
+
+
+Job 224: >> C0017S : Aligning to reference NUCLEAR GENOME
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 39.
+78 of 250 steps (31%) done
+Finished job 33.
+79 of 250 steps (32%) done
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/C0017D_R2.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/C0017D_R1.fastq.
+Finished job 46.
+80 of 250 steps (32%) done
+
+Job 20: >> C0017D : fastqc2 on trimmed fastq
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 219: >> C0017D : Aligning to reference NUCLEAR GENOME
+
+
+Job 7: >> C0017D : fastqc1 on trimmed fastq
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 277: >> C0017D : Aligning to reference EXOME
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/A1015Dbis_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/A1015Dbis_R2.fastq.
+Finished job 50.
+81 of 250 steps (32%) done
+
+Job 223: >> A1015Dbis : Aligning to reference NUCLEAR GENOME
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 11: >> A1015Dbis : fastqc1 on trimmed fastq
+
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Job 280: >> A1015Dbis : Aligning to reference EXOME
+
+
+Job 17: >> A1015Dbis : fastqc2 on trimmed fastq
+
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Activating conda environment /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969.
+Finished job 7.
+82 of 250 steps (33%) done
+Finished job 20.
+83 of 250 steps (33%) done
+Finished job 17.
+84 of 250 steps (34%) done
+Finished job 11.
+85 of 250 steps (34%) done
+Error in rule map_to_exome:
+    jobid: 280
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/A1015Dbis.sam
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/logs/A1015Dbis_alignment.log
+
+RuleException:
+CalledProcessError in line 831 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  bwa mem -M -t 4 -R '@RG\tID:A1015Dbis\tSM:A1015Dbis\tPL:illumina\tLB:truseq\tPU:PE' /home/PERSONALE/eugenio.fonzi2/data_ref/truseq.fasta /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/A1015Dbis_R1.fastq /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/A1015Dbis_R2.fastq > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/A1015Dbis.sam 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/logs/A1015Dbis_alignment.log ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 831, in __rule_map_to_exome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job map_to_exome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/A1015Dbis.sam
+Will exit after finishing currently running jobs.
+Finished job 282.
+86 of 250 steps (34%) done
+Will exit after finishing currently running jobs.
+Error in rule map_to_exome:
+    jobid: 277
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/C0017D.sam
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/logs/C0017D_alignment.log
+
+RuleException:
+CalledProcessError in line 831 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  bwa mem -M -t 4 -R '@RG\tID:C0017D\tSM:C0017D\tPL:illumina\tLB:truseq\tPU:PE' /home/PERSONALE/eugenio.fonzi2/data_ref/truseq.fasta /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/C0017D_R1.fastq /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/C0017D_R2.fastq > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/C0017D.sam 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/logs/C0017D_alignment.log ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 831, in __rule_map_to_exome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job map_to_exome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/04_alignment_exome/01_intermediate/C0017D.sam
+Error in rule map_to_genome:
+    jobid: 224
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/C0017S.sam
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/logs/C0017S_alignment.log
+
+RuleException:
+CalledProcessError in line 566 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  bwa mem -M -t 4 -R '@RG\tID:C0017S\tSM:C0017S\tPL:illumina\tLB:truseq\tPU:PE' /home/PERSONALE/eugenio.fonzi2/data_ref/human_g1k_v37.fasta /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/C0017S_R1.fastq /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/C0017S_R2.fastq > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/C0017S.sam 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/logs/C0017S_alignment.log ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 566, in __rule_map_to_genome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Error in rule map_to_genome:
+    jobid: 223
+    output: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015Dbis.sam
+    log: /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/logs/A1015Dbis_alignment.log
+
+RuleException:
+CalledProcessError in line 566 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py:
+Command 'source activate /home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969; set -euo pipefail;  bwa mem -M -t 4 -R '@RG\tID:A1015Dbis\tSM:A1015Dbis\tPL:illumina\tLB:truseq\tPU:PE' /home/PERSONALE/eugenio.fonzi2/data_ref/human_g1k_v37.fasta /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/A1015Dbis_R1.fastq /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/02_fastq_trimmed/A1015Dbis_R2.fastq > /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015Dbis.sam 2> /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/logs/A1015Dbis_alignment.log ' returned non-zero exit status 1.
+  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakefile_04.py", line 566, in __rule_map_to_genome
+  File "/home/PERSONALE/eugenio.fonzi2/miniconda3/lib/python3.6/concurrent/futures/thread.py", line 56, in run
+Removing output files of failed job map_to_genome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/C0017S.sam
+Removing output files of failed job map_to_genome since they might be corrupted:
+/home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/03_alignment_genome/01_intermediate/A1015Dbis.sam
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Will exit after finishing currently running jobs.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/B2002D_R1.fastq.
+Removing temporary output file /home/PERSONALE/eugenio.fonzi2/ANALYSES_WES/180105_test_adapters_NO_on_clean/01_fastq/02_postprocess/B2002D_R2.fastq.
+Finished job 44.
+87 of 250 steps (35%) done
+Will exit after finishing currently running jobs.
+Finished job 219.
+88 of 250 steps (35%) done
+Will exit after finishing currently running jobs.
+Exiting because a job execution failed. Look above for error message
+Complete log: .snakemake/log/2018-01-09T214424.805913.snakemake.log

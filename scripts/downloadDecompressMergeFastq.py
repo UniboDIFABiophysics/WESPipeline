@@ -36,7 +36,7 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         gz_list = [gz for gz in all_fastq if re.search(fastq_id, gz)]
 
         # open file connection
-        with open(processpath + '/cadaver_get.sh', 'w') as outfile:
+        with open(processpath + 'cadaver_get.sh', 'w') as outfile:
 
             # loop over fastq files of current sample
             for gz in gz_list:
@@ -52,11 +52,11 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
         # run cadaver script
         sp.call(' '.join(['cadaver',
                           'https://ngs-ptl.unibo.it:5006',
-                          '-r', processpath + '/cadaver_get.sh',
+                          '-r', processpath + 'cadaver_get.sh',
                           '>', log]), shell=True)
 
         # delete script
-        sp.call(' '.join(['rm', processpath + '/cadaver_get.sh']), shell=True)
+        sp.call(' '.join(['rm', processpath + 'cadaver_get.sh']), shell=True)
 
         # loop over fastq
         for gz in gz_list:
@@ -79,7 +79,8 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
 
             # decompress it while downloading to inoutpath
             index = (os.path.splitext(os.path.basename(inoutpath + gz[:-3]))[0]).split('_')[1]
-            
+#% TODO: what is this step for??
+
             # decompress it while downloading to inoutpath
             sp.call(' '.join(['gzip',
                               '-dc', inpath + gz,
@@ -130,6 +131,11 @@ def downloadDecompressMergeFastq(name, all_fastq, fastq_path, fastq_id, homepath
     sp.call(' '.join(['cat', R2b, '>', outpath + fastq2]), shell=True)
 
 
+    # remove pre-processed fastq
+    R = ' '.join(R1 + R2)
+    sp.run('rm %s' %R, shell=True)
+
+
 # Snakemake call
 
 downloadDecompressMergeFastq(snakemake.params['name'],
@@ -137,7 +143,7 @@ downloadDecompressMergeFastq(snakemake.params['name'],
                              snakemake.params['fastq_path'],
                              snakemake.params['fastq_id'],
                              snakemake.params['homepath'],
-                             snakemake.params['preprocesspath'],                                                                                
+                             snakemake.params['preprocesspath'],
                              snakemake.params['postprocesspath'],
                              snakemake.params['logpath'],
                              snakemake.log['log'],

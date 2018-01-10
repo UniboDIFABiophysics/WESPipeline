@@ -1,6 +1,6 @@
 
 n_sim: '1'
-cpu_type: 'bio8'
+cpu_type: 'bio3'
 threads: 1
 map_thrs: 1
 RT_thrs: 1
@@ -9,7 +9,9 @@ PrintReads_thrs: 1
 n_cpu: '1'
 
 
-input_list: "input"
+input_list: ''
+
+outdir: ''
 
 dataset: "/data_ref/20171119_aml_dataset.tsv"
 
@@ -60,7 +62,6 @@ ref-files:
 
 folders:
     scripts: 'scripts/'
-    resultdir: '/prova'
     annovar: '/softwares/annovar/'
     softwares: '/softwares/'
     custom_resultdir: ''  # NEW

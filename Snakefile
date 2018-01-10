@@ -15,7 +15,7 @@ homepath = os.path.expanduser('~')
 # get current path
 currentpath = os.getcwd()
 
-folder= config['folders']['resultdir']
+folder = config['resultdir']
 scripts =  config['folders']['scripts']
 
 custom_storepath=config['folders']['custom_resultdir']

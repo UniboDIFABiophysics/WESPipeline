@@ -1,3 +1,0 @@
-SyntaxError:
-Not all output files of rule one contain the same wildcards.
-  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/snakeprova.py", line 376, in <module>

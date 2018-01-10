@@ -1,6 +1,0 @@
-gatkreport_test_v1.table
-                        Test table for version 1.x GATKReport
-gsa.read.gatkreport     Function to read in a GATKReport
-gsa.read.gatkreportv0   Function to read in an old-style GATKReport
-gsa.read.gatkreportv1   Function to read in a new-style GATKReport
-gsalib-package          Utility functions for GATK

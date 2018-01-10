@@ -1,3 +1,0 @@
-NameError in line 120 of /home/PERSONALE/eugenio.fonzi2/snakefiles/snakefile_01.py:
-name 'scripts' is not defined
-  File "/home/PERSONALE/eugenio.fonzi2/snakefiles/snakefile_01.py", line 120, in <module>

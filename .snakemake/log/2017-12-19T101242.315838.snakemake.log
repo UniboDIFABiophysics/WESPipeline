@@ -1,3 +1,0 @@
-FileNotFoundError in line 141 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile:
-[Errno 2] No such file or directory: 'input'
-  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile", line 141, in <module>

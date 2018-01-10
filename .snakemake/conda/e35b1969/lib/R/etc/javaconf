@@ -1,6 +1,0 @@
-## Versions from settings when configure was run
-: ${JAVA_HOME=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969}
-: ${JAVA_CPPFLAGS=-I/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969/include -I/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969/include/linux}
-: ${JAVA_LD_LIBRARY_PATH=/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969/jre/lib/amd64/server}
-: ${JAVA_LIBS=-Wl,-rpath,/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969/jre/lib/amd64/server -L/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/e35b1969/jre/lib/amd64/server -ljvm}
-

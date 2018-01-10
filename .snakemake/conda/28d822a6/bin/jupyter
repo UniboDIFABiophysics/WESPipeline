@@ -1,6 +1,0 @@
-#!/home/PERSONALE/eugenio.fonzi2/WESPipeline/.snakemake/conda/28d822a6/bin/python3.6
-# -*- coding: utf-8 -*-
-if __name__ == '__main__':
-    from sys import exit
-    from jupyter_core.command import main
-    exit(main())

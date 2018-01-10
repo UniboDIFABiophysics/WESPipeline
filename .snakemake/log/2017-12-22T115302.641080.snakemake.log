@@ -1,3 +1,0 @@
-KeyError in line 18 of /home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile:
-'resultdir'
-  File "/home/PERSONALE/eugenio.fonzi2/WESPipeline/Snakefile", line 18, in <module>

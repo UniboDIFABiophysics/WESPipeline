@@ -1,0 +1,98 @@
+
+snakefile: 'snakefile_06.py'
+
+keepgoing: 'True'
+
+outfolder: '_default_outfolder_'
+
+input_list: ''
+
+dataset: "data_ref/20180118_dataset.tsv"
+
+cores: '32'
+cpu_type: 'bio3'
+n_sim: '1'
+n_cpu: '1'
+threads: 32
+
+map_thrs: 4
+RT_thrs: 4
+BaseRecal_thrs: 4
+PrintReads_thrs: 4
+
+batch_size: 6
+
+custom_storepath: ''
+
+custom_pair: ''
+
+adapters: True
+nextera_transposase_2_rc: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
+nextera_transposase_1: 'TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG'
+
+adapter_removal_minquality: '20'
+adapter_removal_minlength: '79'
+
+
+fasta:
+  MT: 'data_ref/MT.fasta'
+  genome: 'data_ref/human_g1k_v37.fasta' #Human Genome Reference
+  nextera: 'data_ref/nextera.fasta'
+  nextera_expanded: 'data_ref/nextera_expanded.fasta'
+  truseq: 'data_ref/truseq.fasta'
+  truseq_rapid: 'data_ref/truseq_rapid.fasta'
+
+bed:
+  MT: "data_ref/MT"
+  nextera: "data_ref/nexterarapidcapture_exome_targetedregions_v1.2"
+  nextera_expanded: 'data_ref/nexterarapidcapture_expandedexome_targetedregions'
+  truseq: "data_ref/truseq-exome-targeted-regions-manifest-v1-2"
+  truseq_rapid: "data_ref/truseq-rapid-exome-targeted-regions-manifest-v1-2"
+
+protocols:
+  genome: "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,snp138,1000g2014oct_all,exac03nontcga,ljb26_all"
+  MT: "ensGene"
+
+operations:
+  genome: "g,r,r,f,f,f,f,f"
+  MT: "g"
+
+rsIDfilter: "171117_rsIDfilter.R"
+
+ref-files:
+    ## For IndelRealigner
+    indels_ref: 'data_ref/Mills_and_1000G_gold_standard.indels.b37.vcf' # The current best set of known indels to be used for local realignment
+    dbsnp: 'data_ref/dbsnp_138.b37.vcf' # SNPs database
+    cosmic: 'data_ref/b37_cosmic_v54_120711.vcf' # Catalog of somatic mutation in cancer
+    ## For Annovar
+    humandb: 'softwares/annovar/humandb' # Annovar human databases folder
+    build_ver: 'hg19' # Set build version
+    dbsnp_ver: 'snp138' # Set SNP database version
+    mitochondrial_ver: 'GRCh37_MT' # Set parameter command for annotating mitochondria variants
+
+folders:
+    scripts: 'scripts/'
+    annovar: 'softwares/annovar/'
+    softwares: 'softwares/'
+
+softwares:
+    gatk: 'softwares/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar'
+    muTect: 'softwares/muTect-1.1.4.jar'
+    annotate: 'softwares/annovar/annotate_variation.pl'
+    tableannovar: 'softwares/annovar/table_annovar.pl'
+    adapter_removal: 'softwares/adapter_removal_1.5.4/AdapterRemoval'
+    picard: 'softwares/picard-tools-1.119/'
+    varscan: 'softwares/VarScan.v2.3.9.jar'
+
+sample-details:
+    platform: 'illumina' # Set platform for mapping
+
+annovar_dbs:
+    hg19_refGene: "softwares/annovar/humandb/hg19_refGene.txt"
+    hg19_cytoBand: "softwares/annovar/humandb/hg19_cytoBand.txt"
+    hg19_gSd: "softwares/annovar/humandb/hg19_genomicSuperDups.txt"
+    hg19_esp: "softwares/annovar/humandb/hg19_esp6500siv2_all.txt"
+    hg19_snp138: "softwares/annovar/humandb/hg19_snp138.txt"
+    hg19_1000g2014oct: "softwares/annovar/humandb/hg19_ALL.sites.2014_10.txt"
+    hg19_exac03nontcga: "softwares/annovar/humandb/hg19_exac03nontcga.txt"
+    hg19_ljb26_all: "softwares/annovar/humandb/hg19_ljb26_all.txt"

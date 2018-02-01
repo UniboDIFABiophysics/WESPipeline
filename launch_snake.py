@@ -14,34 +14,13 @@ currentpath = os.getcwd() + '/'
 
 
 
-#### Parse command line arguments
+#### Parse command line arguments and load CONFIGFILE ####
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-o', required=True, dest='outfolder', action='store', help='name of folder to store current analyses')
-parser.add_argument('-i', required=True, dest='input_list', action='store', help='path to input samples list (no need to provide normal samples)')
 parser.add_argument('-c', required=True, dest='configfile', action='store', help='path to config file')
-parser.add_argument('-p', dest='custom_pair', action='store', help='path to custom TUMOR/NORMAL pairing file')
-parser.add_argument('-s', dest='custom_storepath', action='store', help='alternative path to store results and BAM')
 
 # get arguments
 args = parser.parse_args()
-
-# get OUTFOLDER
-outfolder = args.outfolder
-
-# build and create PROCESSPATH
-processpath = homepath + 'ANALYSES_WES/' + outfolder + '/'
-if not os.path.exists(processpath):
-     os.makedirs(processpath)
-
-
-### get SAMPLE LIST file absolute path
-input_list = args.input_list
-# in case a relative path was given as input
-if not os.path.commonprefix([homepath, input_list]):
-    # append to current path
-    input_list = currentpath + input_list
-
 
 ### get CONFIG file absolute path
 configfile = args.configfile
@@ -50,37 +29,36 @@ if not os.path.commonprefix([homepath, configfile]):
     # append to current path
     configfile = currentpath + configfile
 
-
-### get absolute path to CUSTOM TUMOR/NORMAL pairING file
-custom_pair = args.custom_pair
-if custom_pair:
-    # in case a relative path was given as input
-    if not os.path.commonprefix([homepath, custom_pair]):
-        # append to current path
-        custom_pair = currentpath + custom_pair
-
-
-# get alternative store path (if indicated in command line)
-if args.custom_storepath:
-    storepath = args.custom_storepath + '/'
+## load config file
+with open(configfile) as infile:
+    config = yaml.load(infile)
 
 
 
 
+### build and create PROCESSPATH
+processpath = homepath + 'ANALYSES_WES/' + config['outfolder'] + '/'
+if not os.path.exists(processpath):
+     os.makedirs(processpath)
 
 
-#### Load data
 
-## Load input sample list
+
+### load sample input list
+input_list = homepath + config['input_list_launch_snake']
 with open(input_list) as infile:
     samples = infile.read().splitlines()
 # move sample list file to processpath
 sp.run(' '.join(['cp', input_list, processpath]), shell=True)
 
 
-## load config file for WES
-with open(configfile) as infile:
-    config = yaml.load(infile)
+
+
+### get CUSTOM TUMOR/NORMAL pairing file (if specified in configfile)
+if config['custom_pair']:
+    custom_pair = homepath + config['custom_pair']
+
+
 
 
 # load dataset file and set sample names as indeces
@@ -255,8 +233,16 @@ ordered_pairs = pd.Series(data=largest_size, index=pairs).sort_values().index
 ########################################################################
 
 
+# set --keep-going argument
+if config['keepgoing']:
+    keepgoing = '--keep-going'
+else:
+    keepgoing = ''
 
-### SPLIT THE ORDERED LIST OF PAIRS INTO BATCHES OF 6 PAIRS
+
+
+
+### SPLIT THE ORDERED LIST OF PAIRS INTO BATCHES OF A GIVEN NUMBER OF PAIRS
 ### LAUNCH SNAKEMAKE ON EACH BATCH, ONE BY ONE
 
 # get total number of pairs
@@ -282,10 +268,10 @@ for b in range(0, P, n):
     cmd = ' '.join(['snakemake',
                     '-s', config['snakefile'],
                     '--configfile', configfile,
-                    '--config', 'outfolder=' + outfolder, 'adapters=True',
                     '--use-conda',
                     '--cores', config['cores'],
-                    '--keep-going'
+                    '--resources mem=' + config['resources_mem'],
+                    keepgoing
                    ])
 
     # run snakemake
@@ -294,10 +280,53 @@ for b in range(0, P, n):
     # delete last batch input file
     sp.run('rm %spairs_batch' %processpath, shell=True)
 
-    # copy results to alternative storepath
-    sp.run('rsync -a --ignore-existing %s %s' %(processpath[:-1], storepath), shell=True)
-#%TODO: print message
+    if config['custom_storepath']:
+        storepath = config['custom_storepath']
 
-    # delete BAM/BAI in processpath
-    sp.run('rm %s03_alignment_genome/02_bqsr/*' %processpath, shell=True)
-    sp.run('rm %s05_alignment_MT/02_bqsr/*' %processpath, shell=True)
+        print('\nCopying results of batch %s/%s to %s\n' %(b/n+1, P//n+1, storepath))
+
+        # copy results to alternative storepath
+        sp.run('rsync -a --ignore-existing %s %s' %(processpath[:-1], storepath), shell=True)
+
+        # delete BAM/BAI in processpath
+        sp.run('rm %s03_alignment_genome/02_bqsr/*' %processpath, shell=True)
+        sp.run('rm %s05_alignment_MT/02_bqsr/*' %processpath, shell=True)
+
+
+    if config['log_runs']:
+
+        log_runs_path = homepath + 'ANALYSES_WES/log_runs.tsv'
+        columns = ['run', 'tumor', 'normal', 'analysis']
+
+        # load table or create DF if it doesn't exist
+        try:
+            log_runs = pd.read_table(log_runs_path, sep='\t', header=0, dtype='str')
+        except:
+            log_runs = pd.DataFrame(columns=columns)
+
+        ### create log for current batch ###
+
+        run = [config['outfolder']] * n
+        tumor = [p.split('_')[0] for p in pairs_batch]
+        normal = [p.split('_')[1] for p in pairs_batch]
+        analysis = ['completed'] * n
+
+        if os.path.exists(processpath + 'failed/'):
+            failedpath = processpath + 'failed/'
+            analysis = ['failed' if p in os.listdir(failedpath) else 'completed' for p in pairs_batch]
+
+        df = pd.DataFrame({'run': run,
+                           'tumor': tumor,
+                           'normal': normal,
+                           'analysis': analysis})
+
+        # merge with full log
+        log_runs = pd.concat([log_runs, df])
+
+        # write to file
+        log_runs.to_csv(log_runs_path, sep='\t', index=False)
+
+
+print('EVERY BATCH WERE FULLY ANALYZED - CHECK <failed> FOLDER FOR ANY FAILED SAMPLE PAIRS')
+
+#%TODO: print batch in snakemake messages??

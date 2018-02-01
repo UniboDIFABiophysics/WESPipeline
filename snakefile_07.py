@@ -14,16 +14,14 @@ homepath = os.path.expanduser('~') + '/'
 # set environments path
 pipelinepath = homepath + 'WESPipeline/'
 
-# get current path
-#currentpath = os.getcwd()
-
+# get outfolder
 outfolder = config['outfolder']
 
+# get directory with SCRIPTS
 scripts = config['folders']['scripts']
 
 # build and create PROCESSPATH & STOREPATH
 processpath = homepath + 'ANALYSES_WES/' + outfolder + '/'
-
 if not os.path.exists(processpath):
      os.makedirs(processpath)
 
@@ -35,9 +33,9 @@ data = homepath + config['dataset']
 dataset = pd.read_table(data, sep = '\t',header=0, dtype='str')
 dataset = dataset.set_index("sample_id")
 
-
-
 # References
+black_list = homepath + config['black_list']
+
 hg = homepath + config['fasta']['genome'] # Human Genome Reference
 MT = homepath + config['fasta']['MT']
 nextera = homepath + config['fasta']['nextera']
@@ -90,13 +88,12 @@ annovar_dbs = [homepath + config['annovar_dbs']['hg19_refGene'],
                homepath + config['annovar_dbs']['hg19_snp138'],
                homepath + config['annovar_dbs']['hg19_1000g2014oct'],
                homepath + config['annovar_dbs']['hg19_exac03nontcga'],
-               homepath + config['annovar_dbs']['hg19_ljb26_all'],
+               homepath + config['annovar_dbs']['hg19_ljb26_all']
                ]
 
 
-# script rsIDfilter
-rsIDfilter = pipelinepath + 'scripts/' + config['rsIDfilter']
-
+# script rsIDquery
+rsIDquery = pipelinepath + scripts + config['rsIDquery']
 
 # Label's parameters
 n_sim = config['n_sim']
@@ -116,16 +113,16 @@ minquality = config['adapter_removal_minquality']
 minlength = config['adapter_removal_minlength']
 adapters = config['adapters']
 if adapters:
-    pcr1 = ' --pcr1 ' + config['nextera_transposase_2_rc']
-    pcr2 = ' --pcr2 ' + config['nextera_transposase_1']
+    pcr1 = ' --pcr1 ' + config['adapter_sequence_1']
+    pcr2 = ' --pcr2 ' + config['adapter_sequence_2']
 else:
     pcr1 = ''
     pcr2 = ''
 
 
 #### Load input sample list
-if config['input_list']:
-    input_list = config['input_list']
+if config['input_list_snakemake']:
+    input_list = config['input_list_snakemake']
     with open(input_list) as infile:
         pairs = infile.read().splitlines()
     # move sample list file to processpath
@@ -251,12 +248,15 @@ varscan_MT_logs = varscanpath_MT + 'logs/'
 variants_filter = processpath + '10_variants_filter/'
 variants_filter_logs = variants_filter + 'logs/'
 
-# create a token for each PAIR, which will be deleted at the last step,
-# if the analysis of that pair didn't fail
-failedpath = processpath + 'failed/'
+benchmarkpath = processpath + "benchmarks/"
+
+# create a folder to store tokens for failed samples
+if config['keepgoing']:
+    failed = 'failed/'
+else:
+    failed = ''
+failedpath = processpath + failed
 os.makedirs(failedpath, exist_ok=True)
-for p in pairs:
-    sp.run('> %s%s' % (failedpath, p), shell=True)
 
 
 
@@ -281,9 +281,11 @@ rule all:
         expand(trimmed_logs + "{sample}_discarded.log.gz", sample=samples),
         expand(trimmed_logs + "{sample}_stats.log.gz", sample=samples),
         expand(trimmed_logs + "{sample}_singleton.log.gz", sample=samples),
+        expand(trimmed_logs + '{sample}_settings.log.gz', sample=samples),
         expand(genome_logs + "{sample}_recalibrationPlots.pdf", sample=samples),
         expand(MT_logs + "{sample}_recalibrationPlots.pdf", sample=samples),
-        expand(variants_filter + "{pair}_every_somatic_annotated_filtered_final.tsv", pair=pairs),
+        expand(variants_filter + "{pair}_every_somatic_annotated_labelled.tsv", pair=pairs),
+        expand(variants_filter + "{pair}_every_somatic_annotated_filtered.tsv", pair=pairs),
     message: " THE END "
     run:
        pass
@@ -298,17 +300,17 @@ rule downloadDecompressMergeFastq:
         outpath1 = temp(postprocesspath+ "{sample}_R1.fastq"),
         outpath2 = temp(postprocesspath+ "{sample}_R2.fastq"),
     params:
+        name = "{sample}",
+        processpath = processpath,
+        pairs = pairs,
         fastq_path = lambda wildcards: get_fastq_path(wildcards.sample),
         fastq_cs = lambda wildcards: get_fastq_cs(wildcards.sample),
         scripts = scripts,
-        name = "{sample}",
-        preprocesspath = preprocesspath,
-        postprocesspath = postprocesspath,
     benchmark:
-        processpath + "benchmarks/benchmark_downloadDecompressMergeFastq_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_downloadDecompressMergeFastq_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : downloading, decompressing and merging fastq "
     script:
-        "{params.scripts}"+"downloadDecompressMergeFastq_02.py"
+        "{params.scripts}"+"downloadDecompressMergeFastq_03.py"
 
 
 
@@ -325,7 +327,7 @@ rule fastqc_R1:
   conda:
     pipelinepath + "envs/wes_config_conda.yaml"
   benchmark:
-      processpath + "benchmarks/benchmark_fastqc1_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+      benchmarkpath + "benchmark_fastqc1_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
   message: '>> {wildcards.sample} : fastqc1'
   shell:
     "fastqc -o {params.outpath} {input.fastq1} > {log} 2>&1"
@@ -343,7 +345,7 @@ rule fastqc_R2:
   conda:
     pipelinepath + "envs/wes_config_conda.yaml"
   benchmark:
-      processpath + "benchmarks/benchmark_fastqc2_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+      benchmarkpath + "benchmark_fastqc2_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
   message: '>> {wildcards.sample} : fastqc2'
   shell:
     "fastqc -o {params.outpath} {input.fastq2} > {log} 2>&1"
@@ -359,7 +361,8 @@ rule trim:
         fastq2_trimmed = temp(trimmedpath+"{sample}_R2.fastq"),
         log_disc = trimmed_logs + '{sample}_discarded.log',
         log_stats = trimmed_logs + '{sample}_stats.log',
-        log_sgtn = trimmed_logs + '{sample}_singleton.log',
+        log_singleton = trimmed_logs + '{sample}_singleton.log',
+        log_settings = trimmed_logs + '{sample}_settings.log',
     params:
         pcr1 = pcr1,
         pcr2 = pcr2,
@@ -367,26 +370,28 @@ rule trim:
         minquality = minquality,
         minlength = minlength,
     benchmark:
-        processpath + "benchmarks/benchmark_trim_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_trim_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: '>> {wildcards.sample} : Trimming'
     shell:
-        "{params.adapter_removal} --file1 {input.fastq1} --file2 {input.fastq2}{params.pcr1}{params.pcr2} --stats --trimns --trimqualities --minquality {params.minquality} --minlength {params.minlength} --output1 {output.fastq1_trimmed} --output2 {output.fastq2_trimmed} --discarded {output.log_disc} --outputstats {output.log_stats} --singleton {output.log_sgtn}"
+        "{params.adapter_removal} --file1 {input.fastq1} --file2 {input.fastq2}{params.pcr1}{params.pcr2} --stats --trimns --trimqualities --minquality {params.minquality} --minlength {params.minlength} --output1 {output.fastq1_trimmed} --output2 {output.fastq2_trimmed} --discarded {output.log_disc} --outputstats {output.log_stats} --singleton {output.log_singleton} --settings {output.log_settings}"
 
 
 rule compress_trim_logs:
     input:
         log_disc = trimmed_logs + '{sample}_discarded.log',
         log_stats = trimmed_logs + '{sample}_stats.log',
-        log_sgtn = trimmed_logs + '{sample}_singleton.log',
+        log_singleton = trimmed_logs + '{sample}_singleton.log',
+        log_settings = trimmed_logs + '{sample}_settings.log',
     output:
         log_disc = trimmed_logs + '{sample}_discarded.log.gz',
         log_stats = trimmed_logs + '{sample}_stats.log.gz',
-        log_sgtn = trimmed_logs + '{sample}_singleton.log.gz',
+        log_singleton = trimmed_logs + '{sample}_singleton.log.gz',
+        log_settings = trimmed_logs + '{sample}_settings.log.gz',
     benchmark:
-        processpath + "benchmarks/benchmark_compress_trim_logs_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-    message: '>> {wildcards.sample} : Compress trim logs'
+        benchmarkpath + "benchmark_compress_trim_logs_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    message: '>> {wildcards.sample} : Compressing trim logs'
     shell:
-        'gzip {input.log_disc} {input.log_stats} {input.log_sgtn}'
+        'gzip {input.log_disc} {input.log_stats} {input.log_singleton} {input.log_settings}'
 
 
 rule fastqc_trimmed_R1:
@@ -402,7 +407,7 @@ rule fastqc_trimmed_R1:
   conda:
     pipelinepath + "envs/wes_config_conda.yaml"
   benchmark:
-      processpath + "benchmarks/benchmark_fastqc1_trimmed_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+      benchmarkpath + "benchmark_fastqc1_trimmed_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
   message: '>> {wildcards.sample} : fastqc1 on trimmed fastq'
   shell:
     "fastqc -o {params.outpath} {input} > {log} 2>&1"
@@ -420,7 +425,7 @@ rule fastqc_trimmed_R2:
   conda:
     pipelinepath + "envs/wes_config_conda.yaml"
   benchmark:
-      processpath + "benchmarks/benchmark_fastqc2_trimmed_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+      benchmarkpath + "benchmark_fastqc2_trimmed_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
   message: '>> {wildcards.sample} : fastqc2 on trimmed fastq'
   shell:
     "fastqc -o {params.outpath} {input} > {log} 2>&1"
@@ -452,7 +457,7 @@ rule map_to_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_mapping_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_mapping_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Aligning to reference NUCLEAR GENOME"
     threads: map_thrs
     shell:
@@ -474,7 +479,7 @@ rule sorting_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_sorting_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_sorting_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting genome"
     shell:
         "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
@@ -496,7 +501,7 @@ rule marking_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_marking_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_marking_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : marking genome"
     shell:
         "java -jar {params.picard}MarkDuplicates.jar"
@@ -518,7 +523,7 @@ rule indexing_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_indexing_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_indexing_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : indexing genome"
     shell:
         "java -jar {params.picard}BuildBamIndex.jar INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
@@ -546,7 +551,7 @@ rule RTC_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_RTC_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_RTC_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : RTC genome"
     threads: RT_thrs
     shell:
@@ -573,7 +578,7 @@ rule IndelRealigner_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_IndelRealigner_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_IndelRealigner_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : IndelRealigner genome"
     shell:
         "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -ip 50 -o {output.r_bam} 2> {log}"
@@ -601,7 +606,7 @@ rule BaseRecal_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_BaseRecal_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_BaseRecal_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : BaseRecal genome"
     threads: BaseRecal_thrs
     shell:
@@ -630,7 +635,7 @@ rule PostRecalTable_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_PostRecalTable_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_PostRecalTable_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : PostRecalTable genome"
     threads: BaseRecal_thrs
     shell:
@@ -653,7 +658,7 @@ rule AnalyzeCovariates_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_AnalyzeCovariates_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_AnalyzeCovariates_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : AnalyzeCovariates genome"
     shell:
         "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} 2> {log}"
@@ -677,7 +682,7 @@ rule PrintReads_genome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_PrintReads_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{PrintReads_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, PrintReads_thrs=PrintReads_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_PrintReads_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{PrintReads_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, PrintReads_thrs=PrintReads_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : PrintReads genome"
     threads: PrintReads_thrs
     shell:
@@ -717,7 +722,7 @@ rule map_to_exome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_mapping_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_mapping_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Aligning to reference EXOME"
     threads: map_thrs
     shell:
@@ -739,7 +744,7 @@ rule sorting_exome:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_sorting_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_sorting_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting exome"
     shell:
         "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
@@ -755,7 +760,7 @@ rule extractUnmapped_extract:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_Unmapped_extract_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_Unmapped_extract_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : extractUnmapped extract"
     shell:
         "samtools view -b -f 4 {input} > {output} 2> {log}"
@@ -774,7 +779,7 @@ rule extractUnmapped_convert:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_Unmapped_convert_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_Unmapped_convert_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : extractUnmapped convert"
     shell:
 #        "java -jar -Xmx4g {params.picard}SamToFastq.jar I={input} F={output.unmapped1} F2={output.unmapped2} FU={output.unpair} VALIDATION_STRINGENCY=LENIENT 2> {log}"
@@ -808,7 +813,7 @@ rule map_to_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_mapping_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_mapping_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{map_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, map_thrs=map_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Aligning to reference MITOCHONDRIAL GENOME"
     threads: map_thrs
     shell:
@@ -830,7 +835,7 @@ rule sorting_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_sorting_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_sorting_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting MT"
     shell:
         "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
@@ -852,7 +857,7 @@ rule marking_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_marking_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_marking_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : marking MT"
     shell:
         "java -jar {params.picard}MarkDuplicates.jar"
@@ -874,7 +879,7 @@ rule indexing_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_indexing_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_indexing_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : indexing MT"
     shell:
         "java -jar {params.picard}BuildBamIndex.jar INPUT={input.marked_bam} OUTPUT={output} 2> {log}"
@@ -902,7 +907,7 @@ rule RTC_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_RTC_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_RTC_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{RT_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, RT_thrs=RT_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : RTC MT"
     threads: RT_thrs
     shell:
@@ -929,7 +934,7 @@ rule IndelRealigner_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_IndelRealigner_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_IndelRealigner_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : IndelRealigner MT"
     shell:
         "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -ip 50 -o {output.r_bam} 2> {log}"
@@ -957,7 +962,7 @@ rule BaseRecal_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_BaseRecal_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_BaseRecal_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : BaseRecal MT"
     threads: BaseRecal_thrs
     shell:
@@ -986,7 +991,7 @@ rule PostRecalTable_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_PostRecalTable_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_PostRecalTable_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{BaseRecal_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, BaseRecal_thrs=BaseRecal_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : PostRecalTable MT"
     threads: BaseRecal_thrs
     shell:
@@ -1009,7 +1014,7 @@ rule AnalyzeCovariates_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_AnalyzeCovariates_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_AnalyzeCovariates_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : AnalyzeCovariates MT"
     shell:
         "java -jar {params.gatk} -T AnalyzeCovariates -R {params.ref} -before {input.outtable1} -after {input.outtable2} -plots {output.plots} 2> {log}"
@@ -1035,7 +1040,7 @@ rule PrintReads_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_PrintReads_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{PrintReads_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, PrintReads_thrs=PrintReads_thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_PrintReads_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_{PrintReads_thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, PrintReads_thrs=PrintReads_thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : PrintReads MT"
     threads: PrintReads_thrs
     shell:
@@ -1078,7 +1083,7 @@ rule muTect_genome:
     conda:
         pipelinepath + "envs/wes_config_conda_muTect.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_muTect_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_muTect_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : MuTect on genomic alignment"
     shell:
         "java -Xmx2g -jar {input.muTect} --analysis_type MuTect --reference_sequence {params.ref} --cosmic {input.cosmic} --dbsnp {params.dbsnp} --intervals {input.target} --input_file:normal {input.normal_bam} --input_file:tumor {input.tumor_bam} --out {output.out} --coverage_file {output.cov} > {log.m} 2> {log.err}"
@@ -1108,7 +1113,7 @@ rule muTect_MT:
     conda:
         pipelinepath + "envs/wes_config_conda_muTect.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_muTect_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_muTect_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : MuTect on MT alignment"
     shell:
         "java -Xmx2g -jar {input.muTect} --analysis_type MuTect --reference_sequence {params.ref} --cosmic {input.cosmic} --dbsnp {params.dbsnp} --intervals {input.target} --input_file:normal {input.normal_bam} --input_file:tumor {input.tumor_bam} --out {output.out} --coverage_file {output.cov} > {log.m} 2> {log.err}"
@@ -1139,7 +1144,7 @@ rule varscan_genome_sample:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_varscansample_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_varscansample_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Varscan on sample genomic alignment"
     shell:
         "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.bam} > {output} 2> {log}"
@@ -1162,7 +1167,7 @@ rule varscan_genome_pair:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_varscan_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_varscan_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : Varscan on pair genomic alignment"
     shell:
         "java -jar {input.varscan} somatic {input.normal} {input.tumor} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
@@ -1185,7 +1190,7 @@ rule varscan_MT_sample:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_varscansample_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_varscansample_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : Varscan on sample MT alignment"
     shell:
         "samtools mpileup -B -q 1 -f {params.ref} --positions {input.target} {input.bam} > {output} 2> {log}"
@@ -1208,7 +1213,7 @@ rule varscan_MT_pair:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_varscan_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_varscan_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : Varscan on pair MT alignment"
     shell:
         "java -jar {input.varscan} somatic {input.normal} {input.tumor} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
@@ -1254,7 +1259,7 @@ rule filterSomatic_SNV:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_filterSomatic_SNV_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_filterSomatic_SNV_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : Varscan Filter Somatic SNV"
     shell:
         "java -jar {params.varscan} somaticFilter {input.snp} --indel-file {input.indel} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
@@ -1271,7 +1276,7 @@ rule filterSomatic_Indel:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_filterSomatic_Indel_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_filterSomatic_Indel_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : Varscan Filter Somatic Indel"
     shell:
         "java -jar {params.varscan} somaticFilter {input} --min-coverage 1 --min-reads2 2 --min-var-freq 0.1 --output-file {output} 2> {log}"
@@ -1329,7 +1334,7 @@ rule annovar_genome_mutect:
     log:
         variants_filter_logs + "{pair}_mutect_genome_annovar_err.log"
     benchmark:
-        processpath + "benchmarks/benchmark_annovar_muTect_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_annovar_muTect_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : annotating with ANNOVAR muTect genome variants"
     shell:
         "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
@@ -1350,7 +1355,7 @@ rule annovar_MT_mutect:
     log:
         variants_filter_logs + "{pair}_mutect_mt_g_annovar_err.log"
     benchmark:
-        processpath + "benchmarks/benchmark_annovar_muTect_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_annovar_muTect_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : annotating with ANNOVAR muTect MT variants"
     shell:
         "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
@@ -1387,7 +1392,7 @@ rule annovar_genome_varscan:
     log:
         variants_filter_logs + "{pair}_varscan_genome_annovar_err.log"
     benchmark:
-        processpath + "benchmarks/benchmark_annovar_varscan_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_annovar_varscan_ref_genome_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : annotating with ANNOVAR varscan genome variants"
     shell:
         "perl {params.tableannovar} {input.ann_genome} {params.humandb} -buildver {params.build_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
@@ -1408,13 +1413,15 @@ rule annovar_MT_varscan:
     log:
         variants_filter_logs + "{pair}_varscan_mt_g_annovar_err.log"
     benchmark:
-        processpath + "benchmarks/benchmark_annovar_varscan_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_annovar_varscan_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : annotating with ANNOVAR varscan MT variants"
     shell:
         "perl {params.tableannovar} {input.ann_MT} {params.humandb} -buildver {params.mitochondrial_ver} -out {params.out_label} -remove -protocol {params.protocol} -operation {params.operation} 2> {log}"
 
 
+
 rule MergeMutectVarscan:
+    # in the end, it also saves the list of rsIDs to a table
     input:
         m_gen = variants_filter_logs + "{pair}_mutect_genome.hg19_multianno.txt",
         m_mt = variants_filter_logs + "{pair}_mutect_mt_g.GRCh37_MT_multianno.txt",
@@ -1424,85 +1431,54 @@ rule MergeMutectVarscan:
         vsn_tsv = variants_filter + "{pair}_varscan_somatic.tsv",
     output:
         table_out = variants_filter + "{pair}_every_somatic_annotated.tsv",
+        rsID_table = temp(variants_filter + "{pair}_rsID.tsv"),
     params:
         scripts = scripts,
         workdir = variants_filter_logs,
         name = "{pair}",
     message: ">> {wildcards.pair} : merging muTect and Varscan Variants"
     script:
-        "{params.scripts}"+"MergeMtVar.py"
-
-############ filter on exonic, non-synonymous, polymorphisms
+        "{params.scripts}"+"MergeMtVar_02.py"
 
 
-rule create_rsID_table:
-    input:
-        tsv = variants_filter + "{pair}_every_somatic_annotated.tsv",
-        maf = "/",
-    output:
-        out = temp(variants_filter + "{pair}_rsID.tsv"),
-    params:
-        scripts = scripts,
-    message: ">> {wildcards.pair} : create rsID table"
-    script:
-        "{params.scripts}" + "fEP_script.py"
 
-rule filterExonicPolymorphic:
+rule get_rsID_MAF:
     input:
         variants_filter + "{pair}_rsID.tsv",
     output:
-        temp("{pair}_rsID_maf.tsv")
+        variants_filter_logs + "{pair}_rsID_maf.tsv",
     params:
-        rsIDfilter = rsIDfilter,
+        rsIDquery = rsIDquery,
     log:
-        info = variants_filter_logs + "{pair}_rsID_session_info.log",
-        err_1 = variants_filter_logs + "{pair}_rsID_err_script.log",
-        err_2 = variants_filter_logs + "{pair}_rsID_err.log",
+        variants_filter_logs + "{pair}_rsID_session_info.log",
     conda:
         pipelinepath + "envs/wes_config_conda_R.yaml",
     benchmark:
-        processpath + "benchmarks/benchmark_fEP_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-    message: ">> {wildcards.pair} : filtering exonic/non-synonymous/non-polymorphic"
+        benchmarkpath + "benchmark_get_rsID_MAF_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    message: ">> {wildcards.pair} : Getting rsID MAF"
     shell:
-        "Rscript {params.rsIDfilter} {input} {output} > {log.info} 2> {log.err_1} && "
-        "cat {log.info} {log.err_1} > {log.err_2}"
+        "Rscript {params.rsIDquery} {input} {output} &> {log}"
 
-rule checkMAFs:
+
+
+
+rule label_filter_variants:
     input:
-        tsv = variants_filter + "{pair}_every_somatic_annotated.tsv",
-        maf = "{pair}_rsID_maf.tsv",
+        annotated = variants_filter + "{pair}_every_somatic_annotated.tsv",
+        rsID_maf = variants_filter_logs + "{pair}_rsID_maf.tsv",
     output:
-        out = variants_filter + "{pair}_every_somatic_annotated_filtered.tsv",
+        labelled = variants_filter + "{pair}_every_somatic_annotated_labelled.tsv",
+        filtered = variants_filter + "{pair}_every_somatic_annotated_filtered.tsv",
     params:
         scripts = scripts,
-    message: ">> {wildcards.pair} : checking MAFs"
+        black_list = black_list,
+        processpath = processpath,
+        pair = '{pair}'
+    benchmark:
+        benchmarkpath + "benchmark_labelFilterVariants_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    message: ">> {wildcards.pair} : Labelling and filtering variants"
     script:
-        "{params.scripts}"+"fEP_script.py"
-
-
-rule Remove_segdups:
-    input:
-        segdups = variants_filter + "{pair}_every_somatic_annotated_filtered.tsv",
-        token = failedpath + '{pair}'
-        # normal_token = lambda wildcards: get_token(wildcards.pair,'N', tokenpath),
-        # tumor_token = lambda wildcards: get_token(wildcards.pair,'T', tokenpath),
-    output:
-        no_segdups = variants_filter + "{pair}_every_somatic_annotated_filtered_final.tsv",
-    message: ">> {wildcards.pair} : Removing segdups variants"
-    run:
-        import pandas as pd
-        import os
-
-        T = pd.read_table(input['segdups'],sep='\t')
-        rows_to_drop=[]
-        for index,row in T.iterrows():
-            if not pd.isnull(row['segdups']):
-                rows_to_drop.append(index)
-        T = T.drop(rows_to_drop)
-        T.to_csv(output['no_segdups'],sep='\t',index=False)
-
-        os.remove(input['token'])
-
+        "{params.scripts}"+"labelFilterVariants.py"
 
 
 
@@ -1520,7 +1496,7 @@ rule download_reference:
         zipped = temp(hg+'.gz'),
     version: 0.1
     benchmark:
-        processpath + "benchmarks/benchmark_downloadreference_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_downloadreference_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "downloading HG19"
     shell:
         "wget ftp://ftp.1000genomes.ebi.ac.uk/vol1/ftp/technical/reference/human_g1k_v37.fasta.gz && "
@@ -1532,7 +1508,7 @@ rule gunzip_reference:
     output:
         hg
     benchmark:
-        processpath + "benchmarks/benchmark_gunzip_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_gunzip_ref_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "unzipping HG19"
     shell:
         "gunzip {input.zipped} || true"
@@ -1937,7 +1913,7 @@ rule hg_index_bwa:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_hg_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_hg_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing hg19 with bwa"
     shell:
         "bwa index -a bwtsw {hg}"
@@ -1955,7 +1931,7 @@ rule index_picard_hg:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_hg_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_hg_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing hg19 with picard"
     shell:
         "java -jar {input.picard}CreateSequenceDictionary.jar R={input.hg} O={output}"
@@ -1971,7 +1947,7 @@ rule index_samtools_hg:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_hg_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_hg_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing hg19 with samtools"
     shell:
         "samtools faidx {input.hg} "
@@ -1990,7 +1966,7 @@ rule nextera_index_bwa:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_nextera_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_nextera_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera with bwa"
     shell:
         "bwa index -a bwtsw {input}"
@@ -2008,7 +1984,7 @@ rule index_picard_nextera:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_nextera_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_nextera_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera with picard"
     shell:
         "java -jar {input.picard}CreateSequenceDictionary.jar R={input.nextera} O={output}"
@@ -2024,7 +2000,7 @@ rule index_samtools_nextera:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_nextera_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_nextera_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera with samtools"
     shell:
         "samtools faidx {input} "
@@ -2043,7 +2019,7 @@ rule nextexp_index_bwa:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_nextera_expanded_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_nextera_expanded_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera expanded with bwa"
     shell:
         "bwa index -a bwtsw {input}"
@@ -2061,7 +2037,7 @@ rule index_picard_nextexp:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_nextera_expanded_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_nextera_expanded_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera expanded with picard"
     shell:
         "java -jar {input.picard}CreateSequenceDictionary.jar R={input.nextera_expanded} O={output}"
@@ -2077,7 +2053,7 @@ rule index_samtools_nextexp:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_nextera_expanded_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_nextera_expanded_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing nextera expanded with samtools"
     shell:
         "samtools faidx {input} "
@@ -2094,7 +2070,7 @@ rule truseq_index_bwa:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_truseq_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_truseq_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq with bwa"
     shell:
         "bwa index -a bwtsw {input}"
@@ -2112,7 +2088,7 @@ rule index_picard_truseq:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_truseq_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_truseq_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq with picard"
     shell:
         "java -jar {input.picard}CreateSequenceDictionary.jar R={input.truseq} O={output}"
@@ -2128,7 +2104,7 @@ rule index_samtools_truseq:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_truseq_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_truseq_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq with samtools"
     shell:
         "samtools faidx {input} "
@@ -2146,7 +2122,7 @@ rule truseq_rapid_index_bwa:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_truseq_rapid_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_truseq_rapid_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq_rapid with bwa"
     shell:
         "bwa index -a bwtsw {input}"
@@ -2164,7 +2140,7 @@ rule index_picard_truseq_rapid:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_truseq_rapid_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_truseq_rapid_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq_rapid with picard"
     shell:
         "java -jar {input.picard}CreateSequenceDictionary.jar R={input.truseq_rapid} O={output}"
@@ -2180,7 +2156,7 @@ rule index_samtools_truseq_rapid:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_truseq_rapid_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_truseq_rapid_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing truseq_rapid with samtools"
     shell:
         "samtools faidx {input} "
@@ -2198,7 +2174,7 @@ rule MT_index_bwa:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_MT_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_MT_index_bwa_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing MT with bwa"
     shell:
         "bwa index -a bwtsw {input}"
@@ -2216,7 +2192,7 @@ rule index_picard_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_MT_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_MT_index_picard_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing MT with picard"
     shell:
         "java -jar {input.picard}CreateSequenceDictionary.jar R={input.MT} O={output}"
@@ -2232,7 +2208,7 @@ rule index_samtools_MT:
     conda:
         pipelinepath + "envs/wes_config_conda.yaml"
     benchmark:
-        processpath + "benchmarks/benchmark_MT_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+        benchmarkpath + "benchmark_MT_index_samtools_ref_null_subject_null_n_sim_{n_sim}_cputype_{cpu_type}_thrs_{thrs}_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: "indexing MT with samtools"
     shell:
         "samtools faidx {input} "

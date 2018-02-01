@@ -11,6 +11,7 @@ pip install -U PyYAML
 pip install matplotlib
 pip install pandas
 pip install ipython
+pip install numpy
 conda config --add channels bioconda
 conda install graphviz -y
 mkdir ~/data_ref

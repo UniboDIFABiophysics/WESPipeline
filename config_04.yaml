@@ -10,7 +10,7 @@ input_list_snakemake: ''  # must be a list of pairs like 'tumor_normal'
 
 log_runs: True
 
-dataset: "data_ref/20180118_dataset.tsv"
+dataset: "data_ref/20180201_dataset.tsv"
 black_list: "data_ref/genes_black_list.tsv"
 
 cores: '32'

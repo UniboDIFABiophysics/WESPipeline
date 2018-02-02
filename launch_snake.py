@@ -4,6 +4,7 @@ import subprocess as sp
 import yaml
 import os
 import re
+import math
 
 
 # get home path
@@ -50,13 +51,6 @@ with open(input_list) as infile:
     samples = infile.read().splitlines()
 # move sample list file to processpath
 sp.run(' '.join(['cp', input_list, processpath]), shell=True)
-
-
-
-
-### get CUSTOM TUMOR/NORMAL pairing file (if specified in configfile)
-if config['custom_pair']:
-    custom_pair = homepath + config['custom_pair']
 
 
 
@@ -112,9 +106,11 @@ fastq_size = pd.Series(data=sizes, index=fastqs)
 pair_list = []
 checked_pair_list = []
 
-# if -p option was selected
-if custom_pair:
 
+if config['custom_pair']:
+
+    custom_pair = homepath + config['custom_pair']
+    
     # load custom pairing file
     custom_pair = pd.read_table(custom_pair, sep='\t', header=0, dtype='str')
 
@@ -283,12 +279,12 @@ for b in range(0, P, n):
     if config['custom_storepath']:
         storepath = config['custom_storepath']
 
-        print('\nCopying results of batch %s/%s to %s\n' %(b/n+1, P//n+1, storepath))
+        print('\nCopying results of batch %s/%s to %s\n' %(b+n//n, math.ceil(P/n), storepath))
 
         # copy results to alternative storepath
         sp.run('rsync -a --ignore-existing %s %s' %(processpath[:-1], storepath), shell=True)
 
-        # delete BAM/BAI in processpath
+        # delete .BAM, .BAI in processpath
         sp.run('rm %s03_alignment_genome/02_bqsr/*' %processpath, shell=True)
         sp.run('rm %s05_alignment_MT/02_bqsr/*' %processpath, shell=True)
 
@@ -323,6 +319,12 @@ for b in range(0, P, n):
         # merge with full log
         log_runs = pd.concat([log_runs, df])
 
+        # re-order columns
+        log_runs = log_runs[columns]
+        
+        # drop duplicate rows (in case some analysis was repeated)
+        log_runs.drop_duplicates(inplace=True)
+        
         # write to file
         log_runs.to_csv(log_runs_path, sep='\t', index=False)
 

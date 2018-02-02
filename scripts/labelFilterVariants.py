@@ -14,6 +14,11 @@ def labelFilterVariants(annotated, rsID_maf, black_list, processpath, pair, labe
     # assign 'yes' label to variants that belong to genes in black list
     variants['black_list'] = ['yes' if row.gene in bl else 'no' for _, row in variants.iterrows()]
 
+    # assign 'yes' label to variants that belong to 3 gene families
+    for prefix in ['^MUC', '^OR', '^KRT']:
+        sel = [i for i, row in variants.iterrows() if re.search(prefix, row.gene)]
+        variants.loc[sel, 'black_list'] = 'yes'
+
 
     # get indeces of polymorphisms according to 1000g, ESP and EXAC
     polym_1 = variants[(variants['1000g'] >= 0.01) | (variants.esp >= 0.01) | (variants.exac >= 0.01)].index.tolist()

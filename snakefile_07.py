@@ -132,7 +132,6 @@ else:
         pairs = infile.read().splitlines()
 
 
-
 pairs_dict={}
 # LOOP OVER pairs
 for p in pairs:
@@ -288,7 +287,7 @@ rule all:
         expand(variants_filter + "{pair}_every_somatic_annotated_filtered.tsv", pair=pairs),
     message: " THE END "
     run:
-       pass
+        pass
 
 
 ###########################################################################################

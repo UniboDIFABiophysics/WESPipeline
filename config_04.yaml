@@ -3,9 +3,9 @@ snakefile: 'snakefile_07.py'
 
 keepgoing: True
 
-outfolder: ''
+outfolder: 'launchsnaketest'
 
-input_list_launch_snake: ''
+input_list_launch_snake: 'WESPipeline/input_smallest_fastq_plus_failure.tsv'
 input_list_snakemake: ''  # must be a list of pairs like 'tumor_normal'
 
 log_runs: True

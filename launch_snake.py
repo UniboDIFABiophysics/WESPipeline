@@ -111,21 +111,20 @@ if config['custom_pair']:
 
     custom_pair = homepath + config['custom_pair']
     
+    # move custom pairing file to processpath
+    sp.run(' '.join(['cp', custom_pair, processpath]), shell=True)
+    
     # load custom pairing file
     custom_pair = pd.read_table(custom_pair, sep='\t', header=0, dtype='str')
 
-    # move custom pairing file to processpath
-    sp.run(' '.join(['mv', custom_pair, processpath]), shell=True)
-
-
     # get list of tumors that are both in sample list and custom list
-    tumor = [s for s in samples if s in custom_pair.index]
+    tumor = [s for s in samples if s in custom_pair.tumor.tolist()]
 
     # loop over them
     for t in tumor:
 
         # get normal samples that are paired to t in custom list
-        normal = custom_pair.loc[t, 'normal']
+        normal = custom_pair.loc[custom_pair.tumor == t, 'normal']
 
         # if there is only one normal, concatenate to tumor and add to tumor_normal list
         if type(normal) == str:

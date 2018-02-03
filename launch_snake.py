@@ -177,7 +177,7 @@ for pair in pair_list:
 pairs = list(set(checked_pair_list))
 
 # split every pair and get list of every sample (both tumor and normal)
-samples = [s for p in pairs for s in p.split('_')]
+samples = list(set([s for p in pairs for s in p.split('_')]))
 
 
 
@@ -213,7 +213,7 @@ largest_size = []
 
 # loop over pairs
 for p in pairs:
-
+    
     # get names of tumor and normal
     names = p.split('_')
 

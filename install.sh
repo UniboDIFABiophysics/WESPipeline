@@ -14,6 +14,7 @@ pip install ipython
 pip install numpy
 conda config --add channels bioconda
 conda install graphviz -y
+#conda install retrying
 mkdir ~/data_ref
 echo " " >> ~/.bashrc
 echo "PATH=~/miniconda3/bin:$PATH"  >> ~/.bashrc

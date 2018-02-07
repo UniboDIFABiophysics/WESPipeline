@@ -310,7 +310,7 @@ rule downloadDecompressMergeFastq:
         benchmarkpath + "benchmark_downloadDecompressMergeFastq_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : downloading, decompressing and merging fastq "
     script:
-        "{params.scripts}"+"downloadDecompressMergeFastq_03.py"
+        "{params.scripts}"+"downloadDecompressMergeFastq_04.py"
 
 
 

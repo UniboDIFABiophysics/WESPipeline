@@ -110,10 +110,10 @@ checked_pair_list = []
 if config['custom_pair']:
 
     custom_pair = homepath + config['custom_pair']
-    
+
     # move custom pairing file to processpath
     sp.run(' '.join(['cp', custom_pair, processpath]), shell=True)
-    
+
     # load custom pairing file
     custom_pair = pd.read_table(custom_pair, sep='\t', header=0, dtype='str')
 
@@ -177,7 +177,7 @@ for pair in pair_list:
 pairs = list(set(checked_pair_list))
 
 # split every pair and get list of every sample (both tumor and normal)
-samples = [s for p in pairs for s in p.split('_')]
+samples = list(set([s for p in pairs for s in p.split('_')]))
 
 
 
@@ -320,10 +320,10 @@ for b in range(0, P, n):
 
         # re-order columns
         log_runs = log_runs[columns]
-        
+
         # drop duplicate rows (in case some analysis was repeated)
         log_runs.drop_duplicates(inplace=True)
-        
+
         # write to file
         log_runs.to_csv(log_runs_path, sep='\t', index=False)
 

@@ -3,6 +3,7 @@ def labelFilterVariants(annotated, rsID_maf, black_list, processpath, pair, labe
     import pandas as pd
     import subprocess as sp
     import os
+    import re
 
     # load annotated variants
     variants = pd.read_table(annotated, sep='\t', header=0)

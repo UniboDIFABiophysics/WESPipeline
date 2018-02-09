@@ -213,7 +213,7 @@ largest_size = []
 
 # loop over pairs
 for p in pairs:
-    
+
     # get names of tumor and normal
     names = p.split('_')
 
@@ -265,7 +265,7 @@ for b in range(0, P, n):
                     '--configfile', configfile,
                     '--use-conda',
                     '--cores', config['cores'],
-                    '--resources mem=' + config['resources_mem'],
+                    '--resources disk=1 mem=' + config['resources_mem'],
                     keepgoing
                    ])
 
@@ -278,7 +278,7 @@ for b in range(0, P, n):
     if config['custom_storepath']:
         storepath = config['custom_storepath']
 
-        print('\nCopying results of batch %s/%s to %s\n' %(b+n//n, math.ceil(P/n), storepath))
+        print('\nCopying results of batch %s/%s to %s\n' %(b//n+1, math.ceil(P/n), storepath))
 
         # copy results to alternative storepath
         sp.run('rsync -a --ignore-existing %s %s' %(processpath[:-1], storepath), shell=True)

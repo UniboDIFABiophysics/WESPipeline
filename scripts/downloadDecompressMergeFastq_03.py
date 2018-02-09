@@ -31,11 +31,8 @@ def downloadDecompressMergeFastq(name, processpath, pairs, fastq_path, fastq_cs)
     # loop over them
     for gz in gz_list:
 
-        # decompress it while downloading to inoutpath
-        sp.run(' '.join(['gzip',
-                          '-dc', inpath + gz,
-                          '>', inoutpath + gz[:-3]]), shell=True)
-
+        sp.run('rsync -a %s %s' %(inpath + gz, inoutpath + gz), shell=True)
+        sp.run('gzip -d %s' % inoutpath + gz, shell=True)
 
     # list all fastq for current sample
     current_sample_fastq = [f for f in os.listdir(inoutpath) if re.search(fastq_cs, f)]
@@ -94,17 +91,24 @@ def downloadDecompressMergeFastq(name, processpath, pairs, fastq_path, fastq_cs)
                 # append it to new list
                 R2b.append(r2)
 
+    l = len(R1b)
+
     # join elements in new lists
     R1b = ' '.join(R1b)
     R2b = ' '.join(R2b)
 
-    # concatenate multiple fastq (if there are)
-    sp.run(' '.join(['cat', R1b, '>', outpath + fastq1]), shell=True)
-    sp.run(' '.join(['cat', R2b, '>', outpath + fastq2]), shell=True)
+    if l == 1:
+        # concatenate multiple fastq (if there are)
+        sp.run(' '.join(['mv', R1b, outpath + fastq1]), shell=True)
+        sp.run(' '.join(['mv', R2b, outpath + fastq2]), shell=True)
+    else:
+        # concatenate multiple fastq (if there are)
+        sp.run(' '.join(['cat', R1b, '>', outpath + fastq1]), shell=True)
+        sp.run(' '.join(['cat', R2b, '>', outpath + fastq2]), shell=True)
 
-    # remove pre-processed fastq
-    R = ' '.join(R1 + R2)
-    sp.run('rm %s' %R, shell=True)
+        # remove pre-processed fastq
+        R = ' '.join(R1 + R2)
+        sp.run('rm %s' %R, shell=True)
 
 
 # Snakemake call

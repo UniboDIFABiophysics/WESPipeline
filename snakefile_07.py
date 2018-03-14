@@ -754,20 +754,6 @@ rule sorting_exome:
         "java -jar {input.picard}SortSam.jar INPUT={input.unm_bam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 
-# rule extractUnmapped_extract:
-#     input:
-#         exome_int + "{sample}_sorted.bam",
-#     output:
-#         temp(exome_int + "{sample}_unmapped.bam"),
-#     log:
-#         exome_logs + '{sample}_unmapped.log'
-#     conda:
-#         pipelinepath + "envs/wes_config_conda.yaml"
-#     benchmark:
-#         benchmarkpath + "benchmark_Unmapped_extract_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-#     message: ">> {wildcards.sample} : extractUnmapped extract"
-#     shell:
-#         "samtools view -b -f 4 {input} > {output} 2> {log}"
 
 rule extractUnmapped_convert:
     input:

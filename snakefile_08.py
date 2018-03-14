@@ -306,13 +306,11 @@ rule downloadDecompressMergeFastq:
         fastq_path = lambda wildcards: get_fastq_path(wildcards.sample),
         fastq_cs = lambda wildcards: get_fastq_cs(wildcards.sample),
         scripts = scripts,
-    resources:
-        disk = 1
     benchmark:
         benchmarkpath + "benchmark_downloadDecompressMergeFastq_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : downloading, decompressing and merging fastq "
     script:
-        "{params.scripts}"+"downloadDecompressMergeFastq_03.py"
+        "{params.scripts}"+"downloadDecompressMergeFastq_04.py"
 
 
 
@@ -450,7 +448,7 @@ rule map_to_genome:
         fastq1_trimmed = trimmedpath+"{sample}_R1.fastq",
         fastq2_trimmed = trimmedpath+"{sample}_R2.fastq",
     output:
-        outfile =  temp(genome_int + "{sample}_aligned.bam"),
+        outfile =  temp(genome_int + "{sample}.sam"),
     params:
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
@@ -464,14 +462,14 @@ rule map_to_genome:
     message: ">> {wildcards.sample} : Aligning to reference NUCLEAR GENOME"
     threads: map_thrs
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} 2> {log} | samtools view -b > {output.outfile}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} > {output.outfile} 2> {log}"
 
 rule sorting_genome:
     """
     This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        bam = genome_int + "{sample}_aligned.bam",
+        sam = genome_int + "{sample}.sam",
         picard = picard,
     output:
         outdir = temp(genome_int + "{sample}_sorted.bam"),
@@ -485,7 +483,7 @@ rule sorting_genome:
         benchmarkpath + "benchmark_sorting_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting genome"
     shell:
-        "java -jar {input.picard}SortSam.jar INPUT={input.bam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
+        "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 rule marking_genome:
     """
@@ -715,8 +713,7 @@ rule map_to_exome:
         fastq1_trimmed = trimmedpath+"{sample}_R1.fastq",
         fastq2_trimmed = trimmedpath+"{sample}_R2.fastq",
     output:
-#        outfile =  temp(exome_int + "{sample}_aligned.bam"),
-        outfile =  temp(exome_int + "{sample}_unmapped.bam"),
+        outfile =  temp(exome_int + "{sample}.sam"),
     params:
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
@@ -730,17 +727,17 @@ rule map_to_exome:
     message: ">> {wildcards.sample} : Aligning to reference EXOME"
     threads: map_thrs
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} 2> {log} | samtools view -b -f 4 > {output.outfile}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.fastq1_trimmed} {input.fastq2_trimmed} > {output.outfile} 2> {log}"
 
 rule sorting_exome:
     """
     This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        unm_bam = exome_int + "{sample}_unmapped.bam",
+        sam = exome_int + "{sample}.sam",
         picard = picard,
     output:
-        outdir = temp(exome_int + "{sample}_unmapped_sorted.bam"),
+        outdir = temp(exome_int + "{sample}_sorted.bam"),
     params:
         tmp = tmp_dir,
     log:
@@ -751,27 +748,27 @@ rule sorting_exome:
         benchmarkpath + "benchmark_sorting_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting exome"
     shell:
-        "java -jar {input.picard}SortSam.jar INPUT={input.unm_bam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
+        "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 
-# rule extractUnmapped_extract:
-#     input:
-#         exome_int + "{sample}_sorted.bam",
-#     output:
-#         temp(exome_int + "{sample}_unmapped.bam"),
-#     log:
-#         exome_logs + '{sample}_unmapped.log'
-#     conda:
-#         pipelinepath + "envs/wes_config_conda.yaml"
-#     benchmark:
-#         benchmarkpath + "benchmark_Unmapped_extract_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
-#     message: ">> {wildcards.sample} : extractUnmapped extract"
-#     shell:
-#         "samtools view -b -f 4 {input} > {output} 2> {log}"
+rule extractUnmapped_extract:
+    input:
+        exome_int + "{sample}_sorted.bam",
+    output:
+        temp(exome_int + "{sample}_unmapped.bam"),
+    log:
+        exome_logs + '{sample}_unmapped.log'
+    conda:
+        pipelinepath + "envs/wes_config_conda.yaml"
+    benchmark:
+        benchmarkpath + "benchmark_Unmapped_extract_ref_exome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
+    message: ">> {wildcards.sample} : extractUnmapped extract"
+    shell:
+        "samtools view -b -f 4 {input} > {output} 2> {log}"
 
 rule extractUnmapped_convert:
     input:
-        exome_int + "{sample}_unmapped_sorted.bam",
+        exome_int + "{sample}_unmapped.bam",
     output:
         unmapped1 = temp(alignpath_exomeunmapped + "{sample}_R1.unmapped.fastq"),
         unmapped2 = temp(alignpath_exomeunmapped + "{sample}_R2.unmapped.fastq"),
@@ -807,7 +804,7 @@ rule map_to_MT:
         unmapped2 = alignpath_exomeunmapped + "{sample}_R2.unmapped.fastq",
         unpair = alignpath_exomeunmapped + "{sample}_unpaired.unmapped.fastq",
     output:
-        outfile =  temp(MT_int + "{sample}_aligned.bam"),
+        outfile =  temp(MT_int + "{sample}.sam"),
     params:
         library = lambda wildcards: get_kit(wildcards.sample),
         platform = platform,
@@ -821,14 +818,14 @@ rule map_to_MT:
     message: ">> {wildcards.sample} : Aligning to reference MITOCHONDRIAL GENOME"
     threads: map_thrs
     shell:
-        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.unmapped1} {input.unmapped2} 2> {log} | samtools view -b > {output.outfile}"
+        "bwa mem -M -t {threads} -R \'@RG\\tID:{params.name}\\tSM:{params.name}\\tPL:{params.platform}\\tLB:{params.library}\\tPU:PE\' {input.reference} {input.unmapped1} {input.unmapped2} > {output.outfile} 2> {log}"
 
 rule sorting_MT:
     """
     This tool sorts the input SAM or BAM file by coordinate.
     """
     input:
-        bam = MT_int + "{sample}_aligned.bam",
+        sam = MT_int + "{sample}.sam",
         picard = picard,
     output:
         outdir = temp(MT_int + "{sample}_sorted.bam"),
@@ -842,7 +839,7 @@ rule sorting_MT:
         benchmarkpath + "benchmark_sorting_ref_MT_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : sorting MT"
     shell:
-        "java -jar {input.picard}SortSam.jar INPUT={input.bam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
+        "java -jar {input.picard}SortSam.jar INPUT={input.sam} OUTPUT={output.outdir} SORT_ORDER=coordinate TMP_DIR={params.tmp} 2> {log}"
 
 rule marking_MT:
     """

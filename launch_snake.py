@@ -265,7 +265,7 @@ for b in range(0, P, n):
                     '--configfile', configfile,
                     '--use-conda',
                     '--cores', config['cores'],
-                    '--resources disk=' + config['disk'], 'mem=' + config['resources_mem'],
+                    '--resources disk=1 mem=' + config['resources_mem'],
                     keepgoing
                    ])
 

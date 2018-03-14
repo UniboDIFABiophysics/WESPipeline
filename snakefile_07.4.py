@@ -95,6 +95,10 @@ annovar_dbs = [homepath + config['annovar_dbs']['hg19_refGene'],
 # script rsIDquery
 rsIDquery = pipelinepath + scripts + config['rsIDquery']
 
+# script checkMpileupSize
+checkMpileupSize = pipelinepath + scripts + config['checkMpileupSize']
+
+
 # Label's parameters
 n_sim = config['n_sim']
 cpu_type = config['cpu_type']
@@ -372,6 +376,8 @@ rule trim:
         adapter_removal=adapter_removal,
         minquality = minquality,
         minlength = minlength,
+#        resources:
+#        disk = 1
     benchmark:
         benchmarkpath + "benchmark_trim_ref_null_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: '>> {wildcards.sample} : Trimming'
@@ -584,7 +590,8 @@ rule IndelRealigner_genome:
         benchmarkpath + "benchmark_IndelRealigner_ref_genome_subject_{sample}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.sample} : IndelRealigner genome"
     shell:
-        "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -ip 50 -o {output.r_bam} 2> {log}"
+#        "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -ip 50 -o {output.r_bam} 2> {log}"
+        "java -jar {params.gatk} -T IndelRealigner -R {params.ref} -I {input.bam} -targetIntervals {input.intvs} -known {params.indels_ref} -o {output.r_bam} 2> {log}"
 
 
 rule BaseRecal_genome:
@@ -1198,6 +1205,7 @@ rule varscan_MT_pair:
         indel = varscanpath_MT + "{pair}_indel.tsv",
     params:
         ref = MT,
+        checkMpileupSize = checkMpileupSize,
     log:
         varscan_MT_logs + "{pair}_varscan.log"
     conda:
@@ -1206,6 +1214,7 @@ rule varscan_MT_pair:
         benchmarkpath + "benchmark_varscan_ref_MT_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : Varscan on pair MT alignment"
     shell:
+        "python3 {params.checkMpileupSize} -normal {input.normal} -tumor {input.tumor} && "
         "java -jar {input.varscan} somatic {input.normal} {input.tumor} --output-snp {output.snv} --output-indel {output.indel} --min-avg-qual 15 --strand_filter 1 --min-var-freq 0.05 --somatic-p-value 0.05 2> {log}"
 
 
@@ -1234,7 +1243,7 @@ rule MergeWriteVariants:
         outdir = variants_filter,
     message: ">> {wildcards.pair} : Merge and Write Variants"
     script:
-        "{params.scripts}"+"MergeWriteVariants.py"
+        "{params.scripts}"+"MergeWriteVariants_02.py"
 
 rule filterSomatic_SNV:
     input:
@@ -1468,7 +1477,7 @@ rule label_filter_variants:
         benchmarkpath + "benchmark_labelFilterVariants_ref_null_subject_{pair}" + "_n_sim_{n_sim}_cputype_{cpu_type}_Totthrs_{thrs}_Rulethrs_1_ncpu_{n_cpu}.txt".format(n_sim=n_sim, cpu_type=cpu_type, thrs=thrs, n_cpu=n_cpu)
     message: ">> {wildcards.pair} : Labelling and filtering variants"
     script:
-        "{params.scripts}"+"labelFilterVariants.py"
+        "{params.scripts}"+"labelFilterVariants_02.py"
 
 
 

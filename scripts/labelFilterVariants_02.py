@@ -69,8 +69,9 @@ def labelFilterVariants(annotated, rsID_maf, black_list, processpath, pair, labe
 
     # delete token file if --keep-going argument was specified in SNAKEMAKE
     if os.path.exists(processpath + 'failed/'):
-        failedpath = processpath + 'failed/'
-        os.remove(failedpath + pair)
+        token = processpath + 'failed/' + pair
+        if os.path.exists(token):
+            os.remove(token)
 
 
 

@@ -283,9 +283,16 @@ for b in range(0, P, n):
         # copy results to alternative storepath
         sp.run('rsync -a --ignore-existing %s %s' %(processpath[:-1], storepath), shell=True)
 
+
+
+    if config['delete_bam']:
+
+        print('\nDeleting bqsr BAMs of batch %s/%s\n' %(b//n+1, math.ceil(P/n)))
+
         # delete .BAM, .BAI in processpath
         sp.run('rm %s03_alignment_genome/02_bqsr/*' %processpath, shell=True)
         sp.run('rm %s05_alignment_MT/02_bqsr/*' %processpath, shell=True)
+
 
 
     if config['log_runs']:

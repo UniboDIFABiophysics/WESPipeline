@@ -21,8 +21,9 @@ outtable = args[2]
 rsIDs = read.delim(input_table, sep="\t", header=F, quote="", stringsAsFactors=F)[,1]
 
 # the number of rsIDs that can be passed in to one request is limited
-# therefore, if there are more than 300 I split them in group of 300 and make multiple queries
-q = 300
+# I conducted some empirical trials
+# if there are more than 298 I split them in groups of 298 and make multiple queries
+q = 298
 
 if(length(rsIDs)>q){
 
@@ -36,6 +37,8 @@ if(length(rsIDs)>q){
     if(i<groups){l2 = q*i}else{l2 = n}
     ids = rsIDs[l1:l2]
     rsIDs_annotated<-rbind(rsIDs_annotated, ncbi_snp_query(ids))
+    write.table(rsIDs_annotated, file=outtable, sep="\t", row.names=F, col.names=T, dec=".", quote=F)
+    
   }
 
 }else{rsIDs_annotated<-ncbi_snp_query(rsIDs)}

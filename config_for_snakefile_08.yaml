@@ -1,0 +1,113 @@
+
+snakefile: 'snakefile_08.py'
+
+keepgoing: True
+
+outfolder: '...'
+
+input_list_launch_snake: 'RUN/..../input.....tsv'
+input_list_snakemake: ''  # must be a list of pairs like 'tumor_normal'
+
+log_runs: True
+
+dataset: "data_ref_02/20180201_dataset.tsv"
+black_list: "data_ref_02/180202_genes_black_list.tsv"
+red_list: 'data_ref_02/180416_genes_red_list.tsv'
+rsID_dict: 'data_ref_02/180416_snp138_polymorphisms_from_ucsc.json'
+
+cores: '24'
+resources_mem: '250'
+disk: '1'
+cpu_type: 'NA'
+n_sim: '1'
+n_cpu: '1'
+threads: 28
+
+map_thrs: 4
+RT_thrs: 4
+BaseRecal_thrs: 4
+PrintReads_thrs: 4
+
+batch_size: 6
+
+custom_storepath: '/home/PERSONALE/eugenio.fonzi2/NAS/DATA/stor-rw/eugenio_wes/'
+
+delete_bam: True
+delete_trim_logs: True
+
+custom_pair: ''
+
+adapters: True
+# this is nextera transposase 2 rerverse complement
+adapter_sequence_1: 'CTGTCTCTTATACACATCTCCGAGCCCACGAGAC'
+# this is nextera transposase 1
+adapter_sequence_2: 'TCGTCGGCAGCGTCAGATGTGTATAAGAGACAG'
+
+adapter_removal_minquality: '20'
+adapter_removal_minlength: '76'
+
+
+fasta:
+  MT: 'data_ref_02/MT.fasta'
+  genome: 'data_ref_02/human_g1k_v37.fasta' #Human Genome Reference
+  nextera: 'data_ref_02/nextera.fasta'
+  nextera_expanded: 'data_ref_02/nextera_expanded.fasta'
+  truseq: 'data_ref_02/truseq.fasta'
+  truseq_rapid: 'data_ref_02/truseq_rapid.fasta'
+
+bed:
+  MT: "data_ref_02/MT"
+  nextera: "data_ref_02/nexterarapidcapture_exome_targetedregions_v1.2"
+  nextera_expanded: 'data_ref_02/nexterarapidcapture_expandedexome_targetedregions'
+  truseq: "data_ref_02/truseq-exome-targeted-regions-manifest-v1-2"
+  truseq_rapid: "data_ref_02/truseq-rapid-exome-targeted-regions-manifest-v1-2"
+
+#ADD SOMATICFILTER OPTIONS!!
+
+protocols:
+  genome: "refGene,cytoBand,genomicSuperDups,esp6500siv2_all,snp138,1000g2014oct_all,exac03nontcga,ljb26_all"
+  mt: "ensGene"
+
+operations:
+  genome: "g,r,r,f,f,f,f,f"
+  mt: "g"
+
+checkMpileupSize: 'checkMpileupSize.py'
+
+ref-files:
+    ## For IndelRealigner
+    indels_ref: 'data_ref_02/Mills_and_1000G_gold_standard.indels.b37.vcf' # The current best set of known indels to be used for local realignment
+    dbsnp: 'data_ref_02/dbsnp_138.b37.vcf' # SNPs database
+    cosmic: 'data_ref_02/b37_cosmic_v54_120711.vcf' # Catalog of somatic mutation in cancer
+    ## For Annovar
+    humandb: 'softwares/annovar/humandb' # Annovar human databases folder
+    buildver: 'hg19' # Set build version
+    dbsnp_ver: 'snp138' # Set SNP database version
+    buildver_mt: 'GRCh37_MT' # Set parameter command for annotating mitochondria variants
+
+folders:
+    scripts: 'scripts/'
+    annovar: 'softwares/annovar/'
+    softwares: 'softwares/'
+
+softwares:
+    gatk: 'softwares/GenomeAnalysisTK-3.4-0/GenomeAnalysisTK.jar'
+    muTect: 'softwares/muTect-1.1.4.jar'
+    annotate: 'softwares/annovar/annotate_variation.pl'
+    tableannovar: 'softwares/annovar/table_annovar.pl'
+    adapter_removal: 'softwares/adapter_removal_1.5.4/AdapterRemoval'
+    picard: 'softwares/picard-tools-1.119/'
+    varscan: 'softwares/VarScan.v2.3.9.jar'
+
+sample-details:
+    platform: 'illumina' # Set platform for mapping
+
+annovar_dbs:
+    hg19_refGene: "softwares/annovar/humandb/hg19_refGene.txt"
+    hg19_cytoBand: "softwares/annovar/humandb/hg19_cytoBand.txt"
+    hg19_gSd: "softwares/annovar/humandb/hg19_genomicSuperDups.txt"
+    hg19_esp: "softwares/annovar/humandb/hg19_esp6500siv2_all.txt"
+    hg19_snp138: "softwares/annovar/humandb/hg19_snp138.txt"
+    hg19_1000g2014oct: "softwares/annovar/humandb/hg19_ALL.sites.2014_10.txt"
+    hg19_exac03nontcga: "softwares/annovar/humandb/hg19_exac03nontcga.txt"
+    hg19_ljb26_all: "softwares/annovar/humandb/hg19_ljb26_all.txt"

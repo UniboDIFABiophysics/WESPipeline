@@ -224,7 +224,6 @@ for p in pairs:
 ordered_pairs = pd.Series(data=largest_size, index=pairs).sort_values().index
 
 
-
 ########################################################################
 
 

@@ -239,15 +239,14 @@ def mergeAnnotateLabelFilter(mutect_infile, varscan_infile, tableannovar, varfil
 
 
 
-    # keep 'Somatic' and 'LOH'
-    variants = variants.loc[(variants.somatic_status == 'Somatic') |
-                            (variants.somatic_status == 'LOH'),]
+    # remove 'Germline' and 'Unknown' (this keeps the NaN!!!)
+    variants = variants.loc[~variants.somatic_status.isin(['Germline', 'Unknown']),]
 
-    # keep those that passed VARSCAN's 'somaticFilter'
-    variants = variants.loc[variants.somaticFilter == 'passed',]
+    # keep those that passed VARSCAN's 'somaticFilter' (and the NaN!!!)
+    variants = variants.loc[variants.somaticFilter != 'not_passed',]
 
-    # keep those without STRAND BIAS in tumor ALT reads
-    variants = variants.loc[variants.tumor_strand_bias == 'no',]
+    # keep those without STRAND BIAS in tumor ALT reads (and the NaN!!!)
+    variants = variants.loc[variants.tumor_strand_bias != 'yes',]
 
     # write FILTERED variants to file
     variants.to_csv(filtered, sep='\t', index=False)
